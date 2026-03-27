@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { NodeDeleteButton } from "@/components/node-delete-button";
@@ -73,11 +74,14 @@ export default async function NodePage({
             <div className="overflow-hidden border border-white/5 bg-surface-low">
               <div className="aspect-[2/3] bg-[#0e0e0e]">
                 {node.coverImage ? (
-                  <img
+                  <Image
                     alt={node.title}
                     className="h-full w-full object-cover"
+                    height={1080}
                     loading="lazy"
-                    src={getPosterImageUrl(node.coverImage, "detail")}
+                    sizes="(max-width: 1280px) 100vw, 360px"
+                    src={getPosterImageUrl(node.coverImage, "detail") ?? ""}
+                    width={720}
                   />
                 ) : null}
               </div>

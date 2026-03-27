@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 
 type Crumb = {
   label: string;
@@ -7,10 +6,10 @@ type Crumb = {
 };
 
 export function PlatformHeader({
+  crumbs,
   eyebrow,
   title,
   description,
-  crumbs,
   actions,
   titleClassName,
   variant = "hero",
@@ -23,6 +22,8 @@ export function PlatformHeader({
   titleClassName?: string;
   variant?: "hero" | "compact";
 }) {
+  void crumbs;
+
   if (variant === "compact") {
     return (
       <div className="mb-10">

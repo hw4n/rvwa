@@ -13,7 +13,6 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   formatMetadataValueForInput,
-  inferMetadataFieldType,
   isValidMetadataKeyInput,
   metadataFieldTypeOptions,
   normalizeMetadataKey,

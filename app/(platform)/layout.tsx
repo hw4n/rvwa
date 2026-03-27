@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { PlatformShell } from "@/components/platform-shell";
 
 export default async function PlatformLayout({
@@ -5,5 +6,9 @@ export default async function PlatformLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <PlatformShell>{children}</PlatformShell>;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0e0e0e]" />}>
+      <PlatformShell>{children}</PlatformShell>
+    </Suspense>
+  );
 }

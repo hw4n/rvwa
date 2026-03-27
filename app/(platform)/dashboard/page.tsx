@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { PosterRatingBadge } from "@/components/poster-rating-badge";
 import { PlatformHeader } from "@/components/platform-header";
@@ -27,11 +28,13 @@ export default async function DashboardPage() {
             >
               <div className="aspect-[2/3] bg-surface-low border border-white/5 flex flex-col items-center justify-center p-6 relative overflow-hidden transition-all group-hover:scale-[1.02] group-hover:border-primary/40">
                  {review.coverImage ? (
-                   <img
+                   <Image
                      alt={getReviewDisplayTitle(review)}
                      className="absolute inset-0 h-full w-full object-cover"
+                     fill
                      loading="lazy"
-                     src={getPosterImageUrl(review.coverImage, "card")}
+                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+                     src={getPosterImageUrl(review.coverImage, "card") ?? ""}
                    />
                  ) : null}
                  <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />

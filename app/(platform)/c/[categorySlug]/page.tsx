@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CategoryDeleteButton } from "@/components/category-delete-button";
@@ -70,11 +71,13 @@ export default async function CategoryPage({
             >
               <div className="aspect-[2/3] bg-surface-low border border-white/5 flex flex-col items-center justify-center p-6 relative overflow-hidden transition-all group-hover:scale-[1.02] group-hover:border-primary/30">
                  {node.coverImage ? (
-                   <img
+                   <Image
                      alt={node.title}
                      className="absolute inset-0 h-full w-full object-cover"
+                     fill
                      loading="lazy"
-                     src={getPosterImageUrl(node.coverImage, "card")}
+                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+                     src={getPosterImageUrl(node.coverImage, "card") ?? ""}
                    />
                  ) : null}
                  <PosterRatingBadge rating={node.rating} />

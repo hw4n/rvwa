@@ -5,126 +5,107 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-background: #0e0e0e;        /* 최하단 배경 */
+  --color-foreground: #ececec;
+  
+  --color-surface-lowest: #0e0e0e;    /* 사이드 레일 */
+  --color-surface-low: #131313;       /* 서브 패널 */
+  --color-surface-mid: #0e0e0e;       /* 메인 콘텐츠 배경 */
+  --color-surface-high: #1c1b1b;      /* 카드 및 콘텐츠 블록 */
+  --color-surface-highest: #2a2a2a;   /* 호버 및 활성 상태 */
+  
+  --color-primary: #b0c6ff;           /* 매트릭스 블루 */
+  --color-secondary: #c9c6c5;
+  --color-tertiary: #ffb599;          /* 매트릭스 액센트 */
+  
+  --color-border: rgba(255, 255, 255, 0.05);
+  --color-muted-foreground: #8c90a1;
+  
+  --font-sans: var(--font-noto-sans-kr);
+  --font-mono: var(--font-noto-sans-kr);
+  --font-heading: var(--font-noto-sans-kr);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0e0e0e;
+  --foreground: #ececec;
+  --primary: #b0c6ff;
+  --border: rgba(255, 255, 255, 0.05);
+  --radius: 0px; /* 모든 둥근 모서리 제거 */
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  html { font-size: 120%; }
+  * { @apply border-border outline-none rounded-none!; }
+  body { @apply bg-surface-mid text-foreground font-sans antialiased; letter-spacing: -0.02em; }
+  body, button, input, textarea, select, option { font-family: var(--font-noto-sans-kr), sans-serif; }
+  /* 아바타와 같이 명시적으로 둥글어야 하는 요소만 예외 처리 */
+  .rounded-full { border-radius: 9999px !important; }
+}
+
+@layer utilities {
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #2a2a2a #0e0e0e;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
-  html {
-    @apply font-sans;
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
   }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 0;
+    border: 2px solid #0e0e0e;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #b0c6ff;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  .icon-rail-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #2a2a2a transparent;
+  }
+
+  .icon-rail-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .icon-rail-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .icon-rail-scrollbar::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 0;
+  }
+
+  /* 매트릭스 카드: 중첩된 박스 느낌을 없애고 평면적으로 구성 */
+  .matrix-card {
+    @apply bg-surface-low p-6 border-l-2 border-primary/50 hover:bg-surface-high transition-colors duration-200;
+  }
+
+  .meta-label {
+    @apply font-bold text-[10px] uppercase tracking-[0.2em] text-[#8c90a1]/40;
+  }
+
+  .display-number {
+    @apply font-black text-5xl tracking-tighter text-tertiary uppercase italic;
+  }
+
+  .matrix-input {
+    @apply bg-surface-lowest border border-white/10 px-4 py-2 text-sm focus:border-primary/40 focus:bg-surface-low transition-all rounded-none!;
+  }
+
 }

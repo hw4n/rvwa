@@ -6,9 +6,8 @@ import {
 export default function AdminReviewLoading() {
   return (
     <div className="space-y-16">
-      <CompactHeaderSkeleton showActions={0} showEyebrow={false} titleWidth="w-1/4" />
+      <CompactHeaderSkeleton showActions={0} showDescription={false} showEyebrow={false} showTitle={false} />
       <AdminReviewListSkeleton />
     </div>
   );
 }
-

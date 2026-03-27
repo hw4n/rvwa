@@ -6,9 +6,8 @@ import {
 export default function NodeLoading() {
   return (
     <div className="space-y-8">
-      <CompactHeaderSkeleton showActions={3} showEyebrow />
+      <CompactHeaderSkeleton showActions={2} showEyebrow titleWidth="w-1/3" />
       <NodeReviewLayoutSkeleton />
     </div>
   );
 }
-

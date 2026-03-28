@@ -203,6 +203,8 @@ export function NodeCreateForm({
   const [error, setError] = React.useState("");
   const [clipboardMessage, setClipboardMessage] = React.useState("");
   const [queuedPosterDeletes, setQueuedPosterDeletes] = React.useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const formRef = React.useRef<HTMLFormElement | null>(null);
 
   function getAttributes() {
     const nextAttributes: Record<string, string | number | boolean | string[]> = {};
@@ -355,14 +357,48 @@ export function NodeCreateForm({
     return () => window.removeEventListener("paste", handlePaste);
   }, [definedFieldsByKey]);
 
+  React.useEffect(() => {
+    if (!isEdit) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.isComposing || event.repeat) {
+        return;
+      }
+
+      if (event.key !== "S" || !event.shiftKey || event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (isSubmitting) {
+        return;
+      }
+
+      formRef.current?.requestSubmit();
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isEdit, isSubmitting]);
+
   return (
     <form
       className="bg-[#131313] p-10 border-l-2 border-primary/50 space-y-6"
+      ref={formRef}
       onSubmit={async (event) => {
         event.preventDefault();
+        if (isSubmitting) {
+          return;
+        }
+
+        setIsSubmitting(true);
         setError("");
         if (!isValidItemSlugInput(slug)) {
           setError("항목 slug에는 어떤 언어든 문자, 숫자, 공백, 하이픈을 사용할 수 있습니다.");
+          setIsSubmitting(false);
           return;
         }
         try {
@@ -388,6 +424,7 @@ export function NodeCreateForm({
           router.push(`/n/${result.slug}`);
         } catch (caught) {
           setError(caught instanceof Error ? caught.message : isEdit ? "수정에 실패했습니다." : "생성에 실패했습니다.");
+          setIsSubmitting(false);
         }
       }}
     >
@@ -528,7 +565,7 @@ export function NodeCreateForm({
       </div>
       {clipboardMessage ? <p className="text-[11px] font-bold uppercase tracking-widest text-primary">{clipboardMessage}</p> : null}
       {error ? <p className="text-[11px] font-bold uppercase tracking-widest text-red-400">{error}</p> : null}
-      <Button className="rounded-none bg-primary hover:bg-primary/80" type="submit">
+      <Button className="rounded-none bg-primary hover:bg-primary/80" disabled={isSubmitting} type="submit">
         {isEdit ? "저장" : "생성"}
       </Button>
     </form>

@@ -662,7 +662,7 @@ function CollectionLink({
       href={href}
     >
       <span
-        className={`block text-sm font-bold tracking-tight transition-colors duration-200 ${active ? "text-primary" : "text-white/70 group-hover:text-primary group-hover:opacity-100"
+        className={`block truncate text-sm tracking-tight transition-colors duration-200 ${active ? "text-primary" : "text-white/70 group-hover:text-primary group-hover:opacity-100"
           }`}
       >
         {title}

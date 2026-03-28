@@ -61,16 +61,21 @@ export function NodeReviews({
           className="block group border-b border-white/5 pb-8 last:border-0 last:pb-0"
         >
           <article className="space-y-4">
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
-              <div className="min-w-0 space-y-3">
-                <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
-                  {new Date(review.updatedAt).toLocaleDateString("ko-KR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
+              <div className="min-w-0">
+                <div className="space-y-2">
+                  <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
+                    {new Date(review.updatedAt).toLocaleDateString("ko-KR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </div>
+                  <div className="text-xs font-black uppercase tracking-[0.2em] text-[#ff9b70]/90">
+                    {review.author?.name ?? "익명"}
+                  </div>
                 </div>
-                <p className="text-sm leading-relaxed text-[#c2c6d8] font-medium line-clamp-3">
+                <p className="mt-0.5 text-sm leading-relaxed text-[#c2c6d8] font-medium line-clamp-3">
                   {reviewTitle
                     ? reviewTitle
                     : review.body

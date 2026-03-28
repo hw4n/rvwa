@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { mutationGeneric as mutation, queryGeneric as query } from "convex/server";
+import { mutationGeneric as mutation, paginationOptsValidator, queryGeneric as query } from "convex/server";
 import { v } from "convex/values";
 import { normalizeStoredRating } from "../lib/review-rating";
 import {
@@ -146,6 +146,64 @@ export const getView = query({
       nodeCount: nodes.length,
       reviewCount: approvedReviews.length,
       topTags,
+    };
+  },
+});
+
+export const listRootsPage = query({
+  args: {
+    slug: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const category = await ctx.db
+      .query("categories")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .unique();
+
+    if (!category) {
+      throw new Error("Category not found");
+    }
+
+    const page = await ctx.db
+      .query("nodes")
+      .withIndex("by_category", (q) => q.eq("categorySlug", category.slug))
+      .paginate(args.paginationOpts);
+
+    const roots = page.page.filter((node) => !node.parentId);
+    const averageRatings = new Map<string, number>();
+
+    await Promise.all(
+      roots.map(async (node) => {
+        const reviews = await ctx.db
+          .query("reviews")
+          .withIndex("by_node", (q) => q.eq("nodeId", node._id))
+          .collect();
+
+        const values = reviews
+          .filter((review) => review.status === "approved")
+          .map((review) => normalizeStoredRating(review.rating))
+          .filter((rating): rating is number => typeof rating === "number");
+
+        if (!values.length) {
+          return;
+        }
+
+        averageRatings.set(
+          node._id,
+          Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 1000) / 1000
+        );
+      })
+    );
+
+    return {
+      ...page,
+      page: roots.map((node) =>
+        toNode({
+          ...(node as any),
+          rating: averageRatings.get(node._id),
+        })
+      ),
     };
   },
 });

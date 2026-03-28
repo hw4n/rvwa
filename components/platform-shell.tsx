@@ -246,6 +246,7 @@ export function PlatformShell({
                   key={entry.id}
                   title={entry.spoiler ? "<스포일러 리뷰>" : getReviewDisplayTitle(entry)}
                   author={entry.author?.name}
+                  itemName={entry.nodeTitle ?? entry.proposedTitle}
                   spoiler={entry.spoiler}
                   score={entry.rating}
                 />
@@ -806,6 +807,7 @@ function CollectionLink({
   title,
   category,
   author,
+  itemName,
   score,
   spoiler = false,
   active = false,
@@ -814,6 +816,7 @@ function CollectionLink({
   title: string;
   category?: string;
   author?: string;
+  itemName?: string;
   score?: number;
   spoiler?: boolean;
   active?: boolean;
@@ -845,7 +848,7 @@ function CollectionLink({
           {category}
         </span>
       ) : null}
-      {(author || typeof score === "number") ? (
+      {(author || typeof score === "number" || itemName) ? (
         <span
           className={`mt-0.5 block text-[10px] leading-tight transition-colors duration-200 ${active ? "text-white/60" : "text-muted-foreground/55"
             }`}
@@ -853,6 +856,8 @@ function CollectionLink({
           {author ? <span>{author}</span> : null}
           {author && typeof score === "number" ? <span className="text-[#aeb5d5]"> · </span> : null}
           {typeof score === "number" ? <span>{formatCompactRating(score)}</span> : null}
+          {(author || typeof score === "number") && itemName ? <span className="text-[#aeb5d5]"> · </span> : null}
+          {itemName ? <span>{itemName}</span> : null}
         </span>
       ) : null}
     </Link>

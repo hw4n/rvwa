@@ -81,6 +81,7 @@ export default async function NodePage({
                     loading="lazy"
                     sizes="(max-width: 1280px) 100vw, 360px"
                     src={getPosterImageUrl(node.coverImage, "detail") ?? ""}
+                    unoptimized
                     width={720}
                   />
                 ) : null}

@@ -35,6 +35,7 @@ export default async function DashboardPage() {
                      loading="lazy"
                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
                      src={getPosterImageUrl(review.coverImage, "card") ?? ""}
+                     unoptimized
                    />
                  ) : null}
                  <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />

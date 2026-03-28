@@ -359,6 +359,7 @@ export const resolveAndApprove = mutation({
     newCategoryName: v.optional(v.string()),
     newCategorySlug: v.optional(v.string()),
     newItemTitle: v.optional(v.string()),
+    newItemSummary: v.optional(v.string()),
     newItemSlug: v.optional(v.string()),
     coverImage: v.optional(v.string()),
     attributes: v.optional(v.record(v.string(), v.any())),
@@ -424,7 +425,8 @@ export const resolveAndApprove = mutation({
         categorySlug: category.slug,
         parentId: undefined,
         summary: sanitizeRequiredText(
-          excerptFromBody(review.body, itemTitle),
+          sanitizeOptionalText(args.newItemSummary, "Item summary", INPUT_LIMITS.nodeSummary) ||
+            excerptFromBody(review.body, itemTitle),
           "Item summary",
           INPUT_LIMITS.nodeSummary
         ),

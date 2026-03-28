@@ -21,7 +21,7 @@ import {
 } from "@/lib/metadata";
 import { formatCompactRating } from "@/lib/review-rating";
 import { getReviewDisplayTitle } from "@/lib/review-display";
-import { isValidCategorySlugInput, isValidItemSlugInput } from "@/lib/slug";
+import { isValidCategorySlugInput, isValidItemSlugInput, normalizeSearchSlug } from "@/lib/slug";
 
 type EditableMetadataRow = {
   id: string;
@@ -96,7 +96,9 @@ export function ReviewModerationList() {
   const [newCategoryNames, setNewCategoryNames] = React.useState<Record<string, string>>({});
   const [newCategorySlugs, setNewCategorySlugs] = React.useState<Record<string, string>>({});
   const [newItemTitles, setNewItemTitles] = React.useState<Record<string, string>>({});
+  const [newItemSummaries, setNewItemSummaries] = React.useState<Record<string, string>>({});
   const [newItemSlugs, setNewItemSlugs] = React.useState<Record<string, string>>({});
+  const [newItemSlugOverrides, setNewItemSlugOverrides] = React.useState<Record<string, boolean>>({});
   const [coverImages, setCoverImages] = React.useState<Record<string, string>>({});
   const [definedValuesByReview, setDefinedValuesByReview] = React.useState<
     Record<string, Record<string, string | boolean>>
@@ -107,11 +109,6 @@ export function ReviewModerationList() {
   const [messages, setMessages] = React.useState<Record<string, string>>({});
 
   const activeReview = reviews.find((review) => review.id === openReviewId) ?? null;
-
-  if (!reviews.length) {
-    return <div className="text-sm text-[#8c90a1]">승인 대기 중인 리뷰가 없습니다.</div>;
-  }
-
   const selectedItemId = activeReview
     ? selectedItemIds[activeReview.id] ?? activeReview.nodeId ?? ""
     : "";
@@ -128,12 +125,23 @@ export function ReviewModerationList() {
   const activeNewItemTitle = activeReview
     ? newItemTitles[activeReview.id] ?? activeReview.proposedTitle ?? activeReview.nodeTitle ?? ""
     : "";
-  const activeNewItemSlug = activeReview ? newItemSlugs[activeReview.id] ?? "" : "";
+  const activeNewItemSummary = activeReview ? newItemSummaries[activeReview.id] ?? "" : "";
+  const activeAutoNewItemSlug = normalizeSearchSlug(activeNewItemTitle);
+  const activeHasManualNewItemSlug = activeReview ? newItemSlugOverrides[activeReview.id] ?? false : false;
+  const activeNewItemSlug = activeReview
+    ? activeHasManualNewItemSlug
+      ? newItemSlugs[activeReview.id] ?? ""
+      : activeAutoNewItemSlug
+    : "";
   const activeCoverImage = activeReview ? coverImages[activeReview.id] ?? "" : "";
   const activeCategory = categories.find((category) => category.slug === activeCategorySlug);
   const activeDefinedValues = activeReview ? definedValuesByReview[activeReview.id] ?? {} : {};
   const activeCustomRows = activeReview ? customRowsByReview[activeReview.id] ?? [] : [];
   const message = activeReview ? messages[activeReview.id] : "";
+
+  if (!reviews.length) {
+    return <div className="text-sm text-[#8c90a1]">승인 대기 중인 리뷰가 없습니다.</div>;
+  }
 
   function getAttributes(reviewId: string, category: Category | undefined) {
     const nextAttributes: Record<string, string | number | boolean | string[]> = {};
@@ -210,6 +218,7 @@ export function ReviewModerationList() {
         newCategoryName: selectedItem ? undefined : activeNewCategoryName || undefined,
         newCategorySlug: selectedItem ? undefined : activeNewCategorySlug || undefined,
         newItemTitle: selectedItem ? undefined : activeNewItemTitle || undefined,
+        newItemSummary: selectedItem ? undefined : activeNewItemSummary || undefined,
         newItemSlug: selectedItem ? undefined : activeNewItemSlug || undefined,
         coverImage: selectedItem ? undefined : activeCoverImage || undefined,
         attributes: selectedItem ? undefined : getAttributes(activeReview.id, activeCategory),
@@ -322,7 +331,7 @@ export function ReviewModerationList() {
                 <div className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
                     <select
-                      className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
+                      className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white md:col-span-2"
                       onChange={(event) => {
                         const value = event.currentTarget.value;
                         setCategorySlugs((current) => ({ ...current, [activeReview.id]: value }));
@@ -336,24 +345,28 @@ export function ReviewModerationList() {
                         </option>
                       ))}
                     </select>
-                    <input
-                      className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
-                      onChange={(event) => {
-                        const value = event.currentTarget.value;
-                        setNewCategoryNames((current) => ({ ...current, [activeReview.id]: value }));
-                      }}
-                      placeholder="새 카테고리 이름"
-                      value={activeNewCategoryName}
-                    />
-                    <input
-                      className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
-                      onChange={(event) => {
-                        const value = event.currentTarget.value;
-                        setNewCategorySlugs((current) => ({ ...current, [activeReview.id]: value }));
-                      }}
-                      placeholder="새 카테고리 slug"
-                      value={activeNewCategorySlug}
-                    />
+                    {!activeCategorySlug ? (
+                      <>
+                        <input
+                          className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
+                          onChange={(event) => {
+                            const value = event.currentTarget.value;
+                            setNewCategoryNames((current) => ({ ...current, [activeReview.id]: value }));
+                          }}
+                          placeholder="새 카테고리 이름"
+                          value={activeNewCategoryName}
+                        />
+                        <input
+                          className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
+                          onChange={(event) => {
+                            const value = event.currentTarget.value;
+                            setNewCategorySlugs((current) => ({ ...current, [activeReview.id]: value }));
+                          }}
+                          placeholder="새 카테고리 slug"
+                          value={activeNewCategorySlug}
+                        />
+                      </>
+                    ) : null}
                     <input
                       className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
                       onChange={(event) => {
@@ -368,11 +381,25 @@ export function ReviewModerationList() {
                       onChange={(event) => {
                         const value = event.currentTarget.value;
                         setNewItemSlugs((current) => ({ ...current, [activeReview.id]: value }));
+                        setNewItemSlugOverrides((current) => ({
+                          ...current,
+                          [activeReview.id]: Boolean(value.trim()) && value !== normalizeSearchSlug(activeNewItemTitle),
+                        }));
                       }}
                       placeholder="새 항목 slug"
                       value={activeNewItemSlug}
                     />
                   </div>
+
+                  <textarea
+                    className="min-h-28 w-full border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm text-white placeholder:text-white/30"
+                    onChange={(event) => {
+                      const value = event.currentTarget.value;
+                      setNewItemSummaries((current) => ({ ...current, [activeReview.id]: value }));
+                    }}
+                    placeholder="새 항목 설명"
+                    value={activeNewItemSummary}
+                  />
 
                   <PosterUploadField
                     onChange={(value) =>

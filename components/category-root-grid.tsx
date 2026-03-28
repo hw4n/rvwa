@@ -1,8 +1,10 @@
 "use client";
 
+import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePaginatedQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { PosterRatingBadge } from "@/components/poster-rating-badge";
 import { getPosterImageUrl } from "@/lib/poster";
 
@@ -15,7 +17,7 @@ export function CategoryRootGrid({
 }) {
   const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
   const { results, status, isLoading, loadMore } = usePaginatedQuery(
-    "categories:listRootsPage" as any,
+    api.categories.listRootsPage,
     { slug: categorySlug },
     { initialNumItems: PAGE_SIZE }
   );

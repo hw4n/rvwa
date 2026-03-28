@@ -247,91 +247,94 @@ export function NodeCreateForm({
     return nextAttributes;
   }
 
-  async function applyClipboardJson(rawText: string, options?: { silent?: boolean }) {
-    try {
-      const parsed = JSON.parse(rawText) as Record<string, unknown>;
+  const applyClipboardJson = React.useCallback(
+    async (rawText: string, options?: { silent?: boolean }) => {
+      try {
+        const parsed = JSON.parse(rawText) as Record<string, unknown>;
 
-      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-        if (!options?.silent) {
-          setClipboardMessage("");
-          setError("클립보드에 JSON 객체가 없습니다.");
-        }
-        return false;
-      }
-
-      const nextDefinedValues: Record<string, string | boolean> = {};
-      let nextTags: string | null = null;
-      let nextPoster: string | null = null;
-      let appliedCount = 0;
-
-      for (const [rawKey, rawValue] of Object.entries(parsed)) {
-        if (rawValue == null) {
-          continue;
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+          if (!options?.silent) {
+            setClipboardMessage("");
+            setError("클립보드에 JSON 객체가 없습니다.");
+          }
+          return false;
         }
 
-        const key = normalizeMetadataKey(rawKey);
-        if (!key) {
-          continue;
-        }
+        const nextDefinedValues: Record<string, string | boolean> = {};
+        let nextTags: string | null = null;
+        let nextPoster: string | null = null;
+        let appliedCount = 0;
 
-        if (key === "tags") {
-          nextTags = Array.isArray(rawValue)
-            ? rawValue.map((entry) => String(entry).trim()).filter(Boolean).join(", ")
-            : String(rawValue ?? "");
-          appliedCount += 1;
-          continue;
-        }
+        for (const [rawKey, rawValue] of Object.entries(parsed)) {
+          if (rawValue == null) {
+            continue;
+          }
 
-        if (key === "poster") {
-          const posterValue = String(rawValue ?? "").trim();
-          if (posterValue) {
-            nextPoster = posterValue.startsWith("data:image/")
-              ? await uploadPosterFromDataUrl(posterValue)
-              : posterValue;
+          const key = normalizeMetadataKey(rawKey);
+          if (!key) {
+            continue;
+          }
+
+          if (key === "tags") {
+            nextTags = Array.isArray(rawValue)
+              ? rawValue.map((entry) => String(entry).trim()).filter(Boolean).join(", ")
+              : String(rawValue ?? "");
+            appliedCount += 1;
+            continue;
+          }
+
+          if (key === "poster") {
+            const posterValue = String(rawValue ?? "").trim();
+            if (posterValue) {
+              nextPoster = posterValue.startsWith("data:image/")
+                ? await uploadPosterFromDataUrl(posterValue)
+                : posterValue;
+              appliedCount += 1;
+            }
+            continue;
+          }
+
+          const definedField = definedFieldsByKey.get(key);
+          if (definedField) {
+            nextDefinedValues[key] = formatClipboardValueForInput(rawValue, definedField.type);
             appliedCount += 1;
           }
-          continue;
         }
 
-        const definedField = definedFieldsByKey.get(key);
-        if (definedField) {
-          nextDefinedValues[key] = formatClipboardValueForInput(rawValue, definedField.type);
-          appliedCount += 1;
+        setDefinedValues((current) => ({
+          ...current,
+          ...nextDefinedValues,
+        }));
+
+        if (!appliedCount) {
+          if (!options?.silent) {
+            setClipboardMessage("");
+            setError("적용할 수 있는 정의된 메타데이터나 tags가 없습니다.");
+          }
+          return false;
         }
-      }
 
-      setDefinedValues((current) => ({
-        ...current,
-        ...nextDefinedValues,
-      }));
+        if (nextTags !== null) {
+          setTags(nextTags);
+        }
 
-      if (!appliedCount) {
+        if (nextPoster !== null) {
+          setCoverImage(nextPoster);
+        }
+
+        setError("");
+        setClipboardMessage(`클립보드 JSON에서 ${appliedCount}개 필드를 채웠습니다.`);
+        return true;
+      } catch (caught) {
         if (!options?.silent) {
           setClipboardMessage("");
-          setError("적용할 수 있는 정의된 메타데이터나 tags가 없습니다.");
+          setError(caught instanceof Error ? caught.message : "클립보드 자동 채우기에 실패했습니다.");
         }
         return false;
       }
-
-      if (nextTags !== null) {
-        setTags(nextTags);
-      }
-
-      if (nextPoster !== null) {
-        setCoverImage(nextPoster);
-      }
-
-      setError("");
-      setClipboardMessage(`클립보드 JSON에서 ${appliedCount}개 필드를 채웠습니다.`);
-      return true;
-    } catch (caught) {
-      if (!options?.silent) {
-        setClipboardMessage("");
-        setError(caught instanceof Error ? caught.message : "클립보드 자동 채우기에 실패했습니다.");
-      }
-      return false;
-    }
-  }
+    },
+    [definedFieldsByKey]
+  );
 
   React.useEffect(() => {
     async function handlePaste(event: ClipboardEvent) {
@@ -355,7 +358,7 @@ export function NodeCreateForm({
 
     window.addEventListener("paste", handlePaste);
     return () => window.removeEventListener("paste", handlePaste);
-  }, [definedFieldsByKey]);
+  }, [applyClipboardJson]);
 
   React.useEffect(() => {
     if (!isEdit) {

@@ -527,6 +527,7 @@ function DesktopNodeSearch({
             <div className="grid gap-px bg-white/5">
               {matches.map((item, index) => (
                 <button
+                  aria-selected={index === activeIndex}
                   className={`flex items-center justify-between gap-3 bg-[#101010] px-4 py-3 text-left transition-colors ${
                     index === activeIndex ? "bg-[#181818]" : "hover:bg-[#181818]"
                   }`}

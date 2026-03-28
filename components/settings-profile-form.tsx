@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -14,7 +15,7 @@ export function SettingsProfileForm({
   email: string;
 }) {
   const router = useRouter();
-  const updateDisplayName = useMutation("users:updateDisplayName" as any);
+  const updateDisplayName = useMutation(api.users.updateDisplayName);
   const [displayName, setDisplayName] = React.useState(initialDisplayName);
   const [error, setError] = React.useState("");
   const [status, setStatus] = React.useState("");

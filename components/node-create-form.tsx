@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PosterUploadField } from "@/components/poster-upload-field";
 import { Switch } from "@/components/ui/switch";
+import { validatePosterFile } from "@/lib/poster";
 import {
   formatMetadataValueForInput,
   inferMetadataFieldType,
@@ -33,6 +34,33 @@ function createEmptyMetadataRow(): EditableMetadataRow {
     type: "text",
     value: "",
   };
+}
+
+function formatClipboardValueForInput(
+  value: unknown,
+  type: MetadataFieldType
+): string | boolean {
+  if (type === "boolean") {
+    if (typeof value === "boolean") {
+      return value;
+    }
+
+    if (typeof value === "string") {
+      return value.trim().toLowerCase() === "true";
+    }
+
+    return Boolean(value);
+  }
+
+  if (type === "list") {
+    if (Array.isArray(value)) {
+      return value.map((entry) => String(entry).trim()).filter(Boolean).join(", ");
+    }
+
+    return String(value ?? "");
+  }
+
+  return value == null ? "" : String(value);
 }
 
 function MetadataValueInput({
@@ -77,6 +105,53 @@ async function deletePosterQueue(urls: string[]) {
   );
 }
 
+async function requestPosterUpload(file: File) {
+  const presignResponse = await fetch("/api/posters/upload", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      fileName: file.name,
+      contentType: file.type,
+      size: file.size,
+    }),
+  });
+
+  const presignPayload = (await presignResponse.json().catch(() => null)) as
+    | { uploadUrl?: string; publicUrl?: string; message?: string }
+    | null;
+
+  if (!presignResponse.ok || !presignPayload?.uploadUrl || !presignPayload.publicUrl) {
+    throw new Error(presignPayload?.message ?? "포스터 업로드 준비에 실패했습니다.");
+  }
+
+  const uploadResponse = await fetch(presignPayload.uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type,
+    },
+    body: file,
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error("포스터 업로드에 실패했습니다.");
+  }
+
+  return presignPayload.publicUrl;
+}
+
+async function uploadPosterFromDataUrl(dataUrl: string) {
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
+  const contentType = blob.type || "image/png";
+  const extension = contentType.split("/")[1] || "png";
+  const file = new File([blob], `clipboard-poster.${extension}`, { type: contentType });
+
+  validatePosterFile(file);
+  return requestPosterUpload(file);
+}
+
 export function NodeCreateForm({
   category,
   nodes,
@@ -92,6 +167,10 @@ export function NodeCreateForm({
   const isEdit = Boolean(initialNode);
   const definedFieldKeys = React.useMemo(
     () => new Set(category.fieldDefinitions.map((field) => field.key)),
+    [category.fieldDefinitions]
+  );
+  const definedFieldsByKey = React.useMemo(
+    () => new Map(category.fieldDefinitions.map((field) => [normalizeMetadataKey(field.key), field])),
     [category.fieldDefinitions]
   );
   const [title, setTitle] = React.useState(initialNode?.title ?? "");
@@ -122,6 +201,7 @@ export function NodeCreateForm({
       })
   );
   const [error, setError] = React.useState("");
+  const [clipboardMessage, setClipboardMessage] = React.useState("");
   const [queuedPosterDeletes, setQueuedPosterDeletes] = React.useState<string[]>([]);
 
   function getAttributes() {
@@ -164,6 +244,116 @@ export function NodeCreateForm({
 
     return nextAttributes;
   }
+
+  async function applyClipboardJson(rawText: string, options?: { silent?: boolean }) {
+    try {
+      const parsed = JSON.parse(rawText) as Record<string, unknown>;
+
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        if (!options?.silent) {
+          setClipboardMessage("");
+          setError("클립보드에 JSON 객체가 없습니다.");
+        }
+        return false;
+      }
+
+      const nextDefinedValues: Record<string, string | boolean> = {};
+      let nextTags: string | null = null;
+      let nextPoster: string | null = null;
+      let appliedCount = 0;
+
+      for (const [rawKey, rawValue] of Object.entries(parsed)) {
+        if (rawValue == null) {
+          continue;
+        }
+
+        const key = normalizeMetadataKey(rawKey);
+        if (!key) {
+          continue;
+        }
+
+        if (key === "tags") {
+          nextTags = Array.isArray(rawValue)
+            ? rawValue.map((entry) => String(entry).trim()).filter(Boolean).join(", ")
+            : String(rawValue ?? "");
+          appliedCount += 1;
+          continue;
+        }
+
+        if (key === "poster") {
+          const posterValue = String(rawValue ?? "").trim();
+          if (posterValue) {
+            nextPoster = posterValue.startsWith("data:image/")
+              ? await uploadPosterFromDataUrl(posterValue)
+              : posterValue;
+            appliedCount += 1;
+          }
+          continue;
+        }
+
+        const definedField = definedFieldsByKey.get(key);
+        if (definedField) {
+          nextDefinedValues[key] = formatClipboardValueForInput(rawValue, definedField.type);
+          appliedCount += 1;
+        }
+      }
+
+      setDefinedValues((current) => ({
+        ...current,
+        ...nextDefinedValues,
+      }));
+
+      if (!appliedCount) {
+        if (!options?.silent) {
+          setClipboardMessage("");
+          setError("적용할 수 있는 정의된 메타데이터나 tags가 없습니다.");
+        }
+        return false;
+      }
+
+      if (nextTags !== null) {
+        setTags(nextTags);
+      }
+
+      if (nextPoster !== null) {
+        setCoverImage(nextPoster);
+      }
+
+      setError("");
+      setClipboardMessage(`클립보드 JSON에서 ${appliedCount}개 필드를 채웠습니다.`);
+      return true;
+    } catch (caught) {
+      if (!options?.silent) {
+        setClipboardMessage("");
+        setError(caught instanceof Error ? caught.message : "클립보드 자동 채우기에 실패했습니다.");
+      }
+      return false;
+    }
+  }
+
+  React.useEffect(() => {
+    async function handlePaste(event: ClipboardEvent) {
+      const rawText = event.clipboardData?.getData("text");
+      if (!rawText) {
+        return;
+      }
+
+      const trimmed = rawText.trim();
+      if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
+        return;
+      }
+
+      event.preventDefault();
+      const applied = await applyClipboardJson(rawText, { silent: true });
+      if (!applied) {
+        setClipboardMessage("");
+        setError("붙여넣은 JSON에서 적용할 수 있는 메타데이터, tags 또는 poster를 찾지 못했습니다.");
+      }
+    }
+
+    window.addEventListener("paste", handlePaste);
+    return () => window.removeEventListener("paste", handlePaste);
+  }, [definedFieldsByKey]);
 
   return (
     <form
@@ -336,6 +526,7 @@ export function NodeCreateForm({
           </div>
         ))}
       </div>
+      {clipboardMessage ? <p className="text-[11px] font-bold uppercase tracking-widest text-primary">{clipboardMessage}</p> : null}
       {error ? <p className="text-[11px] font-bold uppercase tracking-widest text-red-400">{error}</p> : null}
       <Button className="rounded-none bg-primary hover:bg-primary/80" type="submit">
         {isEdit ? "저장" : "생성"}

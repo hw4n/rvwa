@@ -12,7 +12,7 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
   const router = useRouter();
   const { signIn } = useAuthActions();
   const { isAuthenticated, isLoading } = useConvexAuth();
-  const [handle, setHandle] = React.useState("");
+  const [displayName, setDisplayName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
@@ -34,7 +34,7 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
         flow: mode,
         email,
         password,
-        handle,
+        displayName,
       });
       router.replace("/dashboard");
       router.refresh();
@@ -53,9 +53,9 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
       {mode === "signUp" ? (
         <Input
           className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
-          onChange={(event) => setHandle(event.currentTarget.value)}
-          placeholder="handle"
-          value={handle}
+          onChange={(event) => setDisplayName(event.currentTarget.value)}
+          placeholder="display name"
+          value={displayName}
         />
       ) : null}
       <Input

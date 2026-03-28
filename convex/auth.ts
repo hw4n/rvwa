@@ -10,7 +10,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         const email = String(params.email ?? "").trim().toLowerCase();
         const fallbackName = email.split("@")[0] ?? "member";
         const rawHandle = sanitizeOptionalText(
-          String(params.handle ?? fallbackName),
+          String(params.displayName ?? params.handle ?? fallbackName),
           "Handle",
           INPUT_LIMITS.handle
         );

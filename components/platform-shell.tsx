@@ -189,6 +189,9 @@ export function PlatformShell({
           label={pendingCount ? `검토 대기 ${pendingCount}` : "검토 대기"}
         />
       ) : null}
+      {!authIsPending && viewer ? (
+        <DrawerLink active={pathname.startsWith("/settings")} href="/settings" icon="settings" label="설정" />
+      ) : null}
       <div className="border-t border-white/10" />
       <nav className="min-h-9 px-3 py-2 text-[11px] text-[#a2a6bb]/60">
         <Breadcrumb>
@@ -268,9 +271,12 @@ export function PlatformShell({
           />
         ))}
       </nav>
-      {!authIsPending && viewer?.role === "admin" ? (
+      {!authIsPending && viewer ? (
         <div className="border-t border-white/5">
-          <RailLink active={pathname.startsWith("/admin/categories/")} href="/admin/categories/new" icon="add" label="추가" />
+          {viewer.role === "admin" ? (
+            <RailLink active={pathname.startsWith("/admin/categories/")} href="/admin/categories/new" icon="add" label="추가" />
+          ) : null}
+          <RailLink active={pathname.startsWith("/settings")} href="/settings" icon="settings" label="설정" />
         </div>
       ) : null}
     </>
@@ -484,6 +490,10 @@ function resolveTopCrumbs(
 
   if (pathname.startsWith("/my-reviews")) {
     return [{ label: "내 리뷰" }];
+  }
+
+  if (pathname.startsWith("/settings")) {
+    return [{ label: "설정" }];
   }
 
   if (pathname.startsWith("/login")) {

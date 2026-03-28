@@ -13,9 +13,9 @@ const noto_sans_kr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "rvwa",
+  title: "R.",
   description:
-    "A generalized review workspace for anime, films, restaurants, dishes, and anything else that deserves structure.",
+    "모든 것에 대하여 리뷰를 작성하고 공유할 수 있는 곳.",
 };
 
 function RootDocument({ children }: { children: React.ReactNode }) {

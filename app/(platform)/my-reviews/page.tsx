@@ -44,7 +44,7 @@ export default async function MyReviewsPage() {
                 </div>
                 </div>
 
-                <h3 className="text-sm font-black text-white uppercase tracking-tight group-hover:text-primary transition-colors line-clamp-2 text-center leading-tight">
+                <h3 className="text-sm font-black text-white tracking-tight group-hover:text-primary transition-colors line-clamp-2 text-center leading-tight">
                   {getReviewDisplayTitle(review)}
                 </h3>
               </Link>

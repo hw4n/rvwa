@@ -21,6 +21,7 @@ import {
 } from "@/lib/metadata";
 import { formatCompactRating } from "@/lib/review-rating";
 import { getReviewDisplayTitle } from "@/lib/review-display";
+import { ReviewSpoilerGate } from "@/components/review-spoiler-gate";
 import { isValidCategorySlugInput, isValidItemSlugInput, normalizeSearchSlug } from "@/lib/slug";
 
 type EditableMetadataRow = {
@@ -302,9 +303,21 @@ export function ReviewModerationList() {
             <div className="grid gap-6 p-1">
               <section className="space-y-2">
                 <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#8c90a1]">리뷰 본문</p>
-                <div className="max-h-44 whitespace-pre-line overflow-auto border border-white/8 bg-[#0e0e0e] px-4 py-3 text-sm text-[#c2c6d8]">
-                  {activeReview.body}
-                </div>
+                {activeReview.spoiler ? (
+                  <ReviewSpoilerGate
+                    confirmLabel="본문 확인"
+                    description="검토 대상 본문에 스포일러가 포함되어 있습니다."
+                    title="스포일러 본문"
+                  >
+                    <div className="max-h-44 whitespace-pre-line overflow-auto border border-white/8 bg-[#0e0e0e] px-4 py-3 text-sm text-[#c2c6d8]">
+                      {activeReview.body}
+                    </div>
+                  </ReviewSpoilerGate>
+                ) : (
+                  <div className="max-h-44 whitespace-pre-line overflow-auto border border-white/8 bg-[#0e0e0e] px-4 py-3 text-sm text-[#c2c6d8]">
+                    {activeReview.body}
+                  </div>
+                )}
               </section>
 
               <section className="space-y-2">

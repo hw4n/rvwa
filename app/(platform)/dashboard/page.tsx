@@ -54,7 +54,7 @@ export default async function DashboardPage() {
                  </div>
               </div>
               <div className="space-y-2">
-                <h3 className="text-sm font-black text-white uppercase tracking-tight group-hover:text-primary transition-colors line-clamp-2 text-center leading-tight">
+                <h3 className="text-sm font-black text-white tracking-tight group-hover:text-primary transition-colors line-clamp-2 text-center leading-tight">
                   {getReviewDisplayTitle(review)}
                 </h3>
               </div>

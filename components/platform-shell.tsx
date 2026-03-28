@@ -244,8 +244,9 @@ export function PlatformShell({
                   active={isReviewDetail ? entry.id === reviewId : false}
                   href={reviewItemHref}
                   key={entry.id}
-                  title={getReviewDisplayTitle(entry)}
+                  title={entry.spoiler ? "<스포일러 리뷰>" : getReviewDisplayTitle(entry)}
                   author={entry.author?.name}
+                  spoiler={entry.spoiler}
                   score={entry.rating}
                 />
               );
@@ -806,6 +807,7 @@ function CollectionLink({
   category,
   author,
   score,
+  spoiler = false,
   active = false,
 }: {
   href: string;
@@ -813,6 +815,7 @@ function CollectionLink({
   category?: string;
   author?: string;
   score?: number;
+  spoiler?: boolean;
   active?: boolean;
 }) {
   return (
@@ -822,7 +825,14 @@ function CollectionLink({
       href={href}
     >
       <span
-        className={`block truncate text-sm tracking-tight transition-colors duration-200 ${active ? "text-primary" : "text-white/70 group-hover:text-primary group-hover:opacity-100"
+        className={`block truncate text-sm tracking-tight transition-colors duration-200 ${
+          spoiler
+            ? active
+              ? "text-red-300"
+              : "text-red-300/80 group-hover:text-red-200 group-hover:opacity-100"
+            : active
+              ? "text-primary"
+              : "text-white/70 group-hover:text-primary group-hover:opacity-100"
           }`}
       >
         {title}

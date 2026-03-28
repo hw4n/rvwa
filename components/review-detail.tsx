@@ -3,6 +3,7 @@ import type { Review } from "@/lib/domain";
 import { MarkdownPreview } from "@/components/markdown-preview";
 import { ReviewRatingDisplay } from "@/components/review-rating-display";
 import { getReviewExplicitTitle } from "@/lib/review-display";
+import { ReviewSpoilerGate } from "@/components/review-spoiler-gate";
 
 export function ReviewDetail({
   review,
@@ -20,6 +21,18 @@ export function ReviewDetail({
   }
 
   const reviewTitle = getReviewExplicitTitle(review);
+  const reviewContent = (
+    <div className="min-w-0 space-y-4">
+      {reviewTitle ? (
+        <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-tight">
+          {reviewTitle}
+        </h2>
+      ) : null}
+      <div className="leading-relaxed font-medium text-[#c2c6d8]">
+        <MarkdownPreview body={review.body} />
+      </div>
+    </div>
+  );
 
   return (
     <article className="space-y-8">
@@ -39,14 +52,13 @@ export function ReviewDetail({
                 <div className="text-xs font-black tracking-[0.2em] text-[#ff9b70]/90">
                   {review.author?.name ?? "익명"}
                 </div>
-                {reviewTitle ? (
-                  <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-tight">
-                    {reviewTitle}
-                  </h2>
-                ) : null}
-                <div className="leading-relaxed font-medium text-[#c2c6d8]">
-                  <MarkdownPreview body={review.body} />
-                </div>
+                {review.spoiler ? (
+                  <ReviewSpoilerGate className="min-w-0" title="스포일러 리뷰">
+                    {reviewContent}
+                  </ReviewSpoilerGate>
+                ) : (
+                  reviewContent
+                )}
               </div>
             </div>
           </div>
@@ -64,7 +76,7 @@ export function ReviewDetail({
               {review.status}
             </span>
             {review.spoiler && (
-              <span className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border border-red-400/20 text-red-400/60 bg-red-400/5">
+              <span className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border border-red-500/25 text-red-300 bg-red-500/10">
                 Spoiler
               </span>
             )}

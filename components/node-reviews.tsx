@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Review } from "@/lib/domain";
 import { ReviewRatingDisplay } from "@/components/review-rating-display";
 import { getReviewExplicitTitle } from "@/lib/review-display";
+import { ReviewSpoilerGate } from "@/components/review-spoiler-gate";
 
 const PAGE_SIZE = 5;
 
@@ -42,6 +43,20 @@ export function NodeReviews({
     return () => observer.disconnect();
   }, [hasMore, reviews.length]);
 
+  function getReviewPreview(review: Review) {
+    const explicitTitle = getReviewExplicitTitle(review);
+    if (explicitTitle) {
+      return explicitTitle;
+    }
+
+    const compactBody = review.body.trim().replace(/\n+/g, " ");
+    if (!compactBody) {
+      return "내용이 비어 있습니다.";
+    }
+
+    return `${compactBody.slice(0, 190)}${compactBody.length > 190 ? "…" : ""}`;
+  }
+
   return (
     <div className="space-y-8">
       {reviews.length ? null : (
@@ -52,7 +67,63 @@ export function NodeReviews({
         </div>
       )}
       {visibleReviews.map((review) => {
-        const reviewTitle = getReviewExplicitTitle(review);
+        const previewText = getReviewPreview(review);
+        const reviewBody = (
+          <p className="mt-0.5 text-sm leading-relaxed text-[#c2c6d8] font-medium line-clamp-3">
+            {previewText}
+          </p>
+        );
+
+        if (review.spoiler) {
+          return (
+            <article
+              className="space-y-4 border border-red-500/20 bg-red-500/5 p-5"
+              key={review.id}
+            >
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
+                <div className="min-w-0">
+                  <div className="space-y-2">
+                    <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
+                      {new Date(review.updatedAt).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </div>
+                    <div className="text-xs font-black tracking-[0.2em] text-[#ff9b70]/90">
+                      {review.author?.name ?? "익명"}
+                    </div>
+                  </div>
+                  <div className="mt-3 inline-flex items-center gap-2 border border-red-500/25 bg-red-500/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-red-300">
+                    <span>!</span>
+                    <span>스포일러 리뷰</span>
+                  </div>
+                  <ReviewSpoilerGate
+                    className="mt-2"
+                    confirmLabel="요약 확인"
+                    description="이 리뷰 요약에는 스포일러가 포함되어 있습니다."
+                    title="스포일러"
+                    variant="compact"
+                  >
+                    {reviewBody}
+                  </ReviewSpoilerGate>
+                </div>
+                <ReviewRatingDisplay rating={review.rating} size="compact" />
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-block border border-red-500/25 bg-red-500/10 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-red-300">
+                  열기 전 주의
+                </span>
+                <Link
+                  className="text-[10px] font-black uppercase tracking-[0.2em] text-red-200/70 transition-colors hover:text-red-100"
+                  href={`/r/${review.id}`}
+                >
+                  상세 보기
+                </Link>
+              </div>
+            </article>
+          );
+        }
 
         return (
         <Link
@@ -75,21 +146,10 @@ export function NodeReviews({
                   {review.author?.name ?? "익명"}
                 </div>
                 </div>
-                <p className="mt-0.5 text-sm leading-relaxed text-[#c2c6d8] font-medium line-clamp-3">
-                  {reviewTitle
-                    ? reviewTitle
-                    : review.body
-                    ? `${review.body.trim().replace(/\n+/g, " ").slice(0, 190)}${review.body.trim().length > 190 ? "…" : ""}`
-                    : "내용이 비어 있습니다."}
-                </p>
+                {reviewBody}
               </div>
               <ReviewRatingDisplay rating={review.rating} size="compact" />
             </div>
-            {review.spoiler ? (
-              <span className="inline-block text-[9px] font-black text-red-400/80 border border-red-400/20 px-2 py-1 uppercase tracking-widest">
-                스포일러
-              </span>
-            ) : null}
           </article>
         </Link>
         );

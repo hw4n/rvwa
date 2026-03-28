@@ -5,8 +5,12 @@ function compactText(value: string) {
 }
 
 export function getReviewDisplayTitle(
-  review: Pick<Review, "title" | "body" | "nodeTitle" | "proposedTitle">
+  review: Pick<Review, "title" | "body" | "nodeTitle" | "proposedTitle"> & { spoiler?: boolean }
 ) {
+  if (review.spoiler) {
+    return "스포일러 리뷰";
+  }
+
   if (review.title?.trim()) {
     return review.title.trim();
   }

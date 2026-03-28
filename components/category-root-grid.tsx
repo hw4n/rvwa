@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePaginatedQuery } from "convex/react";
 import { PosterRatingBadge } from "@/components/poster-rating-badge";
-import { Button } from "@/components/ui/button";
 import { getPosterImageUrl } from "@/lib/poster";
 
 const PAGE_SIZE = 24;
@@ -14,11 +13,32 @@ export function CategoryRootGrid({
 }: {
   categorySlug: string;
 }) {
+  const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
   const { results, status, isLoading, loadMore } = usePaginatedQuery(
     "categories:listRootsPage" as any,
     { slug: categorySlug },
     { initialNumItems: PAGE_SIZE }
   );
+
+  React.useEffect(() => {
+    if (!loadMoreRef.current || status !== "CanLoadMore") {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          loadMore(PAGE_SIZE);
+        }
+      },
+      {
+        rootMargin: "240px 0px",
+      }
+    );
+
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [loadMore, status]);
 
   return (
     <section className="space-y-6">
@@ -69,17 +89,12 @@ export function CategoryRootGrid({
         </div>
       ) : null}
 
-      {status !== "Exhausted" ? (
+      {status !== "Exhausted" ? <div className="h-8" ref={loadMoreRef} /> : null}
+      {status === "LoadingMore" ? (
         <div className="flex justify-center">
-          <Button
-            className="rounded-none border-white/10 hover:bg-white/5"
-            disabled={status === "LoadingMore"}
-            onClick={() => loadMore(PAGE_SIZE)}
-            type="button"
-            variant="outline"
-          >
-            {status === "LoadingMore" ? "불러오는 중" : "더 불러오기"}
-          </Button>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/25">
+            더 불러오는 중
+          </p>
         </div>
       ) : null}
     </section>

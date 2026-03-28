@@ -36,6 +36,9 @@ export function ReviewDetail({
                     day: "numeric",
                   })}
                 </div>
+                <div className="text-xs font-black tracking-[0.2em] text-[#ff9b70]/90">
+                  {review.author?.name ?? "익명"}
+                </div>
                 {reviewTitle ? (
                   <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-tight">
                     {reviewTitle}

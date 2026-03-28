@@ -71,9 +71,9 @@ export function NodeReviews({
                       day: "numeric",
                     })}
                   </div>
-                  <div className="text-xs font-black uppercase tracking-[0.2em] text-[#ff9b70]/90">
-                    {review.author?.name ?? "익명"}
-                  </div>
+                <div className="text-xs font-black tracking-[0.2em] text-[#ff9b70]/90">
+                  {review.author?.name ?? "익명"}
+                </div>
                 </div>
                 <p className="mt-0.5 text-sm leading-relaxed text-[#c2c6d8] font-medium line-clamp-3">
                   {reviewTitle

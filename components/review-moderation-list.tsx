@@ -4,6 +4,7 @@
 import * as React from "react";
 import { useMutation, useQuery } from "convex/react";
 import type { Category, ContentNode, MetadataFieldType, Review } from "@/lib/domain";
+import { ContentNodePicker, useContentNodePicker } from "@/components/content-node-picker";
 import { PosterUploadField } from "@/components/poster-upload-field";
 import { ReviewDeleteButton } from "@/components/review-delete-button";
 import { Button } from "@/components/ui/button";
@@ -116,11 +117,7 @@ export function ReviewModerationList() {
     : "";
   const selectedItem = activeReview && selectedItemId ? items.find((item) => item.id === selectedItemId) : undefined;
   const search = activeReview ? searches[activeReview.id] ?? "" : "";
-  const matches = activeReview && search.trim()
-    ? items
-        .filter((item) => item.title.toLowerCase().includes(search.trim().toLowerCase()))
-        .slice(0, 6)
-    : [];
+  const { matches } = useContentNodePicker({ items, search, selectedItem });
   const activeCategorySlug =
     selectedItem?.categorySlug ??
     (activeReview ? categorySlugs[activeReview.id] ?? activeReview.selectedCategorySlug ?? "" : "");
@@ -287,7 +284,7 @@ export function ReviewModerationList() {
         }}
       >
         {activeReview ? (
-          <SheetContent className="w-full p-4 sm:max-w-xl">
+          <SheetContent className="max-h-[90vh] w-full overflow-y-auto p-4 sm:max-w-xl">
             <SheetHeader className="px-1">
               <SheetTitle>검토 항목</SheetTitle>
               <SheetDescription>{getReviewDisplayTitle(activeReview)}</SheetDescription>
@@ -302,48 +299,23 @@ export function ReviewModerationList() {
               </section>
 
               <section className="space-y-2">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#8c90a1]">기존 항목 검색</p>
-                <input
-                  className="w-full border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
-                  onChange={(event) => {
-                    const value = event.currentTarget.value;
-                    setSearches((current) => ({ ...current, [activeReview.id]: value }));
+                <ContentNodePicker
+                  label="항목"
+                  matches={matches}
+                  onClearSelection={() =>
+                    setSelectedItemIds((current) => ({ ...current, [activeReview.id]: "" }))
+                  }
+                  onSearchChange={(value) =>
+                    setSearches((current) => ({ ...current, [activeReview.id]: value }))
+                  }
+                  onSelect={(item) => {
+                    setSelectedItemIds((current) => ({ ...current, [activeReview.id]: item.id }));
+                    setSearches((current) => ({ ...current, [activeReview.id]: item.title }));
+                    setMessages((current) => ({ ...current, [activeReview.id]: "" }));
                   }}
-                  placeholder="기존 항목 검색"
-                  value={search}
+                  search={search}
+                  selectedItem={selectedItem}
                 />
-
-                {selectedItem ? (
-                  <div className="flex items-center justify-between gap-4 border border-white/5 bg-[#0e0e0e] px-4 py-3">
-                    <p className="font-bold text-white">{selectedItem.title}</p>
-                    <Button
-                      className="rounded-none uppercase tracking-widest"
-                      onClick={() => setSelectedItemIds((current) => ({ ...current, [activeReview.id]: "" }))}
-                      type="button"
-                      variant="outline"
-                    >
-                      해제
-                    </Button>
-                  </div>
-                ) : (
-                  matches.length > 0 && (
-                    <div className="grid gap-2">
-                      {matches.map((item) => (
-                        <button
-                          className="flex items-center justify-between border border-white/5 bg-[#0e0e0e] px-4 py-3 text-left hover:border-primary/20 hover:bg-[#1c1b1b]"
-                          key={item.id}
-                          onClick={() => {
-                            setSelectedItemIds((current) => ({ ...current, [activeReview.id]: item.id }));
-                            setMessages((current) => ({ ...current, [activeReview.id]: "" }));
-                          }}
-                          type="button"
-                        >
-                          <span className="font-bold text-white">{item.title}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )
-                )}
               </section>
 
               {!selectedItem && (

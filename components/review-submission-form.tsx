@@ -2,11 +2,12 @@
 "use client";
 
 import * as React from "react";
-import { startTransition, useDeferredValue } from "react";
+import { startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import type { Category, ContentNode, Review } from "@/lib/domain";
 import { Button } from "@/components/ui/button";
+import { ContentNodePicker, useContentNodePicker } from "@/components/content-node-picker";
 import { ReviewRatingInput } from "@/components/review-rating-input";
 import { MarkdownPreview } from "@/components/markdown-preview";
 import { formatRatingInputValue } from "@/lib/review-rating";
@@ -43,15 +44,8 @@ export function ReviewSubmissionForm({
   const [spoiler, setSpoiler] = React.useState(initialReview?.spoiler ?? false);
   const [pending, setPending] = React.useState(false);
   const [message, setMessage] = React.useState("");
-  const deferredSearch = useDeferredValue(search.trim().toLowerCase());
   const selectedItem = selectedItemSlug ? items.find((item) => item.slug === selectedItemSlug) : undefined;
-
-  const matches = deferredSearch
-    ? items
-      .filter((item) => `${item.title} ${item.categorySlug}`.toLowerCase().includes(deferredSearch))
-      .slice(0, 8)
-    : [];
-  const hasNoResults = !selectedItem && !!search.trim() && matches.length === 0;
+  const { hasNoResults, matches } = useContentNodePicker({ items, search, selectedItem });
   const effectiveProposedTitle = proposedTitle || (hasNoResults && !proposedTitleTouched ? search.trim() : "");
   const previewTitle = getReviewExplicitTitle({ title });
 
@@ -89,69 +83,30 @@ export function ReviewSubmissionForm({
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_340px] items-start min-h-0">
       <section className="space-y-4 min-h-0">
-        <div className="space-y-3">
-          <p className="text-sm font-black text-primary tracking-[0.3em] uppercase">
-            항목
-            <span className="ml-1 text-red-500">*</span>
-          </p>
-          {selectedItem ? (
-            <div className="flex items-center justify-between gap-4 bg-surface-high p-4 group border border-white/5">
-              <div>
-                <p className="text-lg font-black text-white uppercase tracking-tight">{selectedItem.title}</p>
-              </div>
-              <Button
-                className="rounded-none border-white/10 hover:bg-white/5"
-                onClick={() => {
-                  setSelectedItemSlug("");
-                  setSearch("");
-                  if (!proposedTitleTouched) {
-                    setProposedTitle("");
-                  }
-                }}
-                type="button"
-                variant="outline"
-              >
-                변경
-              </Button>
-            </div>
-          ) : (
-            <input
-              className="w-full bg-surface-low border-b border-white/5 px-0 py-3 text-2xl font-black tracking-tight text-white focus:border-primary/40 transition-colors placeholder:text-white/10"
-              onChange={(event) => {
-                setSearch(event.currentTarget.value);
-                if (!proposedTitleTouched) {
-                  setProposedTitle("");
-                }
-              }}
-              placeholder="항목 검색 또는 새 항목 입력"
-              value={search}
-            />
-          )}
-          {!selectedItem && matches.length ? (
-            <div className="grid gap-px bg-white/5 overflow-hidden">
-              {matches.map((item) => (
-                <button
-                  className="flex items-center justify-between bg-surface-low px-4 py-3 text-left hover:bg-surface-high group transition-colors"
-                  key={item.id}
-                  onClick={() => {
-                    setSelectedItemSlug(item.slug);
-                    setSearch(item.title);
-                  }}
-                  type="button"
-                >
-                  <span className="flex items-center gap-2 font-black tracking-tight transition-colors">
-                    <span className="text-white group-hover:text-primary">{item.title}</span>
-                    <span className="text-primary">{item.categorySlug}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          ) : !selectedItem && hasNoResults ? (
-            <div className="bg-surface-low p-4 border border-white/5">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#c2c6d8]/20">일치하는 항목이 없습니다.</p>
-            </div>
-          ) : null}
-        </div>
+        <ContentNodePicker
+          label="항목"
+          matches={matches}
+          onClearSelection={() => {
+            setSelectedItemSlug("");
+            setSearch("");
+            if (!proposedTitleTouched) {
+              setProposedTitle("");
+            }
+          }}
+          onSearchChange={(value) => {
+            setSearch(value);
+            if (!proposedTitleTouched) {
+              setProposedTitle("");
+            }
+          }}
+          onSelect={(item) => {
+            setSelectedItemSlug(item.slug);
+            setSearch(item.title);
+          }}
+          required
+          search={search}
+          selectedItem={selectedItem}
+        />
 
         {selectedItem ? null : (
           <div className="grid gap-4 p-4 bg-surface-low border border-white/5">

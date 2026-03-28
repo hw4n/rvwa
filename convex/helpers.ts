@@ -91,7 +91,7 @@ export function parseTagInput(value: string) {
     new Set(
       value
         .split(",")
-        .map((entry) => normalizeSlug(entry))
+        .map((entry) => entry.trim())
         .filter(Boolean)
     )
   );
@@ -246,7 +246,6 @@ export function sanitizeTagList(tags: string[]) {
     new Set(
       tags
         .map((tag) => sanitizeRequiredText(tag, "Tag", INPUT_LIMITS.tagLength))
-        .map((tag) => normalizeSlug(tag))
         .filter(Boolean)
     )
   );

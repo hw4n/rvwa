@@ -2,11 +2,12 @@
 "use client";
 
 import * as React from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import Link from "next/link";
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, SearchIcon } from "lucide-react";
 import { AppIcon } from "@/components/app-icon";
+import { useContentNodePicker } from "@/components/content-node-picker";
 import { Button } from "@/components/ui/button";
 import {
   Breadcrumb,
@@ -326,7 +327,7 @@ export function PlatformShell({
               </SheetContent>
             </Sheet>
 
-            <nav className="min-w-0 flex-1 overflow-hidden text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[#c2c6d8]/50">
+            <nav className="min-w-0 flex-1 overflow-hidden text-[10px] font-bold uppercase tracking-widest text-[#c2c6d8]/50 md:hidden">
               <Breadcrumb>
                 <BreadcrumbList className="flex-wrap gap-y-1">
                   {topCrumbs.map((crumb, index) => (
@@ -354,6 +355,10 @@ export function PlatformShell({
                 </BreadcrumbList>
               </Breadcrumb>
             </nav>
+
+            <div className="hidden min-w-0 flex-1 md:block">
+              <DesktopNodeSearch items={items} pathname={pathname} searchParamsKey={searchParamsKey} />
+            </div>
           </div>
 
           <div className="flex shrink-0 flex-wrap justify-end gap-2 md:gap-3 text-muted-foreground/60">
@@ -386,6 +391,161 @@ export function PlatformShell({
           <div className="custom-scrollbar px-4 py-6 md:px-10 md:py-10 w-full min-h-0 overflow-y-auto flex-1">{children}</div>
         </main>
       </div>
+    </div>
+  );
+}
+
+function DesktopNodeSearch({
+  items,
+  pathname,
+  searchParamsKey,
+}: {
+  items: ContentNode[];
+  pathname: string;
+  searchParamsKey: string;
+}) {
+  const router = useRouter();
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const [search, setSearch] = React.useState("");
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [activeIndex, setActiveIndex] = React.useState(-1);
+  const { hasNoResults, matches } = useContentNodePicker({
+    items,
+    limit: 8,
+    search,
+  });
+
+  const navigateToItem = React.useCallback(
+    (item: ContentNode) => {
+      setSearch("");
+      setIsOpen(false);
+      setActiveIndex(-1);
+      router.push(`/n/${encodeURIComponent(item.slug)}`);
+    },
+    [router]
+  );
+
+  React.useEffect(() => {
+    setSearch("");
+    setIsOpen(false);
+    setActiveIndex(-1);
+  }, [pathname, searchParamsKey]);
+
+  React.useEffect(() => {
+    setActiveIndex(matches.length ? 0 : -1);
+  }, [matches]);
+
+  React.useEffect(() => {
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, []);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Escape") {
+      setIsOpen(false);
+      setActiveIndex(-1);
+      return;
+    }
+
+    if (!matches.length) {
+      return;
+    }
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setIsOpen(true);
+      setActiveIndex((current) => {
+        if (current < 0) {
+          return 0;
+        }
+        return Math.min(current + 1, matches.length - 1);
+      });
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setIsOpen(true);
+      setActiveIndex((current) => {
+        if (current < 0) {
+          return matches.length - 1;
+        }
+        return Math.max(current - 1, 0);
+      });
+      return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      navigateToItem(matches[activeIndex] ?? matches[0]);
+    }
+  };
+
+  return (
+    <div className="relative max-w-xl" ref={containerRef}>
+      <label className="sr-only" htmlFor="desktop-node-search">
+        항목 검색
+      </label>
+      <div className="flex h-11 items-center gap-3 border border-white/10 bg-[#131313] px-4 text-sm text-white/70 transition-colors focus-within:border-primary/40">
+        <SearchIcon className="h-4 w-4 shrink-0 text-white/35" />
+        <input
+          aria-autocomplete="list"
+          aria-controls="desktop-node-search-results"
+          aria-expanded={isOpen && (!!matches.length || hasNoResults)}
+          className="w-full bg-transparent text-sm font-medium text-white outline-none placeholder:text-white/20"
+          id="desktop-node-search"
+          onChange={(event) => {
+            setSearch(event.currentTarget.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => {
+            if (search.trim()) {
+              setIsOpen(true);
+            }
+          }}
+          onKeyDown={handleKeyDown}
+          placeholder="항목 검색"
+          role="combobox"
+          value={search}
+        />
+      </div>
+      {isOpen && search.trim() ? (
+        <div
+          className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-30 overflow-hidden border border-white/10 bg-[#131313] shadow-2xl"
+          id="desktop-node-search-results"
+          role="listbox"
+        >
+          {matches.length ? (
+            <div className="grid gap-px bg-white/5">
+              {matches.map((item, index) => (
+                <button
+                  className={`flex items-center justify-between gap-3 bg-[#101010] px-4 py-3 text-left transition-colors ${
+                    index === activeIndex ? "bg-[#181818]" : "hover:bg-[#181818]"
+                  }`}
+                  key={item.id}
+                  onClick={() => navigateToItem(item)}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  role="option"
+                  type="button"
+                >
+                  <span className="min-w-0 truncate text-sm font-semibold tracking-tight text-white">{item.title}</span>
+                  <span className="shrink-0 text-[11px] font-black uppercase tracking-[0.2em] text-primary">{item.categorySlug}</span>
+                </button>
+              ))}
+            </div>
+          ) : hasNoResults ? (
+            <div className="px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-[#c2c6d8]/30">
+              일치하는 항목이 없습니다.
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

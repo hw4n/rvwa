@@ -44,10 +44,6 @@ export function SettingsProfileForm({
     >
       <div className="space-y-2">
         <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary">Profile</p>
-        <h2 className="text-2xl font-black tracking-tight text-white">Display name</h2>
-        <p className="max-w-2xl text-sm font-medium leading-relaxed text-[#c2c6d8]/60">
-          리뷰와 사이드바에 표시되는 이름을 변경합니다.
-        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">

@@ -9,8 +9,7 @@ export default async function SettingsPage() {
     <div className="space-y-10 md:space-y-12">
       <PlatformHeader
         crumbs={[{ label: "설정" }]}
-        description="리뷰에 표시되는 display name을 수정합니다."
-        eyebrow="Account"
+        eyebrow="settings"
         title="설정"
         variant="compact"
       />

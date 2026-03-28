@@ -13,7 +13,7 @@ export default async function MyReviewsPage() {
   return (
     <div className="space-y-6">
       <section className="space-y-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-8">
           {reviews.map((review) => (
             <div key={review.id} className="group space-y-4">
               <Link href={`/r/${review.id}`} className="block space-y-4">
@@ -53,7 +53,7 @@ export default async function MyReviewsPage() {
         </div>
 
         {reviews.length === 0 ? (
-          <div className="bg-surface-low p-20 text-center border border-white/5">
+          <div className="bg-surface-low p-10 md:p-20 text-center border border-white/5">
             <p className="text-xs font-black uppercase text-white/20 tracking-[0.4em]">리뷰가 없습니다.</p>
           </div>
         ) : null}

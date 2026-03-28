@@ -5,6 +5,7 @@ import * as React from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import Link from "next/link";
+import { MenuIcon } from "lucide-react";
 import { AppIcon } from "@/components/app-icon";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import type { Category, ContentNode, Review, UserSummary } from "@/lib/domain";
 import { LogoutButton } from "@/components/logout-button";
 import { getReviewDisplayTitle } from "@/lib/review-display";
@@ -30,7 +37,9 @@ export function PlatformShell({
   const SIDEBAR_PAGE_SIZE = 12;
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const searchParamsKey = searchParams.toString();
   const { isLoading: isAuthLoading } = useConvexAuth();
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const [recentReviewLimit, setRecentReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const [categoryItemLimit, setCategoryItemLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const [itemReviewLimit, setItemReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
@@ -105,8 +114,6 @@ export function PlatformShell({
   const pendingCount = viewer?.role === "admin" ? pendingReviews.length : 0;
   const topCrumbs = resolveTopCrumbs(pathname, searchParams, categories, items, currentReview, editingReview);
   const sidebarTopCrumbs = pathname.startsWith("/r/") ? topCrumbs.slice(0, -1) : topCrumbs;
-  const headerActionClass = "rounded-none border-white/10 hover:bg-white/5 uppercase tracking-[0.15em] text-white";
-  const writeButtonClass = "rounded-none bg-primary text-black hover:bg-primary/80 uppercase tracking-[0.15em]";
   const authIsPending = isAuthLoading || viewerQuery === undefined;
   const showGlobalWriteButton = !authIsPending && Boolean(viewer) && !pathname.startsWith("/write");
   const globalWriteHref = currentItemSlug
@@ -140,6 +147,10 @@ export function PlatformShell({
   }, [currentItemSlug, sidebarMode]);
 
   React.useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname, searchParamsKey]);
+
+  React.useEffect(() => {
     if (!loadMoreRef.current || !sidebarScrollRef.current || !hasMoreSidebarItems) {
       return;
     }
@@ -166,67 +177,169 @@ export function PlatformShell({
     return () => observer.disconnect();
   }, [hasMoreSidebarItems, sidebarMode, sidebarReviews.length]);
 
+  const drawerNavigation = (
+    <>
+      <DrawerLink active={pathname === "/dashboard"} href="/dashboard" icon="history" label="최근 리뷰" />
+      {!authIsPending && viewer ? <DrawerLink active={pathname.startsWith("/my-reviews")} href="/my-reviews" icon="book" label="내 리뷰" /> : null}
+      {!authIsPending && viewer?.role === "admin" ? (
+        <DrawerLink
+          active={pathname.startsWith("/admin/reviews")}
+          href="/admin/reviews"
+          icon="pending_actions"
+          label={pendingCount ? `검토 대기 ${pendingCount}` : "검토 대기"}
+        />
+      ) : null}
+      <div className="border-t border-white/10" />
+      <nav className="min-h-9 px-3 py-2 text-[11px] text-[#a2a6bb]/60">
+        <Breadcrumb>
+          <BreadcrumbList className="flex min-h-5 items-center gap-1 whitespace-nowrap">
+            {sidebarTopCrumbs.map((crumb, index) => (
+              <div className="contents" key={`${crumb.label}-${index}`}>
+                <BreadcrumbItem>
+                  {crumb.href ? (
+                    <BreadcrumbLink asChild>
+                      <Link
+                        href={crumb.href}
+                        className="hover:text-primary transition-colors text-[11px] max-w-40 truncate block"
+                      >
+                        {crumb.label}
+                      </Link>
+                    </BreadcrumbLink>
+                  ) : (
+                    <BreadcrumbPage className="text-[#e5e2e1] text-[11px] font-medium max-w-40 truncate block">
+                      {crumb.label}
+                    </BreadcrumbPage>
+                  )}
+                </BreadcrumbItem>
+                {index < sidebarTopCrumbs.length - 1 ? (
+                  <BreadcrumbSeparator className="text-white/20 opacity-30">
+                    <span className="mx-1">/</span>
+                  </BreadcrumbSeparator>
+                ) : null}
+              </div>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </nav>
+
+      <div className="space-y-0">
+        <div className="space-y-0">
+          {sidebarMode === "category"
+            ? sidebarCategoryVisibleNodes.map((entry) => (
+              <CollectionLink
+                active={pathname === `/n/${entry.slug}`}
+                href={`/n/${entry.slug}`}
+                key={entry.id}
+                title={entry.title}
+              />
+            ))
+            : sidebarReviews.map((entry) => {
+              const reviewItemHref = entry.id ? `/r/${entry.id}` : "/dashboard";
+              return (
+                <CollectionLink
+                  active={isReviewDetail ? entry.id === reviewId : false}
+                  href={reviewItemHref}
+                  key={entry.id}
+                  title={getReviewDisplayTitle(entry)}
+                  author={entry.author?.name}
+                  score={entry.rating}
+                />
+              );
+            })}
+          {hasMoreSidebarItems ? <div className="h-4" ref={loadMoreRef} /> : null}
+        </div>
+      </div>
+    </>
+  );
+
+  const railNavigation = (
+    <>
+      <Link className="flex h-16 w-full items-center justify-center" href="/dashboard">
+        <AppIcon className="size-6 text-primary" name="hub" strokeWidth={2.4} />
+      </Link>
+      <nav className="flex w-full flex-1 flex-col gap-0">
+        {categories.map((category) => (
+          <RailLink
+            active={pathname.startsWith(`/c/${category.slug}`)}
+            href={`/c/${category.slug}`}
+            icon={category.icon}
+            key={category.id}
+            label={category.name}
+          />
+        ))}
+      </nav>
+      {!authIsPending && viewer?.role === "admin" ? (
+        <div className="border-t border-white/5">
+          <RailLink active={pathname.startsWith("/admin/categories/")} href="/admin/categories/new" icon="add" label="추가" />
+        </div>
+      ) : null}
+    </>
+  );
+
   return (
     <div className="relative flex min-h-0 h-screen flex-col overflow-hidden bg-[#0e0e0e] selection:bg-primary/20 text-[#e5e2e1]">
       <div className="flex min-h-0 w-full flex-1 overflow-hidden">
-        <aside className="icon-rail-scrollbar flex h-full w-16 shrink-0 flex-col items-stretch overflow-y-auto overflow-x-hidden border-r border-white/5 bg-[#0e0e0e]">
-          <Link className="flex h-16 w-full items-center justify-center" href="/dashboard">
-            <AppIcon className="size-6 text-primary" name="hub" strokeWidth={2.4} />
-          </Link>
-          <nav className="flex w-full flex-1 flex-col gap-0">
-            {categories.map((category) => (
-              <RailLink
-                active={pathname.startsWith(`/c/${category.slug}`)}
-                href={`/c/${category.slug}`}
-                icon={category.icon}
-                key={category.id}
-                label={category.name}
-              />
-            ))}
-          </nav>
-          {!authIsPending && viewer?.role === "admin" ? (
-            <div className="border-t border-white/5">
-              <RailLink active={pathname.startsWith("/admin/categories/")} href="/admin/categories/new" icon="add" label="추가" />
-            </div>
-          ) : null}
+        <aside className="icon-rail-scrollbar hidden md:flex h-full w-16 shrink-0 flex-col items-stretch overflow-y-auto overflow-x-hidden border-r border-white/5 bg-[#0e0e0e]">
+          {railNavigation}
         </aside>
 
-        <aside className="flex h-full w-60 shrink-0 flex-col border-r border-white/5 bg-[#131313]">
+        <aside className="hidden md:flex h-full w-60 shrink-0 flex-col border-r border-white/5 bg-[#131313]">
           <div className="flex-1 overflow-y-auto custom-scrollbar" ref={sidebarScrollRef}>
-            <DrawerLink active={pathname === "/dashboard"} href="/dashboard" icon="history" label="최근 리뷰" />
-            {!authIsPending && viewer ? <DrawerLink active={pathname.startsWith("/my-reviews")} href="/my-reviews" icon="book" label="내 리뷰" /> : null}
-            {!authIsPending && viewer?.role === "admin" ? (
-              <DrawerLink
-                active={pathname.startsWith("/admin/reviews")}
-                href="/admin/reviews"
-                icon="pending_actions"
-                label={pendingCount ? `검토 대기 ${pendingCount}` : "검토 대기"}
-              />
-            ) : null}
-            <div className="border-t border-white/10" />
-            <nav className="min-h-9 px-3 py-2 text-[11px] text-[#a2a6bb]/60">
+            {drawerNavigation}
+          </div>
+        </aside>
+
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <header className="sticky top-0 h-14 md:h-16 w-full bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 md:px-10 z-20">
+          
+          <div className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+            <Sheet onOpenChange={setMobileNavOpen} open={mobileNavOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  className="shrink-0 border-white/10 text-white md:hidden"
+                  size="icon-sm"
+                  variant="outline"
+                >
+                  <MenuIcon className="h-4 w-4" />
+                  <span className="sr-only">메뉴 열기</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                className="w-[min(92vw,24rem)] border-r border-white/10 bg-[#0e0e0e] p-0 text-white"
+                side="left"
+              >
+                <SheetTitle className="sr-only">네비게이션</SheetTitle>
+                <div className="flex min-h-0 flex-1 overflow-hidden">
+                  <aside className="icon-rail-scrollbar flex h-full w-14 shrink-0 flex-col items-stretch overflow-y-auto overflow-x-hidden border-r border-white/5 bg-[#0e0e0e]">
+                    {railNavigation}
+                  </aside>
+                  <div className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#131313]">
+                    {drawerNavigation}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            <nav className="min-w-0 flex-1 overflow-hidden text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[#c2c6d8]/50">
               <Breadcrumb>
-                <BreadcrumbList className="flex min-h-5 items-center gap-1 whitespace-nowrap">
-                  {sidebarTopCrumbs.map((crumb, index) => (
+                <BreadcrumbList className="flex-wrap gap-y-1">
+                  {topCrumbs.map((crumb, index) => (
                     <div className="contents" key={`${crumb.label}-${index}`}>
                       <BreadcrumbItem>
                         {crumb.href ? (
                           <BreadcrumbLink asChild>
-                            <Link
-                              href={crumb.href}
-                              className="hover:text-primary transition-colors text-[11px] max-w-40 truncate block"
-                            >
+                            <Link href={crumb.href} className="hover:text-primary transition-colors">
                               {crumb.label}
                             </Link>
                           </BreadcrumbLink>
                         ) : (
-                          <BreadcrumbPage className="text-[#e5e2e1] text-[11px] font-medium max-w-40 truncate block">
+                          <BreadcrumbPage className="text-white font-black tracking-[0.2em]">
                             {crumb.label}
                           </BreadcrumbPage>
                         )}
                       </BreadcrumbItem>
-                      {index < sidebarTopCrumbs.length - 1 ? (
-                        <BreadcrumbSeparator className="text-white/20 opacity-30">
+                      {index < topCrumbs.length - 1 ? (
+                        <BreadcrumbSeparator className="text-white/10 opacity-30">
                           <span className="mx-1">/</span>
                         </BreadcrumbSeparator>
                       ) : null}
@@ -235,95 +348,36 @@ export function PlatformShell({
                 </BreadcrumbList>
               </Breadcrumb>
             </nav>
-
-            <div className="space-y-0">
-              <div className="space-y-0">
-                {sidebarMode === "category"
-                  ? sidebarCategoryVisibleNodes.map((entry) => (
-                    <CollectionLink
-                      active={pathname === `/n/${entry.slug}`}
-                      href={`/n/${entry.slug}`}
-                      key={entry.id}
-                      title={entry.title}
-                    />
-                  ))
-                  : sidebarReviews.map((entry) => {
-                    const reviewItemHref = entry.id ? `/r/${entry.id}` : "/dashboard";
-                    return (
-                      <CollectionLink
-                        active={isReviewDetail ? entry.id === reviewId : false}
-                        href={reviewItemHref}
-                        key={entry.id}
-                        title={getReviewDisplayTitle(entry)}
-                        author={entry.author?.name}
-                        score={entry.rating}
-                      />
-                    );
-                  })}
-                {hasMoreSidebarItems ? <div className="h-4" ref={loadMoreRef} /> : null}
-              </div>
-            </div>
           </div>
-        </aside>
 
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <header className="sticky top-0 h-16 w-full bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-10 z-20">
-          <nav className="text-[11px] font-bold uppercase tracking-widest text-[#c2c6d8]/50">
-            <Breadcrumb>
-              <BreadcrumbList className="flex-wrap gap-y-1">
-                {topCrumbs.map((crumb, index) => (
-                  <div className="contents" key={`${crumb.label}-${index}`}>
-                    <BreadcrumbItem>
-                      {crumb.href ? (
-                        <BreadcrumbLink asChild>
-                          <Link href={crumb.href} className="hover:text-primary transition-colors">
-                            {crumb.label}
-                          </Link>
-                        </BreadcrumbLink>
-                      ) : (
-                        <BreadcrumbPage className="text-white font-black tracking-[0.2em]">
-                          {crumb.label}
-                        </BreadcrumbPage>
-                      )}
-                    </BreadcrumbItem>
-                    {index < topCrumbs.length - 1 ? (
-                      <BreadcrumbSeparator className="text-white/10 opacity-30">
-                        <span className="mx-1">/</span>
-                      </BreadcrumbSeparator>
-                    ) : null}
-                  </div>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
-          </nav>
-          <div className="flex gap-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
+          <div className="flex shrink-0 flex-wrap justify-end gap-2 md:gap-3 text-muted-foreground/60">
             {authIsPending ? (
-              <div className="flex items-center gap-3">
-                <Skeleton className="h-7 w-24" />
-                <Skeleton className="h-4 w-16 border-0 bg-white/10" />
+              <div className="flex items-center gap-2 md:gap-3">
+                <Skeleton className="h-7 w-20 md:w-24" />
+                <Skeleton className="h-4 w-12 md:w-16 border-0 bg-white/10" />
               </div>
             ) : viewer ? (
               <>
                 {showGlobalWriteButton ? (
-                  <Button asChild className={writeButtonClass} size="sm">
+                  <Button asChild className="rounded-none bg-primary text-black hover:bg-primary/80">
                     <Link href={globalWriteHref}>리뷰 작성</Link>
                   </Button>
                 ) : null}
-                <LogoutButton className={headerActionClass}>로그아웃</LogoutButton>
+                <LogoutButton className="rounded-none border-white/10 hover:bg-white/5">로그아웃</LogoutButton>
               </>
             ) : (
               <>
-                <Button asChild className={headerActionClass} variant="outline">
+                <Button asChild className="rounded-none border-white/10 hover:bg-white/5" variant="outline">
                   <Link href="/login">로그인</Link>
                 </Button>
-                <Button asChild className={headerActionClass} variant="outline">
+                <Button asChild className="rounded-none border-white/10 hover:bg-white/5" variant="outline">
                   <Link href="/signup">가입</Link>
                 </Button>
               </>
             )}
           </div>
         </header>
-          <div className="custom-scrollbar px-10 py-10 w-full min-h-0 overflow-y-auto flex-1">{children}</div>
+          <div className="custom-scrollbar px-4 py-6 md:px-10 md:py-10 w-full min-h-0 overflow-y-auto flex-1">{children}</div>
         </main>
       </div>
     </div>
@@ -547,7 +601,7 @@ function RailLink({
       href={href}
     >
       <AppIcon className="size-5" name={icon} strokeWidth={active ? 2.6 : 2.2} />
-      <span className="text-[12px] font-bold leading-none tracking-tight">{label}</span>
+      <span className="text-[10px] md:text-[12px] font-bold leading-none tracking-tight">{label}</span>
     </Link>
   );
 }

@@ -47,7 +47,7 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
 
   return (
     <form
-      className="w-full max-w-md bg-[#131313] p-10 border-l-2 border-primary/50 space-y-6"
+      className="w-full max-w-md bg-[#131313] p-6 md:p-10 border-l-2 border-primary/50 space-y-6"
       onSubmit={onSubmit}
     >
       {mode === "signUp" ? (
@@ -73,15 +73,15 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
         value={password}
       />
       {error ? <p className="text-[11px] font-bold uppercase tracking-widest text-red-400">{error}</p> : null}
-      <div className="flex gap-3">
+      <div className="flex flex-col md:flex-row gap-3">
         <Button
-          className="rounded-none bg-primary hover:bg-primary/80"
+          className="rounded-none bg-primary hover:bg-primary/80 w-full md:w-auto"
           disabled={pending}
           type="submit"
         >
           {mode === "signIn" ? "로그인" : "가입"}
         </Button>
-        <Button asChild className="rounded-none border-white/10" variant="outline">
+        <Button asChild className="rounded-none border-white/10 w-full md:w-auto" variant="outline">
           <Link href={mode === "signIn" ? "/signup" : "/login"}>
             {mode === "signIn" ? "가입" : "로그인"}
           </Link>

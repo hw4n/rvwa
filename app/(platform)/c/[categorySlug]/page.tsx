@@ -37,15 +37,16 @@ export default async function CategoryPage({
   const { category, roots } = view;
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-10 md:space-y-16">
       <PlatformHeader
         eyebrow={category.slug}
         title={category.name}
         description={category.description}
         crumbs={[{ label: "대시보드", href: "/dashboard" }, { label: category.name }]}
         variant="compact"
+        actionsOutside
         actions={
-          <div className="flex gap-4">
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4">
             {viewer?.role === "admin" ? (
               <Button asChild className="rounded-none border-white/10 hover:bg-white/5" variant="outline">
                 <Link href={`/admin/categories/${category.slug}/edit`}>수정</Link>
@@ -62,7 +63,7 @@ export default async function CategoryPage({
       />
 
       <section className="space-y-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
           {roots.map((node) => (
             <Link
               key={node.id}

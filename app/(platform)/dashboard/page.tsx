@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   const snapshot = await getDashboardSnapshot();
 
   return (
-    <div className="space-y-20">
+    <div className="space-y-10 md:space-y-20">
       <PlatformHeader
         eyebrow=""
         title=""
@@ -19,7 +19,7 @@ export default async function DashboardPage() {
       />
 
       <section className="space-y-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-8">
           {snapshot.recentReviews.map((review) => (
             <Link
               key={review.id}
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
         </div>
         
         {snapshot.recentReviews.length === 0 ? (
-          <div className="bg-surface-low p-20 text-center border border-white/5">
+          <div className="bg-surface-low p-10 md:p-20 text-center border border-white/5">
             <p className="text-xs font-black uppercase text-white/20 tracking-[0.4em]">승인된 리뷰가 아직 없습니다.</p>
           </div>
         ) : null}

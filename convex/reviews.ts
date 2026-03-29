@@ -278,10 +278,6 @@ export const submit = mutation({
       throw new Error("Item title is required");
     }
 
-    if (!args.nodeId && !args.selectedCategorySlug?.trim() && !suggestedCategoryName) {
-      throw new Error("Category is required");
-    }
-
     if (args.nodeId) {
       await ensureNodeExists(ctx, args.nodeId);
     }
@@ -511,10 +507,6 @@ export const updateSubmission = mutation({
 
     if (!args.nodeId && !proposedTitle) {
       throw new Error("Item title is required");
-    }
-
-    if (!args.nodeId && !args.selectedCategorySlug?.trim() && !suggestedCategoryName) {
-      throw new Error("Category is required");
     }
 
     if (args.nodeId) {

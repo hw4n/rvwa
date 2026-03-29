@@ -58,6 +58,7 @@ export function ContentNodePicker({
   required = false,
   search,
   selectedItem,
+  suppressResults = false,
 }: {
   emptyActionLabel?: string;
   emptyMessage?: string;
@@ -71,9 +72,10 @@ export function ContentNodePicker({
   required?: boolean;
   search: string;
   selectedItem?: ContentNode;
+  suppressResults?: boolean;
 }) {
   const hasNoResults = !selectedItem && !!search.trim() && matches.length === 0;
-  const showEmptyAction = !selectedItem && !!search.trim() && !!onEmptyAction;
+  const showEmptyAction = !suppressResults && !selectedItem && !!search.trim() && !!onEmptyAction;
   const emptyActionButton = showEmptyAction ? (
     <button
       className="group flex w-full items-center justify-between bg-surface-low px-4 py-3 text-left transition-colors hover:bg-surface-high"
@@ -116,7 +118,7 @@ export function ContentNodePicker({
           value={search}
         />
       )}
-      {!selectedItem && (matches.length || showEmptyAction) ? (
+      {!suppressResults && !selectedItem && (matches.length || showEmptyAction) ? (
         <div className="grid overflow-hidden bg-white/5 gap-px">
           {emptyActionButton}
           {matches.map((item) => (
@@ -133,7 +135,7 @@ export function ContentNodePicker({
             </button>
           ))}
         </div>
-      ) : !selectedItem && hasNoResults ? (
+      ) : !suppressResults && !selectedItem && hasNoResults ? (
         <div className="border border-white/5 bg-surface-low p-4">
           <p className="text-xs font-black uppercase tracking-[0.2em] text-[#c2c6d8]/20">{emptyMessage}</p>
         </div>

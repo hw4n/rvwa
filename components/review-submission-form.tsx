@@ -15,9 +15,7 @@ import { formatRatingInputValue } from "@/lib/review-rating";
 import { getReviewExplicitTitle } from "@/lib/review-display";
 
 export function ReviewSubmissionForm({
-  categories,
   items,
-  initialCategorySlug,
   initialItemSlug,
   initialReview,
 }: {
@@ -33,22 +31,19 @@ export function ReviewSubmissionForm({
   const initialItem = initialItemSlug ? items.find((item) => item.slug === initialItemSlug) : undefined;
   const [selectedItemSlug, setSelectedItemSlug] = React.useState(initialItem?.slug ?? "");
   const [search, setSearch] = React.useState(initialItem?.title ?? initialReview?.proposedTitle ?? "");
-  const [proposedTitle, setProposedTitle] = React.useState(initialReview?.proposedTitle ?? "");
-  const [proposedTitleTouched, setProposedTitleTouched] = React.useState(Boolean(initialReview?.proposedTitle));
-  const [selectedCategorySlug, setSelectedCategorySlug] = React.useState(
-    initialReview?.selectedCategorySlug ?? initialCategorySlug ?? ""
+  const [customItemTitle, setCustomItemTitle] = React.useState<string | null>(
+    initialReview?.nodeId ? null : initialReview?.proposedTitle ?? null
   );
-  const [suggestedCategoryName, setSuggestedCategoryName] = React.useState(initialReview?.suggestedCategoryName ?? "");
   const [title, setTitle] = React.useState(initialReview?.title ?? "");
   const [body, setBody] = React.useState(initialReview?.body ?? "");
   const [rating, setRating] = React.useState(formatRatingInputValue(initialReview?.rating));
   const [spoiler, setSpoiler] = React.useState(initialReview?.spoiler ?? false);
   const [pending, setPending] = React.useState(false);
   const [message, setMessage] = React.useState("");
-  const proposedTitleInputRef = React.useRef<HTMLInputElement | null>(null);
+  const bodyInputRef = React.useRef<HTMLTextAreaElement | null>(null);
   const selectedItem = selectedItemSlug ? items.find((item) => item.slug === selectedItemSlug) : undefined;
-  const { hasNoResults, matches } = useContentNodePicker({ items, search, selectedItem });
-  const effectiveProposedTitle = proposedTitle || (hasNoResults && !proposedTitleTouched ? search.trim() : "");
+  const { matches } = useContentNodePicker({ items, search, selectedItem });
+  const proposedTitle = customItemTitle ?? search.trim();
   const previewTitle = getReviewExplicitTitle({ title });
 
   async function submitReview() {
@@ -58,9 +53,7 @@ export function ReviewSubmissionForm({
     try {
       const payload = {
         nodeId: selectedItem?.id,
-        proposedTitle: selectedItem ? undefined : effectiveProposedTitle,
-        selectedCategorySlug: selectedItem ? undefined : selectedCategorySlug || undefined,
-        suggestedCategoryName: selectedItem ? undefined : suggestedCategoryName || undefined,
+        proposedTitle: selectedItem ? undefined : proposedTitle || undefined,
         title: title.trim(),
         body: body.trim(),
         rating: rating ? Number(rating) : undefined,
@@ -86,21 +79,17 @@ export function ReviewSubmissionForm({
     <div className="grid gap-6 xl:grid-cols-[1fr_340px] items-start min-h-0">
       <section className="space-y-4 min-h-0">
         <ContentNodePicker
-          emptyActionLabel="새 항목 제안"
+          emptyActionLabel="추가"
           label="항목"
           matches={matches}
           onClearSelection={() => {
             setSelectedItemSlug("");
             setSearch("");
-            if (!proposedTitleTouched) {
-              setProposedTitle("");
-            }
+            setCustomItemTitle(null);
           }}
           onSearchChange={(value) => {
             setSearch(value);
-            if (!proposedTitleTouched) {
-              setProposedTitle("");
-            }
+            setCustomItemTitle(null);
           }}
           onEmptyAction={(keyword) => {
             const normalized = keyword.trim();
@@ -108,80 +97,31 @@ export function ReviewSubmissionForm({
               return;
             }
             setSelectedItemSlug("");
-            setProposedTitleTouched(true);
-            setProposedTitle(normalized);
+            setSearch(normalized);
+            setCustomItemTitle(normalized);
             requestAnimationFrame(() => {
-              proposedTitleInputRef.current?.focus();
-              proposedTitleInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+              bodyInputRef.current?.focus();
+              bodyInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
             });
           }}
           onSelect={(item) => {
             setSelectedItemSlug(item.slug);
             setSearch(item.title);
+            setCustomItemTitle(null);
           }}
           required
           search={search}
           selectedItem={selectedItem}
+          suppressResults={Boolean(customItemTitle)}
         />
 
-        {selectedItem ? null : (
-          <div className="grid gap-4 p-4 bg-surface-low border border-white/5">
-            <p className="text-sm font-black text-primary tracking-[0.3em] uppercase">새 항목 제안</p>
-            <p className="text-xs text-muted-foreground/70">
-              카테고리 및 제목은 관리자가 최종 검토 및 분류하므로 간단히 작성해 주세요.
+        {!selectedItem && customItemTitle ? (
+          <div className="px-1">
+            <p className="text-sm font-black tracking-[0.15em] text-yellow-200">
+              새 항목 추가 - <span className="text-orange-200">{customItemTitle}</span>
             </p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-3">
-                <label className="text-xs font-black uppercase text-white/30 tracking-widest">카테고리</label>
-                <select
-                  className="w-full border border-white/5 bg-surface-high px-4 py-3 text-sm font-bold text-white focus:border-primary/40 appearance-none"
-                  onChange={(event) => {
-                    const next = event.currentTarget.value;
-                    setSelectedCategorySlug(next);
-                    if (next) {
-                      setSuggestedCategoryName("");
-                    }
-                  }}
-                  value={selectedCategorySlug}
-                >
-                  <option value="">카테고리 선택...</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.slug}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-3">
-                <label className="text-xs font-black uppercase text-white/30 tracking-widest">
-                  항목 제목
-                  <span className="ml-1 text-red-500">*</span>
-                </label>
-                <input
-                  className="w-full bg-surface-high border border-white/5 px-4 py-3 text-base font-bold text-white focus:border-primary/40"
-                  ref={proposedTitleInputRef}
-                  onChange={(event) => {
-                    setProposedTitleTouched(true);
-                    setProposedTitle(event.currentTarget.value);
-                  }}
-                  placeholder="예: 케이온 1기"
-                  value={effectiveProposedTitle}
-                />
-              </div>
-              {!selectedCategorySlug ? (
-                <div className="space-y-3 md:col-span-2">
-                  <label className="text-xs font-black uppercase text-white/30 tracking-widest">새 카테고리</label>
-                  <input
-                    className="w-full bg-surface-high border border-white/5 px-4 py-3 text-base font-bold text-white focus:border-primary/40"
-                    onChange={(event) => setSuggestedCategoryName(event.currentTarget.value)}
-                    placeholder="새 카테고리 이름 (예: 애니메이션, 게임...)"
-                    value={suggestedCategoryName}
-                  />
-                </div>
-              ) : null}
-            </div>
           </div>
-        )}
+        ) : null}
 
         <div className="space-y-6">
           <div className="space-y-4">
@@ -201,6 +141,7 @@ export function ReviewSubmissionForm({
             </p>
             <textarea
               className="min-h-[260px] w-full bg-surface-low border border-white/5 p-4 text-base leading-relaxed text-[#c2c6d8] focus:border-primary/20 transition-all placeholder:text-white/5"
+              ref={bodyInputRef}
               onChange={(event) => setBody(event.currentTarget.value)}
               placeholder={reviewBodyTemplate}
               value={body}
@@ -228,7 +169,7 @@ export function ReviewSubmissionForm({
           </label>
           <Button
             className="rounded-none bg-primary text-black hover:bg-primary/80"
-            disabled={!body.trim() || pending}
+            disabled={!body.trim() || (!selectedItem && !proposedTitle) || pending}
             onClick={() => void submitReview()}
             type="button"
           >

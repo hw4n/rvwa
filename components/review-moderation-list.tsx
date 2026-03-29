@@ -219,7 +219,7 @@ export function ReviewModerationList() {
         newCategoryName: selectedItem ? undefined : activeNewCategoryName || undefined,
         newCategorySlug: selectedItem ? undefined : activeNewCategorySlug || undefined,
         newItemTitle: selectedItem ? undefined : activeNewItemTitle || undefined,
-        newItemSummary: selectedItem ? undefined : activeNewItemSummary || undefined,
+        newItemSummary: selectedItem ? undefined : activeNewItemSummary.trim() || "-",
         newItemSlug: selectedItem ? undefined : activeNewItemSlug || undefined,
         coverImage: selectedItem ? undefined : activeCoverImage || undefined,
         attributes: selectedItem ? undefined : getAttributes(activeReview.id, activeCategory),
@@ -410,7 +410,7 @@ export function ReviewModerationList() {
                       const value = event.currentTarget.value;
                       setNewItemSummaries((current) => ({ ...current, [activeReview.id]: value }));
                     }}
-                    placeholder="새 항목 설명"
+                    placeholder="새 항목 설명 (비우면 -)"
                     value={activeNewItemSummary}
                   />
 

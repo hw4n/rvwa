@@ -419,8 +419,7 @@ export const resolveAndApprove = mutation({
         categorySlug: category.slug,
         parentId: undefined,
         summary: sanitizeRequiredText(
-          sanitizeOptionalText(args.newItemSummary, "Item summary", INPUT_LIMITS.nodeSummary) ||
-            excerptFromBody(review.body, itemTitle),
+          sanitizeOptionalText(args.newItemSummary, "Item summary", INPUT_LIMITS.nodeSummary) || "-",
           "Item summary",
           INPUT_LIMITS.nodeSummary
         ),

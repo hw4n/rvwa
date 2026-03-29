@@ -13,10 +13,13 @@ export const getSnapshot = query({
       .collect();
 
     const recentReviews = await Promise.all(
-      reviews
-        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-        .slice(0, 4)
-        .map((review) => toReview(ctx, review as any))
+      (
+        await ctx.db
+          .query("reviews")
+          .withIndex("by_status_and_updated_at", (q) => q.eq("status", "approved"))
+          .order("desc")
+          .take(4)
+      ).map((review) => toReview(ctx, review as any))
     );
 
     return {

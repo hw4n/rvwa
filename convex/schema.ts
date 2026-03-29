@@ -100,7 +100,8 @@ export default defineSchema({
   })
     .index("by_node", ["nodeId"])
     .index("by_author", ["authorId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_status_and_updated_at", ["status", "updatedAt"]),
 
   collections: defineTable({
     slug: v.string(),

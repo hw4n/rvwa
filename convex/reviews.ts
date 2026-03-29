@@ -95,17 +95,15 @@ async function getExistingCategory(ctx: any, slug?: string | null) {
 export const listRecent = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 4;
+    const limit = Math.max(1, Math.min(Math.floor(args.limit ?? 4), 120));
     const reviews = await ctx.db
       .query("reviews")
-      .withIndex("by_status", (q) => q.eq("status", "approved"))
-      .collect();
+      .withIndex("by_status_and_updated_at", (q) => q.eq("status", "approved"))
+      .order("desc")
+      .take(limit);
 
     return await Promise.all(
-      reviews
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-        .slice(0, limit)
-        .map((review) => toReview(ctx, review as any))
+      reviews.map((review) => toReview(ctx, review as any))
     );
   },
 });

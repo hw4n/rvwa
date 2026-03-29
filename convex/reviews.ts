@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { mutationGeneric as mutation, queryGeneric as query } from "convex/server";
+import { mutationGeneric as mutation, paginationOptsValidator, queryGeneric as query } from "convex/server";
 import { v } from "convex/values";
 import {
   INPUT_LIMITS,
@@ -105,6 +105,24 @@ export const listRecent = query({
     return await Promise.all(
       reviews.map((review) => toReview(ctx, review as any))
     );
+  },
+});
+
+export const listRecentPage = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const page = await ctx.db
+      .query("reviews")
+      .withIndex("by_status_and_updated_at", (q) => q.eq("status", "approved"))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    return {
+      ...page,
+      page: await Promise.all(
+        page.page.map((review) => toReview(ctx, review as any))
+      ),
+    };
   },
 });
 

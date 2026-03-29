@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useQuery } from "convex/react";
+import { usePaginatedQuery } from "convex/react";
 import Image from "next/image";
 import Link from "next/link";
 import { PosterRatingBadge } from "@/components/poster-rating-badge";
@@ -13,21 +13,21 @@ const PAGE_SIZE = 12;
 
 export function DashboardReviewGrid() {
   const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
-  const [limit, setLimit] = React.useState(PAGE_SIZE);
-  const queriedReviews = useQuery(api.reviews.listRecent, { limit });
-  const reviews = queriedReviews ?? [];
-  const isLoading = queriedReviews === undefined;
-  const hasMore = reviews.length >= limit;
+  const { results, status, isLoading, loadMore } = usePaginatedQuery(
+    api.reviews.listRecentPage,
+    {},
+    { initialNumItems: PAGE_SIZE }
+  );
 
   React.useEffect(() => {
-    if (!loadMoreRef.current || !hasMore) {
+    if (!loadMoreRef.current || status !== "CanLoadMore") {
       return;
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
-          setLimit((current) => current + PAGE_SIZE);
+          loadMore(PAGE_SIZE);
         }
       },
       {
@@ -37,9 +37,9 @@ export function DashboardReviewGrid() {
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [hasMore]);
+  }, [loadMore, status]);
 
-  if (!isLoading && reviews.length === 0) {
+  if (!isLoading && results.length === 0) {
     return (
       <div className="border border-white/5 bg-surface-low p-10 text-center md:p-20">
         <p className="text-xs font-black uppercase tracking-[0.4em] text-white/20">
@@ -52,7 +52,7 @@ export function DashboardReviewGrid() {
   return (
     <section className="space-y-6">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-8 lg:grid-cols-5 xl:grid-cols-6">
-        {reviews.map((review) => (
+        {results.map((review) => (
           <Link
             key={review.id}
             href={`/r/${review.id}`}
@@ -91,8 +91,8 @@ export function DashboardReviewGrid() {
         ))}
       </div>
 
-      {hasMore ? <div className="h-8" ref={loadMoreRef} /> : null}
-      {isLoading || hasMore ? (
+      {status !== "Exhausted" ? <div className="h-8" ref={loadMoreRef} /> : null}
+      {status === "LoadingMore" ? (
         <div className="flex justify-center">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/25">
             더 불러오는 중

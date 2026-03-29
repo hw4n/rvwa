@@ -8,6 +8,7 @@ import { useMutation } from "convex/react";
 import type { Category, ContentNode, Review } from "@/lib/domain";
 import { Button } from "@/components/ui/button";
 import { ContentNodePicker, useContentNodePicker } from "@/components/content-node-picker";
+import { reviewBodyTemplate } from "@/components/review-composer";
 import { ReviewRatingInput } from "@/components/review-rating-input";
 import { MarkdownPreview } from "@/components/markdown-preview";
 import { formatRatingInputValue } from "@/lib/review-rating";
@@ -185,7 +186,7 @@ export function ReviewSubmissionForm({
             <textarea
               className="min-h-[260px] w-full bg-surface-low border border-white/5 p-4 text-base leading-relaxed text-[#c2c6d8] focus:border-primary/20 transition-all placeholder:text-white/5"
               onChange={(event) => setBody(event.currentTarget.value)}
-              placeholder="리뷰 내용을 입력하세요."
+              placeholder={reviewBodyTemplate}
               value={body}
             />
           </div>
@@ -229,7 +230,7 @@ export function ReviewSubmissionForm({
               {previewTitle}
             </h2>
           ) : null}
-          <div className="text-sm text-[#c2c6d8]/40 prose prose-invert prose-sm max-w-none leading-relaxed">
+          <div className="text-sm text-[#c2c6d8]/40 leading-relaxed">
             <MarkdownPreview body={body.trim() || "_미리보기 준비중..._"} />
           </div>
         </div>

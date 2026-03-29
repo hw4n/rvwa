@@ -11,9 +11,19 @@ import { Button } from "@/components/ui/button";
 import { MarkdownPreview } from "@/components/markdown-preview";
 import { getReviewDisplayTitle } from "@/lib/review-display";
 
+export const reviewBodyTemplate = `내가 이 작품을 보고 느낀것은
+- 주인공이 멋지고
+- 주인공이 예쁘고
+- 주인공이 대단하다는 점으로
+
+그래서 나는 앞으로 ...
+
+0. 대단해야되고
+0. 멋져야되고`;
+
 const initialDraft: ReviewDraft = {
   title: "",
-  body: "## 주요 특징\n\n- \n\n## 계층 내 위치\n\n",
+  body: reviewBodyTemplate,
   rating: "",
   spoiler: false,
 };
@@ -142,7 +152,7 @@ export function ReviewComposer({
               className="min-h-[500px] w-full bg-[#0e0e0e] border border-white/5 p-6 font-mono text-[13px] leading-relaxed text-[#c2c6d8] placeholder:opacity-20 italic focus:border-primary/30 transition-colors"
               value={draft.body}
               onChange={(event) => updateDraft("body", event.target.value)}
-              placeholder="BEGIN_TRANSMISSION..."
+              placeholder={reviewBodyTemplate}
             />
           </div>
         </div>
@@ -186,7 +196,7 @@ export function ReviewComposer({
               nodeTitle: node.title,
             })}
           </h2>
-          <div className="mt-8 text-sm text-[#c2c6d8]/70 prose prose-invert prose-sm max-w-none">
+          <div className="mt-8 text-sm text-[#c2c6d8]/70">
             <MarkdownPreview body={deferredBody || "_버퍼가 비어 있습니다. 입력을 시작하십시오._"} />
           </div>
         </div>

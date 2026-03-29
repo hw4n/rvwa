@@ -45,6 +45,7 @@ export function ReviewSubmissionForm({
   const [spoiler, setSpoiler] = React.useState(initialReview?.spoiler ?? false);
   const [pending, setPending] = React.useState(false);
   const [message, setMessage] = React.useState("");
+  const proposedTitleInputRef = React.useRef<HTMLInputElement | null>(null);
   const selectedItem = selectedItemSlug ? items.find((item) => item.slug === selectedItemSlug) : undefined;
   const { hasNoResults, matches } = useContentNodePicker({ items, search, selectedItem });
   const effectiveProposedTitle = proposedTitle || (hasNoResults && !proposedTitleTouched ? search.trim() : "");
@@ -85,6 +86,7 @@ export function ReviewSubmissionForm({
     <div className="grid gap-6 xl:grid-cols-[1fr_340px] items-start min-h-0">
       <section className="space-y-4 min-h-0">
         <ContentNodePicker
+          emptyActionLabel="새 항목 제안"
           label="항목"
           matches={matches}
           onClearSelection={() => {
@@ -99,6 +101,19 @@ export function ReviewSubmissionForm({
             if (!proposedTitleTouched) {
               setProposedTitle("");
             }
+          }}
+          onEmptyAction={(keyword) => {
+            const normalized = keyword.trim();
+            if (!normalized) {
+              return;
+            }
+            setSelectedItemSlug("");
+            setProposedTitleTouched(true);
+            setProposedTitle(normalized);
+            requestAnimationFrame(() => {
+              proposedTitleInputRef.current?.focus();
+              proposedTitleInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+            });
           }}
           onSelect={(item) => {
             setSelectedItemSlug(item.slug);
@@ -144,6 +159,7 @@ export function ReviewSubmissionForm({
                 </label>
                 <input
                   className="w-full bg-surface-high border border-white/5 px-4 py-3 text-base font-bold text-white focus:border-primary/40"
+                  ref={proposedTitleInputRef}
                   onChange={(event) => {
                     setProposedTitleTouched(true);
                     setProposedTitle(event.currentTarget.value);

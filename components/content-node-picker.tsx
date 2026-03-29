@@ -46,10 +46,12 @@ export function useContentNodePicker({
 }
 
 export function ContentNodePicker({
+  emptyActionLabel,
   emptyMessage = "일치하는 항목이 없습니다.",
   label = "항목",
   matches,
   onClearSelection,
+  onEmptyAction,
   onSearchChange,
   onSelect,
   placeholder = "항목 검색 또는 새 항목 입력",
@@ -57,10 +59,12 @@ export function ContentNodePicker({
   search,
   selectedItem,
 }: {
+  emptyActionLabel?: string;
   emptyMessage?: string;
   label?: string;
   matches: ContentNode[];
   onClearSelection: () => void;
+  onEmptyAction?: (keyword: string) => void;
   onSearchChange: (value: string) => void;
   onSelect: (item: ContentNode) => void;
   placeholder?: string;
@@ -69,6 +73,19 @@ export function ContentNodePicker({
   selectedItem?: ContentNode;
 }) {
   const hasNoResults = !selectedItem && !!search.trim() && matches.length === 0;
+  const showEmptyAction = !selectedItem && !!search.trim() && !!onEmptyAction;
+  const emptyActionButton = showEmptyAction ? (
+    <button
+      className="group flex w-full items-center justify-between bg-surface-low px-4 py-3 text-left transition-colors hover:bg-surface-high"
+      onClick={() => onEmptyAction(search.trim())}
+      type="button"
+    >
+      <span className="flex items-center gap-2 font-black tracking-tight transition-colors">
+        <span className="min-w-0 truncate text-white group-hover:text-primary">{search.trim()}</span>
+        <span className="shrink-0 text-orange-300">{emptyActionLabel ?? "새 항목 제안"}</span>
+      </span>
+    </button>
+  ) : null;
 
   return (
     <div className="space-y-3">
@@ -99,8 +116,9 @@ export function ContentNodePicker({
           value={search}
         />
       )}
-      {!selectedItem && matches.length ? (
+      {!selectedItem && (matches.length || showEmptyAction) ? (
         <div className="grid overflow-hidden bg-white/5 gap-px">
+          {emptyActionButton}
           {matches.map((item) => (
             <button
               className="group flex items-center justify-between bg-surface-low px-4 py-3 text-left transition-colors hover:bg-surface-high"

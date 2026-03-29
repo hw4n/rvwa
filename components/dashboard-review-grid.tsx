@@ -5,16 +5,16 @@ import { useQuery } from "convex/react";
 import Image from "next/image";
 import Link from "next/link";
 import { PosterRatingBadge } from "@/components/poster-rating-badge";
+import { api } from "@/convex/_generated/api";
 import { getPosterImageUrl } from "@/lib/poster";
 import { getReviewDisplayTitle } from "@/lib/review-display";
-import type { Review } from "@/lib/domain";
 
 const PAGE_SIZE = 12;
 
 export function DashboardReviewGrid() {
   const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
   const [limit, setLimit] = React.useState(PAGE_SIZE);
-  const queriedReviews = useQuery("reviews:listRecent" as any, { limit }) as Review[] | undefined;
+  const queriedReviews = useQuery(api.reviews.listRecent, { limit });
   const reviews = queriedReviews ?? [];
   const isLoading = queriedReviews === undefined;
   const hasMore = reviews.length >= limit;

@@ -10,10 +10,11 @@ function FilledStars({
   rating: number;
   size: RatingDisplaySize;
 }) {
-  const starClassName = size === "detail" ? "size-4" : "size-3.5";
+  const starClassName = size === "detail" ? "size-3.5" : "size-3.5";
+  const containerClassName = size === "detail" ? "flex items-center gap-1" : "flex items-center gap-1.5";
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className={containerClassName}>
       {Array.from({ length: 5 }, (_, index) => {
         const fill = Math.max(0, Math.min(1, rating - index));
 
@@ -48,14 +49,14 @@ export function ReviewRatingDisplay({
     <div
       className={
         size === "detail"
-          ? "inline-flex items-center gap-3 bg-surface-low border border-white/5 px-3 py-2 min-w-[92px] shrink-0"
+          ? "flex w-full items-center justify-between gap-2 border border-white/5 bg-surface-low px-2.5 py-2 shrink-0"
           : "inline-flex items-center gap-2 bg-surface-low border border-white/5 px-2.5 py-1.5 shrink-0"
       }
     >
       <span
         className={
           size === "detail"
-            ? "text-xl font-black text-primary tracking-tighter leading-none"
+            ? "text-lg font-black text-primary tracking-tight leading-none"
             : "text-lg font-black text-primary tracking-tighter leading-none"
         }
       >

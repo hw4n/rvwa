@@ -1,7 +1,10 @@
+import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Review } from "@/lib/domain";
 import { MarkdownPreview } from "@/components/markdown-preview";
 import { ReviewRatingDisplay } from "@/components/review-rating-display";
+import { getPosterImageUrl } from "@/lib/poster";
 import { getReviewExplicitTitle } from "@/lib/review-display";
 import { ReviewSpoilerGate } from "@/components/review-spoiler-gate";
 
@@ -21,6 +24,28 @@ export function ReviewDetail({
   }
 
   const reviewTitle = getReviewExplicitTitle(review);
+  const posterTitle = review.nodeTitle ?? review.proposedTitle ?? reviewTitle ?? "R";
+  const posterCard = (
+    <div className="relative flex aspect-[2/3] w-full max-w-44 items-center justify-center overflow-hidden border border-white/5 bg-surface-low">
+      {review.coverImage ? (
+        <Image
+          alt={posterTitle}
+          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          priority
+          sizes="(max-width: 768px) 10rem, 11rem"
+          src={getPosterImageUrl(review.coverImage, "detail") ?? ""}
+          unoptimized
+        />
+      ) : null}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20" />
+      {!review.coverImage ? (
+        <span className="relative z-10 select-none text-7xl font-black uppercase tracking-tighter text-white/10">
+          {posterTitle.charAt(0)}
+        </span>
+      ) : null}
+    </div>
+  );
   const reviewContent = (
     <div className="min-w-0 space-y-4">
       {reviewTitle ? (
@@ -39,8 +64,17 @@ export function ReviewDetail({
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
         <div className="flex-1 max-w-4xl">
           <div className="grid items-start gap-4">
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-4">
-            <ReviewRatingDisplay rating={review.rating} size="detail" />
+            <div className="grid gap-6 md:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] md:gap-8">
+              <div className="flex w-full max-w-44 flex-col items-start gap-4">
+                {review.nodeSlug ? (
+                  <Link className="block w-full max-w-44 transition-transform hover:scale-[1.02]" href={`/n/${review.nodeSlug}`}>
+                    {posterCard}
+                  </Link>
+                ) : (
+                  posterCard
+                )}
+                <ReviewRatingDisplay rating={review.rating} size="detail" />
+              </div>
               <div className="min-w-0 space-y-4">
                 <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
                   {new Date(review.createdAt).toLocaleDateString("ko-KR", {

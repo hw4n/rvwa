@@ -25,6 +25,22 @@ export function ReviewDetail({
 
   const reviewTitle = getReviewExplicitTitle(review);
   const posterTitle = review.nodeTitle ?? review.proposedTitle ?? reviewTitle ?? "R";
+  const statusBadges = (
+    <div className="flex flex-wrap gap-3">
+      <span className={`px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border ${
+        review.status === "approved" ? "border-primary/20 text-primary/60 bg-primary/5" :
+        review.status === "pending" ? "border-yellow-400/20 text-yellow-400/60 bg-yellow-400/5" :
+        "border-red-400/20 text-red-400/60 bg-red-400/5"
+      }`}>
+        {review.status}
+      </span>
+      {review.spoiler ? (
+        <span className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border border-red-500/25 text-red-300 bg-red-500/10">
+          Spoiler
+        </span>
+      ) : null}
+    </div>
+  );
   const posterCard = (
     <div className="relative flex aspect-[2/3] w-full max-w-44 items-center justify-center overflow-hidden border border-white/5 bg-surface-low">
       {review.coverImage ? (
@@ -74,6 +90,14 @@ export function ReviewDetail({
                   posterCard
                 )}
                 <ReviewRatingDisplay rating={review.rating} size="detail" />
+                <div className="md:hidden">
+                  {statusBadges}
+                </div>
+                {actions ? (
+                  <div className="flex flex-wrap gap-3 md:hidden">
+                    {actions}
+                  </div>
+                ) : null}
               </div>
               <div className="min-w-0 space-y-4">
                 <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
@@ -99,21 +123,10 @@ export function ReviewDetail({
         </div>
         
         <div className="shrink-0 flex flex-col items-start md:items-end gap-3">
-          <div className="flex flex-col items-end gap-3">
-            {actions ? <div className="flex flex-wrap justify-end gap-3">{actions}</div> : null}
-            <div className="flex flex-wrap gap-3">
-            <span className={`px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border ${
-              review.status === "approved" ? "border-primary/20 text-primary/60 bg-primary/5" :
-              review.status === "pending" ? "border-yellow-400/20 text-yellow-400/60 bg-yellow-400/5" :
-              "border-red-400/20 text-red-400/60 bg-red-400/5"
-            }`}>
-              {review.status}
-            </span>
-            {review.spoiler && (
-              <span className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border border-red-500/25 text-red-300 bg-red-500/10">
-                Spoiler
-              </span>
-            )}
+          <div className="flex flex-col items-start gap-3 md:items-end">
+            {actions ? <div className="hidden flex-wrap justify-end gap-3 md:flex">{actions}</div> : null}
+            <div className="hidden md:flex">
+              {statusBadges}
             </div>
           </div>
         </div>

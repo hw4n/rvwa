@@ -110,13 +110,16 @@ export function PlatformShell({
   const sidebarItemVisibleReviews = sidebarItemReviews.slice(0, itemReviewLimit);
   const sidebarRecentReviews = sidebarMode === "dashboard" ? recentReviews : [];
   const sidebarMyReviews = sidebarMode === "mine" ? myReviews : [];
+  const sidebarPendingReviews = sidebarMode === "pending" ? pendingReviews : [];
 
   const sidebarReviews =
     sidebarMode === "item"
       ? sidebarItemVisibleReviews
       : sidebarMode === "mine"
         ? sidebarMyReviews
-        : sidebarRecentReviews;
+        : sidebarMode === "pending"
+          ? sidebarPendingReviews
+          : sidebarRecentReviews;
   const hasMoreSidebarItems =
     sidebarMode === "category"
       ? sidebarCategoryNodes.length > categoryItemLimit
@@ -124,7 +127,9 @@ export function PlatformShell({
         ? sidebarItemReviews.length > itemReviewLimit
         : sidebarMode === "mine"
           ? sidebarMyReviews.length >= myReviewLimit
-        : sidebarRecentReviews.length >= recentReviewLimit;
+          : sidebarMode === "pending"
+            ? false
+            : sidebarRecentReviews.length >= recentReviewLimit;
   const pendingCount = viewer?.role === "admin" ? pendingReviews.length : 0;
   const topCrumbs = resolveTopCrumbs(pathname, searchParams, categories, items, currentReview, editingReview);
   const sidebarTopCrumbs = pathname.startsWith("/r/") ? topCrumbs.slice(0, -1) : topCrumbs;
@@ -784,6 +789,10 @@ function getSidebarMode(pathname: string, currentReview: Review | null) {
 
   if (pathname.startsWith("/c/")) {
     return "category";
+  }
+
+  if (pathname.startsWith("/admin/reviews")) {
+    return "pending";
   }
 
   if (pathname.startsWith("/n/")) {

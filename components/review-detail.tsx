@@ -41,6 +41,30 @@ export function ReviewDetail({
       ) : null}
     </div>
   );
+  const reviewMeta = (
+    <>
+      <div className="text-foreground/40 text-[10px] font-black uppercase tracking-[0.16em] leading-none sm:tracking-[0.2em]">
+        {new Date(review.createdAt).toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      </div>
+      <div className="text-xs font-black tracking-[0.16em] text-tertiary/90 sm:tracking-[0.2em]">
+        {review.author?.name ?? "익명"}
+      </div>
+    </>
+  );
+  const topControls = (
+    <div className="min-w-0 space-y-4 md:flex md:flex-col md:items-end">
+      {actions ? (
+        <div className="flex flex-wrap gap-3 md:justify-end">
+          {actions}
+        </div>
+      ) : null}
+      {statusBadges}
+    </div>
+  );
   const posterCard = (
     <div className="relative flex aspect-[2/3] w-full max-w-44 items-center justify-center overflow-hidden border border-border bg-surface-low">
       {review.coverImage ? (
@@ -62,10 +86,10 @@ export function ReviewDetail({
       ) : null}
     </div>
   );
-  const reviewContent = (
+  const reviewBody = (
     <div className="min-w-0 space-y-4">
       {reviewTitle ? (
-        <h2 className="text-4xl font-black text-foreground tracking-tighter uppercase leading-tight">
+        <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase leading-tight sm:text-4xl">
           {reviewTitle}
         </h2>
       ) : null}
@@ -74,13 +98,42 @@ export function ReviewDetail({
       </div>
     </div>
   );
+  const renderReviewContent = (content: ReactNode) => review.spoiler ? (
+    <ReviewSpoilerGate className="min-w-0" title="스포일러 리뷰">
+      {content}
+    </ReviewSpoilerGate>
+  ) : (
+    content
+  );
+  const tabletReviewBody = (
+    <div className="min-w-0 space-y-4">
+      {reviewMeta}
+      {reviewBody}
+    </div>
+  );
 
   return (
     <article className="space-y-8">
-      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
-        <div className="flex-1 max-w-4xl">
+      <div className="grid gap-8 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-6 xl:hidden">
+        <div className="w-full max-w-44 space-y-4">
+          {review.nodeSlug ? (
+            <Link className="block w-full max-w-44 transition-transform hover:scale-[1.02]" href={`/n/${review.nodeSlug}`}>
+              {posterCard}
+            </Link>
+          ) : (
+            posterCard
+          )}
+          <ReviewRatingDisplay rating={review.rating} size="detail" />
+        </div>
+        {topControls}
+        <div className="min-w-0 md:col-span-2">
+          {renderReviewContent(tabletReviewBody)}
+        </div>
+      </div>
+      <div className="hidden items-start justify-between gap-8 xl:flex">
+        <div className="max-w-4xl flex-1">
           <div className="grid items-start gap-4">
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] lg:gap-8">
+            <div className="grid gap-8 xl:grid-cols-[minmax(0,11rem)_minmax(0,1fr)]">
               <div className="flex w-full max-w-44 flex-col items-start gap-4">
                 {review.nodeSlug ? (
                   <Link className="block w-full max-w-44 transition-transform hover:scale-[1.02]" href={`/n/${review.nodeSlug}`}>
@@ -90,48 +143,23 @@ export function ReviewDetail({
                   posterCard
                 )}
                 <ReviewRatingDisplay rating={review.rating} size="detail" />
-                <div className="lg:hidden">
-                  {statusBadges}
-                </div>
-                {actions ? (
-                  <div className="flex flex-wrap gap-3 lg:hidden">
-                    {actions}
-                  </div>
-                ) : null}
               </div>
               <div className="min-w-0 space-y-4">
-                <div className="text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
-                  {new Date(review.createdAt).toLocaleDateString("ko-KR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </div>
-                <div className="text-xs font-black tracking-[0.2em] text-tertiary/90">
-                  {review.author?.name ?? "익명"}
-                </div>
-                {review.spoiler ? (
-                  <ReviewSpoilerGate className="min-w-0" title="스포일러 리뷰">
-                    {reviewContent}
-                  </ReviewSpoilerGate>
-                ) : (
-                  reviewContent
-                )}
+                {reviewMeta}
+                {renderReviewContent(reviewBody)}
               </div>
             </div>
           </div>
         </div>
-        
-        <div className="shrink-0 flex flex-col items-start lg:items-end gap-3">
-          <div className="flex flex-col items-start gap-3 lg:items-end">
-            {actions ? <div className="hidden flex-wrap justify-end gap-3 lg:flex">{actions}</div> : null}
-            <div className="hidden lg:flex">
-              {statusBadges}
+        <div className="flex shrink-0 flex-col items-start gap-3 xl:items-end">
+          {actions ? (
+            <div className="flex flex-wrap justify-end gap-3">
+              {actions}
             </div>
-          </div>
+          ) : null}
+          {statusBadges}
         </div>
       </div>
-      
     </article>
   );
 }

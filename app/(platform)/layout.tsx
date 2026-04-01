@@ -7,7 +7,7 @@ export default async function PlatformLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-surface-mid" />}>
+    <Suspense fallback={<div className="min-h-dvh bg-surface-mid" />}>
       <PlatformShell>{children}</PlatformShell>
     </Suspense>
   );

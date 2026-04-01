@@ -487,7 +487,7 @@ export function PlatformShell({
   );
 
   return (
-    <div className="relative flex h-screen min-h-0 flex-col overflow-hidden bg-surface-mid text-foreground selection:bg-primary/20">
+    <div className="relative flex h-dvh min-h-0 flex-col overflow-hidden bg-surface-mid text-foreground selection:bg-primary/20">
       <div className="flex min-h-0 w-full flex-1 overflow-hidden">
         <aside className="icon-rail-scrollbar hidden h-full w-16 shrink-0 flex-col items-stretch overflow-x-hidden overflow-y-auto border-r border-border bg-surface-lowest lg:flex">
           {railNavigation}
@@ -700,7 +700,7 @@ function DesktopNodeSearch({
           role="listbox"
         >
           {matches.length ? (
-            <div className="custom-scrollbar grid max-h-[min(24rem,calc(100vh-10rem))] gap-px overflow-y-auto bg-border">
+            <div className="custom-scrollbar grid max-h-[min(24rem,calc(100dvh-10rem))] gap-px overflow-y-auto bg-border">
               {matches.map((item, index) => (
                 <button
                   aria-selected={index === activeIndex}

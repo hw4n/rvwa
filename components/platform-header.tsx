@@ -49,14 +49,14 @@ export function PlatformHeader({
               </div>
             ) : null}
             <h1
-              className={`text-3xl md:text-4xl font-black text-white tracking-tight leading-none ${
+              className={`text-3xl md:text-4xl font-black text-foreground tracking-tight leading-none ${
                 titleClassName ?? ""
               }`}
             >
               {title}
             </h1>
             {description ? (
-              <p className="mt-4 text-sm max-w-2xl leading-relaxed text-[#c2c6d8]/60 font-medium">
+              <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground">
                 {description}
               </p>
             ) : null}
@@ -70,9 +70,9 @@ export function PlatformHeader({
   return (
     <div className="mb-12 md:mb-20">
       <section className="flex flex-col md:flex-row md:items-end gap-8 md:gap-12">
-        <div className="w-full h-56 md:w-48 md:h-72 bg-surface-low shrink-0 border border-white/5 flex flex-col items-center justify-center p-6 md:p-8 relative overflow-hidden group">
-           <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-           <span className="text-7xl md:text-9xl font-black text-white/5 tracking-tighter uppercase mb-4 select-none group-hover:scale-110 transition-transform">
+        <div className="relative h-56 w-full shrink-0 overflow-hidden border border-border bg-surface-low p-6 md:h-72 md:w-48 md:p-8 flex flex-col items-center justify-center group">
+           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+           <span className="mb-4 select-none text-7xl font-black uppercase tracking-tighter text-foreground/10 transition-transform group-hover:scale-110 md:text-9xl">
              {title.charAt(0)}
            </span>
            <div className="mt-auto flex flex-col items-center gap-2">
@@ -87,11 +87,11 @@ export function PlatformHeader({
               {eyebrow}
             </span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-6 md:mb-8 leading-[0.9] uppercase">
+          <h1 className="mb-6 text-5xl font-black uppercase leading-[0.9] tracking-tighter text-foreground md:mb-8 md:text-7xl">
             {title}
           </h1>
           {description ? (
-            <p className="text-[#c2c6d8]/60 text-base md:text-lg max-w-2xl leading-relaxed font-medium">
+            <p className="max-w-2xl text-base font-medium leading-relaxed text-muted-foreground md:text-lg">
               {description}
             </p>
           ) : null}

@@ -10,15 +10,17 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border-white/6 bg-primary text-black hover:bg-primary/80",
+          "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10",
         outline:
-          "border-white/8 bg-white/3 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:bg-white/7 hover:text-foreground aria-expanded:bg-white/7 aria-expanded:text-foreground",
+          "border-border bg-surface-lowest text-foreground shadow-sm hover:bg-surface-high hover:text-foreground aria-expanded:bg-surface-high aria-expanded:text-foreground",
         secondary:
-          "border-white/6 bg-secondary/65 text-secondary-foreground hover:bg-secondary/85 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "border-secondary/30 bg-secondary/10 text-secondary-foreground hover:bg-secondary/20 aria-expanded:bg-secondary/20 aria-expanded:text-secondary-foreground",
         ghost:
-          "border-white/0 bg-transparent text-muted-foreground hover:bg-white/6 hover:text-foreground aria-expanded:bg-white/6 aria-expanded:text-foreground",
+          "border-transparent bg-transparent text-muted-foreground hover:bg-surface-high hover:text-foreground aria-expanded:bg-surface-high aria-expanded:text-foreground",
         destructive:
-          "border-red-600 bg-red-600 text-white hover:bg-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20",
+          "border-destructive bg-destructive text-destructive-foreground hover:bg-destructive/80 focus-visible:ring-destructive/20",
+        warning:
+          "border-orange-500/30 bg-orange-500/5 text-orange-500 hover:bg-orange-500/15 focus-visible:ring-orange-500/20",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

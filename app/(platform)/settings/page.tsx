@@ -1,5 +1,6 @@
 import { PlatformHeader } from "@/components/platform-header";
 import { SettingsProfileForm } from "@/components/settings-profile-form";
+import { SettingsThemeForm } from "@/components/settings-theme-form";
 import { requireViewer } from "@/lib/auth";
 
 export default async function SettingsPage() {
@@ -14,6 +15,7 @@ export default async function SettingsPage() {
         variant="compact"
       />
 
+      <SettingsThemeForm />
       <SettingsProfileForm
         email={viewer.email}
         initialDisplayName={viewer.name}

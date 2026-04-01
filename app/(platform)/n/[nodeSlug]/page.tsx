@@ -54,7 +54,7 @@ export default async function NodePage({
           <div className="flex flex-wrap gap-4">
             {viewer?.role === "admin" ? (
               <>
-                <Button asChild className="rounded-none border-white/10 hover:bg-white/5" variant="outline">
+                <Button asChild className="rounded-none border-border hover:bg-foreground/5" variant="outline">
                   <Link href={`/admin/nodes/${node.slug}/edit`}>수정</Link>
                 </Button>
                 <NodeDeleteButton slug={node.slug} />
@@ -66,13 +66,13 @@ export default async function NodePage({
 
       <section className="space-y-6">
         <div className="grid gap-6 xl:grid-cols-[1fr_360px] xl:items-start">
-          <div className="bg-surface-low border border-white/5 p-6">
+          <div className="bg-surface-low border border-border p-6">
             <NodeReviews reviews={approvedReviews} />
           </div>
 
           <div className="space-y-6">
-            <div className="overflow-hidden border border-white/5 bg-surface-low">
-              <div className="aspect-[2/3] bg-[#0e0e0e]">
+            <div className="overflow-hidden border border-border bg-surface-low">
+              <div className="aspect-[2/3] bg-surface-lowest">
                 {node.coverImage ? (
                   <Image
                     alt={node.title}
@@ -88,7 +88,7 @@ export default async function NodePage({
               </div>
             </div>
 
-            <div className="bg-surface-low p-6 border border-white/5">
+            <div className="bg-surface-low p-6 border border-border">
               <div className="space-y-6">
                 <p className="text-[14px] font-black text-primary uppercase tracking-[0.3em] mt-1">Tags</p>
                 <div className="flex flex-wrap gap-3">
@@ -96,39 +96,39 @@ export default async function NodePage({
                     node.tagSlugs.map((tag) => (
                       <span
                         key={tag}
-                        className="bg-surface-high border border-white/5 px-3 py-1.5 text-[14px] font-black uppercase tracking-widest text-white/40"
+                        className="bg-surface-high border border-border px-3 py-1.5 text-[14px] font-black uppercase tracking-widest text-foreground/40"
                       >
                         #{tag}
                       </span>
                     ))
                   ) : (
-                    <span className="text-[14px] font-bold text-[#c2c6d8]/20 italic">No tags assigned</span>
+                    <span className="text-[14px] font-bold text-muted-foreground/20 italic">No tags assigned</span>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="bg-surface-low p-6 border border-white/5">
+            <div className="bg-surface-low p-6 border border-border">
               <div className="space-y-6">
                 <p className="text-[14px] font-black text-primary uppercase tracking-[0.3em] mt-1">Info</p>
-                <div className="grid gap-px bg-white/5 overflow-hidden">
+                <div className="grid gap-px bg-foreground/5 overflow-hidden">
                   {attributeEntries.length ? (
                     attributeEntries.map(({ key, label, value }) => (
                       <div
                         key={key}
                         className="bg-surface-lowest p-3 transition-colors hover:bg-surface-low"
                       >
-                        <div className="text-[14px] font-black text-white/20 uppercase tracking-[0.2em]">
+                        <div className="text-[14px] font-black text-foreground/20 uppercase tracking-[0.2em]">
                           {label}
                         </div>
-                        <div className="ml-4 mt-1 text-[14px] font-bold text-white/80">
+                        <div className="ml-4 mt-1 text-[14px] font-bold text-foreground/80">
                           {Array.isArray(value) ? value.join(", ") : String(value)}
                         </div>
                       </div>
                     ))
                   ) : (
                     <div className="bg-surface-lowest p-3">
-                      <span className="text-[14px] font-bold text-[#c2c6d8]/20 italic">No attributes defined</span>
+                      <span className="text-[14px] font-bold text-muted-foreground/20 italic">No attributes defined</span>
                     </div>
                   )}
                 </div>

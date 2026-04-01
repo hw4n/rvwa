@@ -21,7 +21,7 @@ export function ReviewDeleteButton({
 
   return (
     <Button
-      className={`rounded-none uppercase tracking-[0.15em] ${className ?? ""}`}
+      className={`rounded-none uppercase tracking-widest font-bold ${className ?? ""}`}
       disabled={pending}
       onClick={async () => {
         if (!window.confirm("삭제하시겠습니까?")) {

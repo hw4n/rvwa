@@ -65,8 +65,8 @@ function MetadataValueInput({
 }) {
   if (type === "boolean") {
     return (
-      <div className="flex h-12 items-center justify-between border border-white/5 bg-[#0e0e0e] px-4">
-        <span className="text-sm font-bold text-white">{value ? "true" : "false"}</span>
+      <div className="flex h-12 items-center justify-between border border-border bg-surface-lowest px-4">
+        <span className="text-sm font-bold text-foreground">{value ? "true" : "false"}</span>
         <Switch checked={Boolean(value)} onCheckedChange={onChange} />
       </div>
     );
@@ -74,7 +74,7 @@ function MetadataValueInput({
 
   return (
     <Input
-      className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+      className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
       onChange={(event) => onChange(event.currentTarget.value)}
       placeholder={type === "list" ? "a, b, c" : type}
       value={String(value)}
@@ -141,7 +141,7 @@ export function ReviewModerationList() {
   const message = activeReview ? messages[activeReview.id] : "";
 
   if (!reviews.length) {
-    return <div className="text-sm text-[#8c90a1]">승인 대기 중인 리뷰가 없습니다.</div>;
+    return <div className="text-sm text-muted-foreground">승인 대기 중인 리뷰가 없습니다.</div>;
   }
 
   function getAttributes(reviewId: string, category: Category | undefined) {
@@ -249,7 +249,7 @@ export function ReviewModerationList() {
 
   return (
     <div className="space-y-4">
-      <Table className="border border-white/10">
+      <Table className="border border-border">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[42%]">리뷰</TableHead>
@@ -261,7 +261,7 @@ export function ReviewModerationList() {
         <TableBody>
           {reviews.map((review) => (
             <TableRow
-              className="cursor-pointer hover:bg-[#1c1b1b]"
+              className="cursor-pointer hover:bg-surface-high"
               key={review.id}
               onClick={() => setOpenReviewId(review.id)}
               onKeyDown={(event) => {
@@ -273,13 +273,13 @@ export function ReviewModerationList() {
               tabIndex={0}
             >
               <TableCell>
-                <p className="font-black tracking-tight text-white">{getReviewDisplayTitle(review)}</p>
+                <p className="font-black tracking-tight text-foreground">{getReviewDisplayTitle(review)}</p>
               </TableCell>
-              <TableCell className="text-[#c2c6d8]">{review.author?.name ?? "알 수 없음"}</TableCell>
-              <TableCell className="font-black text-[#ffb599]">
+              <TableCell className="text-muted-foreground">{review.author?.name ?? "알 수 없음"}</TableCell>
+              <TableCell className="font-black text-tertiary">
                 {typeof review.rating === "number" ? formatCompactRating(review.rating) : "-"}
               </TableCell>
-              <TableCell className="text-[#8c90a1]">{formatReviewDate(review.createdAt)}</TableCell>
+              <TableCell className="text-muted-foreground">{formatReviewDate(review.createdAt)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -302,19 +302,19 @@ export function ReviewModerationList() {
 
             <div className="grid gap-6 p-1">
               <section className="space-y-2">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#8c90a1]">리뷰 본문</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">리뷰 본문</p>
                 {activeReview.spoiler ? (
                   <ReviewSpoilerGate
                     confirmLabel="본문 확인"
                     description="검토 대상 본문에 스포일러가 포함되어 있습니다."
                     title="스포일러 본문"
                   >
-                    <div className="max-h-44 whitespace-pre-line overflow-auto border border-white/8 bg-[#0e0e0e] px-4 py-3 text-sm text-[#c2c6d8]">
+                    <div className="max-h-44 whitespace-pre-line overflow-auto border border-border bg-surface-lowest px-4 py-3 text-sm text-muted-foreground">
                       {activeReview.body}
                     </div>
                   </ReviewSpoilerGate>
                 ) : (
-                  <div className="max-h-44 whitespace-pre-line overflow-auto border border-white/8 bg-[#0e0e0e] px-4 py-3 text-sm text-[#c2c6d8]">
+                  <div className="max-h-44 whitespace-pre-line overflow-auto border border-border bg-surface-lowest px-4 py-3 text-sm text-muted-foreground">
                     {activeReview.body}
                   </div>
                 )}
@@ -344,7 +344,7 @@ export function ReviewModerationList() {
                 <div className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
                     <select
-                      className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white md:col-span-2"
+                      className="border border-border bg-surface-lowest px-4 py-3 text-sm font-bold text-foreground md:col-span-2"
                       onChange={(event) => {
                         const value = event.currentTarget.value;
                         setCategorySlugs((current) => ({ ...current, [activeReview.id]: value }));
@@ -361,7 +361,7 @@ export function ReviewModerationList() {
                     {!activeCategorySlug ? (
                       <>
                         <input
-                          className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
+                          className="border border-border bg-surface-lowest px-4 py-3 text-sm font-bold text-foreground"
                           onChange={(event) => {
                             const value = event.currentTarget.value;
                             setNewCategoryNames((current) => ({ ...current, [activeReview.id]: value }));
@@ -370,7 +370,7 @@ export function ReviewModerationList() {
                           value={activeNewCategoryName}
                         />
                         <input
-                          className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
+                          className="border border-border bg-surface-lowest px-4 py-3 text-sm font-bold text-foreground"
                           onChange={(event) => {
                             const value = event.currentTarget.value;
                             setNewCategorySlugs((current) => ({ ...current, [activeReview.id]: value }));
@@ -381,7 +381,7 @@ export function ReviewModerationList() {
                       </>
                     ) : null}
                     <input
-                      className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
+                      className="border border-border bg-surface-lowest px-4 py-3 text-sm font-bold text-foreground"
                       onChange={(event) => {
                         const value = event.currentTarget.value;
                         setNewItemTitles((current) => ({ ...current, [activeReview.id]: value }));
@@ -390,7 +390,7 @@ export function ReviewModerationList() {
                       value={activeNewItemTitle}
                     />
                     <input
-                      className="border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm font-bold text-white"
+                      className="border border-border bg-surface-lowest px-4 py-3 text-sm font-bold text-foreground"
                       onChange={(event) => {
                         const value = event.currentTarget.value;
                         setNewItemSlugs((current) => ({ ...current, [activeReview.id]: value }));
@@ -405,7 +405,7 @@ export function ReviewModerationList() {
                   </div>
 
                   <textarea
-                    className="min-h-28 w-full border border-white/5 bg-[#0e0e0e] px-4 py-3 text-sm text-white placeholder:text-white/30"
+                    className="min-h-28 w-full border border-border bg-surface-lowest px-4 py-3 text-sm text-foreground placeholder:text-foreground/30"
                     onChange={(event) => {
                       const value = event.currentTarget.value;
                       setNewItemSummaries((current) => ({ ...current, [activeReview.id]: value }));
@@ -424,10 +424,10 @@ export function ReviewModerationList() {
 
                   {activeCategory?.fieldDefinitions.length ? (
                     <div className="space-y-3">
-                      <span className="text-sm font-bold text-white">메타데이터</span>
+                      <span className="text-sm font-bold text-foreground">메타데이터</span>
                       {activeCategory.fieldDefinitions.map((field) => (
                         <div className="grid gap-3 md:grid-cols-[180px_minmax(0,1fr)]" key={field.key}>
-                          <div className="flex h-12 items-center border border-white/5 bg-[#0e0e0e] px-4 text-sm font-bold text-white">
+                          <div className="flex h-12 items-center border border-border bg-surface-lowest px-4 text-sm font-bold text-foreground">
                             {field.label}
                           </div>
                           <MetadataValueInput
@@ -455,9 +455,9 @@ export function ReviewModerationList() {
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-sm font-bold text-white">추가 메타데이터</span>
+                      <span className="text-sm font-bold text-foreground">추가 메타데이터</span>
                       <Button
-                        className="rounded-none border-white/10"
+                        className="rounded-none border-border"
                         onClick={() =>
                           setCustomRowsByReview((current) => ({
                             ...current,
@@ -476,7 +476,7 @@ export function ReviewModerationList() {
                         key={row.id}
                       >
                         <Input
-                          className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+                          className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
                           onBlur={(event) => {
                             const key = normalizeMetadataKey(event.currentTarget.value);
                             setCustomRowsByReview((current) => ({
@@ -501,7 +501,7 @@ export function ReviewModerationList() {
                           value={row.key}
                         />
                         <select
-                          className="h-12 w-full rounded-none border border-white/5 bg-[#0e0e0e] px-4 text-white"
+                          className="h-12 w-full rounded-none border border-border bg-surface-lowest px-4 text-foreground"
                           onChange={(event) => {
                             const value = event.currentTarget.value as MetadataFieldType;
                             setCustomRowsByReview((current) => ({
@@ -545,7 +545,7 @@ export function ReviewModerationList() {
                           value={row.value}
                         />
                         <Button
-                          className="rounded-none border-red-600 text-red-500 hover:bg-red-600/10 hover:text-red-400"
+                          className="rounded-none uppercase tracking-widest font-bold"
                           onClick={() =>
                             setCustomRowsByReview((current) => ({
                               ...current,
@@ -555,7 +555,7 @@ export function ReviewModerationList() {
                             }))
                           }
                           type="button"
-                          variant="outline"
+                          variant="destructive"
                         >
                           삭제
                         </Button>
@@ -567,7 +567,7 @@ export function ReviewModerationList() {
 
               <div className="flex flex-wrap gap-3 pt-2">
                 <Button
-                  className="rounded-none bg-[#b0c6ff] text-[#0e0e0e] hover:bg-[#9eb1ff] hover:text-[#0e0e0e] uppercase tracking-widest"
+                  className="rounded-none uppercase tracking-widest font-bold"
                   disabled={pendingId === activeReview.id}
                   onClick={handleApprove}
                   type="button"

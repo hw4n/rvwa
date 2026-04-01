@@ -83,7 +83,7 @@ export function ContentNodePicker({
       type="button"
     >
       <span className="flex items-center gap-2 font-black tracking-tight transition-colors">
-        <span className="min-w-0 truncate text-white group-hover:text-primary">{search.trim()}</span>
+        <span className="min-w-0 truncate text-foreground group-hover:text-primary">{search.trim()}</span>
         <span className="shrink-0 text-orange-300">{emptyActionLabel ?? "새 항목 제안"}</span>
       </span>
     </button>
@@ -96,13 +96,13 @@ export function ContentNodePicker({
         {required ? <span className="ml-1 text-red-500">*</span> : null}
       </p>
       {selectedItem ? (
-        <div className="group flex items-center justify-between gap-4 border border-white/5 bg-surface-high p-4">
+        <div className="group flex items-center justify-between gap-4 border border-border bg-surface-high p-4">
           <div className="min-w-0">
-            <p className="text-lg font-black tracking-tight text-white">{selectedItem.title}</p>
+            <p className="text-lg font-black tracking-tight text-foreground">{selectedItem.title}</p>
             <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{selectedItem.categorySlug}</p>
           </div>
           <Button
-            className="rounded-none border-white/10 hover:bg-white/5"
+            className="rounded-none border-border hover:bg-foreground/5"
             onClick={onClearSelection}
             type="button"
             variant="outline"
@@ -112,14 +112,14 @@ export function ContentNodePicker({
         </div>
       ) : (
         <input
-          className="w-full border-b border-white/5 bg-surface-low px-0 py-3 text-2xl font-black tracking-tight text-white transition-colors placeholder:text-white/10 focus:border-primary/40"
+          className="w-full border-b border-border bg-surface-low px-0 py-3 text-2xl font-black tracking-tight text-foreground transition-colors placeholder:text-foreground/10 focus:border-primary/40"
           onChange={(event) => onSearchChange(event.currentTarget.value)}
           placeholder={placeholder}
           value={search}
         />
       )}
       {!suppressResults && !selectedItem && (matches.length || showEmptyAction) ? (
-        <div className="grid overflow-hidden bg-white/5 gap-px">
+        <div className="grid overflow-hidden bg-foreground/5 gap-px">
           {emptyActionButton}
           {matches.map((item) => (
             <button
@@ -129,15 +129,15 @@ export function ContentNodePicker({
               type="button"
             >
               <span className="flex items-center gap-2 font-black tracking-tight transition-colors">
-                <span className="text-white group-hover:text-primary">{item.title}</span>
+                <span className="text-foreground group-hover:text-primary">{item.title}</span>
                 <span className="text-primary">{item.categorySlug}</span>
               </span>
             </button>
           ))}
         </div>
       ) : !suppressResults && !selectedItem && hasNoResults ? (
-        <div className="border border-white/5 bg-surface-low p-4">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-[#c2c6d8]/20">{emptyMessage}</p>
+        <div className="border border-border bg-surface-low p-4">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/20">{emptyMessage}</p>
         </div>
       ) : null}
     </div>

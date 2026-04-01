@@ -13,7 +13,7 @@ export function CategoryDeleteButton({ slug }: { slug: string }) {
 
   return (
     <Button
-      className="rounded-none"
+      className="rounded-none uppercase tracking-widest font-bold"
       disabled={pending}
       onClick={async () => {
         if (!window.confirm("카테고리를 삭제하시겠습니까?")) {

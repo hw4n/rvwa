@@ -96,12 +96,12 @@ export function ReviewComposer({
 
   return (
     <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_400px]">
-      <section className="bg-[#131313] p-10 border-l-2 border-primary/50 shadow-2xl relative">
-        <div className="flex flex-wrap items-center justify-between gap-6 border-b border-white/10 pb-8">
+      <section className="bg-surface-low p-10 border-l-2 border-primary/50 shadow-2xl relative">
+        <div className="flex flex-wrap items-center justify-between gap-6 border-b border-border pb-8">
           <div>
             <p className="text-sm font-bold text-primary/60 uppercase tracking-widest mb-2 font-mono italic">REVIEW_PROTOCOL</p>
-            <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white">매트릭스 데이터 전송</h2>
-            <p className="mt-4 max-w-2xl text-sm font-bold leading-relaxed text-[#c2c6d8]/40 uppercase tracking-widest">
+            <h2 className="text-3xl font-black italic uppercase tracking-tighter text-foreground">매트릭스 데이터 전송</h2>
+            <p className="mt-4 max-w-2xl text-sm font-bold leading-relaxed text-muted-foreground/40 uppercase tracking-widest">
               노드 계층 구조로의 직접 매핑. 저장소: 서버 레이어.
             </p>
           </div>
@@ -114,7 +114,7 @@ export function ReviewComposer({
           <div className="space-y-4">
             <span className="text-xs font-bold text-muted-foreground/30 uppercase tracking-widest">리뷰 제목 인덱스</span>
             <input
-              className="w-full bg-[#0e0e0e] border border-white/5 px-6 py-4 text-xl font-black italic tracking-tight text-white focus:border-primary/50 transition-colors"
+              className="w-full bg-surface-lowest border border-border px-6 py-4 text-xl font-black italic tracking-tight text-foreground focus:border-primary/50 transition-colors"
               value={draft.title}
               onChange={(event) => updateDraft("title", event.target.value)}
               placeholder="ENTRY_TITLE_NULL"
@@ -125,7 +125,7 @@ export function ReviewComposer({
             <div className="space-y-4">
               <span className="text-xs font-bold text-muted-foreground/30 uppercase tracking-widest">평점 (0-100)</span>
               <input
-                className="w-full bg-[#0e0e0e] border border-white/5 px-6 py-4 text-4xl font-black italic tracking-tighter text-[#ffb599] focus:border-[#ffb599]/40 transition-colors"
+                className="w-full bg-surface-lowest border border-border px-6 py-4 text-4xl font-black italic tracking-tighter text-tertiary focus:border-[#ffb599]/40 transition-colors"
                 inputMode="decimal"
                 max="100"
                 min="0"
@@ -135,21 +135,21 @@ export function ReviewComposer({
                 placeholder="00"
               />
             </div>
-            <label className="flex items-center gap-5 border border-white/5 bg-[#0e0e0e] px-8 py-4 cursor-pointer hover:bg-white/5 transition-colors group">
+            <label className="flex items-center gap-5 border border-border bg-surface-lowest px-8 py-4 cursor-pointer hover:bg-foreground/5 transition-colors group">
               <input
                 checked={draft.spoiler}
-                className="size-5 border-white/10 bg-black text-primary focus:ring-0"
+                className="size-5 border-border bg-black text-primary focus:ring-0"
                 onChange={(event) => updateDraft("spoiler", event.target.checked)}
                 type="checkbox"
               />
-              <span className="text-sm font-black uppercase tracking-widest text-[#c2c6d8]/60 group-hover:text-primary transition-colors">중대한 스포일러 포함 아티팩트로 표시</span>
+              <span className="text-sm font-black uppercase tracking-widest text-muted-foreground/60 group-hover:text-primary transition-colors">중대한 스포일러 포함 아티팩트로 표시</span>
             </label>
           </div>
 
           <div className="space-y-4">
             <span className="text-xs font-bold text-muted-foreground/30 uppercase tracking-widest">데이터 스트림 (Markdown)</span>
             <textarea
-              className="min-h-[500px] w-full bg-[#0e0e0e] border border-white/5 p-6 font-mono text-[13px] leading-relaxed text-[#c2c6d8] placeholder:opacity-20 italic focus:border-primary/30 transition-colors"
+              className="min-h-[500px] w-full bg-surface-lowest border border-border p-6 font-mono text-[13px] leading-relaxed text-muted-foreground placeholder:opacity-20 italic focus:border-primary/30 transition-colors"
               value={draft.body}
               onChange={(event) => updateDraft("body", event.target.value)}
               placeholder={reviewBodyTemplate}
@@ -157,15 +157,14 @@ export function ReviewComposer({
           </div>
         </div>
 
-        <div className="mt-12 flex flex-wrap gap-4 border-t border-white/10 pt-10">
-          <Button 
-            onClick={() => void publishReview()} 
+        <div className="mt-12 flex flex-wrap gap-4 border-t border-border pt-10">
+          <Button
+            onClick={() => void publishReview()}
             disabled={!draft.body.trim() || pending}
-            className="rounded-none bg-primary text-black uppercase tracking-widest hover:bg-primary/80"
-          >
-            매트릭스 커밋
+            className="rounded-none uppercase tracking-widest font-bold"
+          >            매트릭스 커밋
           </Button>
-          <Button asChild variant="outline" className="rounded-none border-white/10 text-muted-foreground hover:bg-white/5 uppercase">
+          <Button asChild variant="outline" className="rounded-none border-border text-muted-foreground hover:bg-foreground/5 uppercase">
             <Link href={`/n/${node.slug}`}>중단 / 복귀</Link>
           </Button>
           <Button
@@ -187,23 +186,23 @@ export function ReviewComposer({
       </section>
 
       <aside className="space-y-6">
-        <div className="bg-[#131313] p-8 border border-white/5 shadow-2xl">
+        <div className="bg-surface-low p-8 border border-border shadow-2xl">
           <p className="text-sm font-bold text-primary/40 uppercase tracking-widest mb-6 font-mono italic">REAL_TIME_PREVIEW</p>
-          <h2 className="text-xl font-black italic tracking-tighter text-white uppercase border-b border-white/10 pb-6 truncate leading-none">
+          <h2 className="text-xl font-black italic tracking-tighter text-foreground uppercase border-b border-border pb-6 truncate leading-none">
             {getReviewDisplayTitle({
               title: draft.title,
               body: draft.body,
               nodeTitle: node.title,
             })}
           </h2>
-          <div className="mt-8 text-sm text-[#c2c6d8]/70">
+          <div className="mt-8 text-sm text-muted-foreground/70">
             <MarkdownPreview body={deferredBody || "_버퍼가 비어 있습니다. 입력을 시작하십시오._"} />
           </div>
         </div>
         
         <div className="bg-primary/5 p-6 border-l-2 border-primary italic">
           <p className="text-sm text-primary/60 leading-relaxed font-bold uppercase tracking-widest">
-             노드 <span className="text-white font-bold underline underline-offset-4 decoration-primary/40">{node.title}</span> 에 대한 리뷰를 작성 중입니다. 
+             노드 <span className="text-foreground font-bold underline underline-offset-4 decoration-primary/40">{node.title}</span> 에 대한 리뷰를 작성 중입니다. 
              전송된 데이터는 아카이브의 일부가 됩니다.
           </p>
         </div>

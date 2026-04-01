@@ -4,41 +4,41 @@ import remarkGfm from "remark-gfm";
 
 export function MarkdownPreview({ body }: { body: string }) {
   return (
-    <div className="max-w-none space-y-4 text-[#c2c6d8]">
+    <div className="max-w-none space-y-4 text-foreground/90">
       <ReactMarkdown
         components={{
           h1: ({ children }) => (
-            <h1 className="mb-4 mt-8 text-3xl font-semibold tracking-[-0.03em] text-white first:mt-0">
+            <h1 className="mb-4 mt-8 text-3xl font-semibold tracking-[-0.03em] text-foreground first:mt-0">
               {children}
             </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="mb-3 mt-7 text-2xl font-semibold tracking-[-0.03em] text-white first:mt-0">
+            <h2 className="mb-3 mt-7 text-2xl font-semibold tracking-[-0.03em] text-foreground first:mt-0">
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="mb-3 mt-6 text-xl font-semibold tracking-[-0.03em] text-white first:mt-0">
+            <h3 className="mb-3 mt-6 text-xl font-semibold tracking-[-0.03em] text-foreground first:mt-0">
               {children}
             </h3>
           ),
           h4: ({ children }) => (
-            <h4 className="mb-2 mt-5 text-lg font-semibold tracking-[-0.03em] text-white first:mt-0">
+            <h4 className="mb-2 mt-5 text-lg font-semibold tracking-[-0.03em] text-foreground first:mt-0">
               {children}
             </h4>
           ),
           p: ({ children }) => (
-            <p className="my-5 leading-7 text-[#c2c6d8]">
+            <p className="my-5 leading-7 text-foreground/90">
               {children}
             </p>
           ),
           ul: ({ children }) => (
-            <ul className="my-5 list-disc space-y-2 pl-6 text-[#c2c6d8] marker:text-white/45">
+            <ul className="my-5 list-disc space-y-2 pl-6 text-foreground/90 marker:text-muted-foreground">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="my-5 list-decimal space-y-2 pl-6 text-[#c2c6d8] marker:text-white/45">
+            <ol className="my-5 list-decimal space-y-2 pl-6 text-foreground/90 marker:text-muted-foreground">
               {children}
             </ol>
           ),
@@ -48,7 +48,7 @@ export function MarkdownPreview({ body }: { body: string }) {
             </li>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="my-6 border-l border-primary/30 pl-4 italic text-[#c2c6d8]">
+            <blockquote className="my-6 border-l border-primary/30 pl-4 italic text-muted-foreground">
               {children}
             </blockquote>
           ),
@@ -63,7 +63,7 @@ export function MarkdownPreview({ body }: { body: string }) {
             </strong>
           ),
           pre: ({ children }) => (
-            <pre className="my-6 overflow-x-auto rounded-[24px] border border-white/6 bg-[#0f1117] p-4 text-sm leading-6 text-[#d7dbe8]">
+            <pre className="my-6 overflow-x-auto rounded-[24px] border border-border bg-surface-low p-4 text-sm leading-6 text-foreground">
               {children}
             </pre>
           ),
@@ -77,7 +77,7 @@ export function MarkdownPreview({ body }: { body: string }) {
               );
             }
             return (
-              <code className="rounded bg-white/6 px-1 py-0.5 text-[0.9em] text-foreground" {...props}>
+              <code className="rounded bg-surface-high px-1 py-0.5 text-[0.9em] text-foreground" {...props}>
                 {children}
               </code>
             );

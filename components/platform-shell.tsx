@@ -193,8 +193,8 @@ export function PlatformShell({
       {!authIsPending && viewer ? (
         <DrawerLink active={pathname.startsWith("/settings")} href="/settings" icon="settings" label="설정" />
       ) : null}
-      <div className="border-t border-white/10" />
-      <nav className="min-h-9 px-3 py-2 text-[11px] text-[#a2a6bb]/60">
+      <div className="border-t border-border" />
+      <nav className="min-h-9 px-3 py-2 text-[11px] text-muted-foreground">
         <Breadcrumb>
           <BreadcrumbList className="flex min-h-5 items-center gap-1 whitespace-nowrap">
             {sidebarTopCrumbs.map((crumb, index) => (
@@ -210,13 +210,13 @@ export function PlatformShell({
                       </Link>
                     </BreadcrumbLink>
                   ) : (
-                    <BreadcrumbPage className="text-[#e5e2e1] text-[11px] font-medium max-w-40 truncate block">
+                    <BreadcrumbPage className="block max-w-40 truncate text-[11px] font-medium text-foreground">
                       {crumb.label}
                     </BreadcrumbPage>
                   )}
                 </BreadcrumbItem>
                 {index < sidebarTopCrumbs.length - 1 ? (
-                  <BreadcrumbSeparator className="text-white/20 opacity-30">
+                  <BreadcrumbSeparator className="text-foreground/20 opacity-30">
                     <span className="mx-1">/</span>
                   </BreadcrumbSeparator>
                 ) : null}
@@ -275,7 +275,7 @@ export function PlatformShell({
         ))}
       </nav>
       {!authIsPending && viewer ? (
-        <div className="border-t border-white/5">
+        <div className="border-t border-border">
           {viewer.role === "admin" ? (
             <RailLink active={pathname.startsWith("/admin/categories/")} href="/admin/categories/new" icon="add" label="추가" />
           ) : null}
@@ -286,26 +286,26 @@ export function PlatformShell({
   );
 
   return (
-    <div className="relative flex min-h-0 h-screen flex-col overflow-hidden bg-[#0e0e0e] selection:bg-primary/20 text-[#e5e2e1]">
+    <div className="relative flex h-screen min-h-0 flex-col overflow-hidden bg-surface-mid text-foreground selection:bg-primary/20">
       <div className="flex min-h-0 w-full flex-1 overflow-hidden">
-        <aside className="icon-rail-scrollbar hidden md:flex h-full w-16 shrink-0 flex-col items-stretch overflow-y-auto overflow-x-hidden border-r border-white/5 bg-[#0e0e0e]">
+        <aside className="icon-rail-scrollbar hidden h-full w-16 shrink-0 flex-col items-stretch overflow-x-hidden overflow-y-auto border-r border-border bg-surface-lowest md:flex">
           {railNavigation}
         </aside>
 
-        <aside className="hidden md:flex h-full w-60 shrink-0 flex-col border-r border-white/5 bg-[#131313]">
+        <aside className="hidden h-full w-60 shrink-0 flex-col border-r border-border bg-surface-low md:flex">
           <div className="flex-1 overflow-y-auto custom-scrollbar" ref={sidebarScrollRef}>
             {drawerNavigation}
           </div>
         </aside>
 
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <header className="sticky top-0 h-14 md:h-16 w-full bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 md:px-10 z-20">
+          <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-border bg-surface-mid/80 px-4 backdrop-blur-xl md:h-16 md:px-10">
           
           <div className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
             <Sheet onOpenChange={setMobileNavOpen} open={mobileNavOpen}>
               <SheetTrigger asChild>
                 <Button
-                  className="shrink-0 border-white/10 text-white md:hidden"
+                  className="shrink-0 border-border text-foreground md:hidden"
                   size="icon-sm"
                   variant="outline"
                 >
@@ -314,22 +314,22 @@ export function PlatformShell({
                 </Button>
               </SheetTrigger>
               <SheetContent
-                className="w-[min(92vw,24rem)] border-r border-white/10 bg-[#0e0e0e] p-0 text-white"
+                className="w-[min(92vw,24rem)] border-r border-border bg-surface-mid p-0 text-foreground"
                 side="left"
               >
                 <SheetTitle className="sr-only">네비게이션</SheetTitle>
                 <div className="flex min-h-0 flex-1 overflow-hidden">
-                  <aside className="icon-rail-scrollbar flex h-full w-14 shrink-0 flex-col items-stretch overflow-y-auto overflow-x-hidden border-r border-white/5 bg-[#0e0e0e]">
+                  <aside className="icon-rail-scrollbar flex h-full w-14 shrink-0 flex-col items-stretch overflow-x-hidden overflow-y-auto border-r border-border bg-surface-lowest">
                     {railNavigation}
                   </aside>
-                  <div className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#131313]">
+                  <div className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto bg-surface-low">
                     {drawerNavigation}
                   </div>
                 </div>
               </SheetContent>
             </Sheet>
 
-            <nav className="min-w-0 flex-1 overflow-hidden text-[10px] font-bold uppercase tracking-widest text-[#c2c6d8]/50 md:hidden">
+            <nav className="min-w-0 flex-1 overflow-hidden text-[10px] font-bold uppercase tracking-widest text-muted-foreground md:hidden">
               <Breadcrumb>
                 <BreadcrumbList className="flex-wrap gap-y-1">
                   {topCrumbs.map((crumb, index) => (
@@ -342,13 +342,13 @@ export function PlatformShell({
                             </Link>
                           </BreadcrumbLink>
                         ) : (
-                          <BreadcrumbPage className="text-white font-black tracking-[0.2em]">
+                          <BreadcrumbPage className="font-black tracking-[0.2em] text-foreground">
                             {crumb.label}
                           </BreadcrumbPage>
                         )}
                       </BreadcrumbItem>
                       {index < topCrumbs.length - 1 ? (
-                        <BreadcrumbSeparator className="text-white/10 opacity-30">
+                        <BreadcrumbSeparator className="text-foreground/10 opacity-30">
                           <span className="mx-1">/</span>
                         </BreadcrumbSeparator>
                       ) : null}
@@ -363,27 +363,27 @@ export function PlatformShell({
             </div>
           </div>
 
-          <div className="flex shrink-0 flex-wrap justify-end gap-2 md:gap-3 text-muted-foreground/60">
+          <div className="flex shrink-0 flex-wrap justify-end gap-2 md:gap-3">
             {authIsPending ? (
               <div className="flex items-center gap-2 md:gap-3">
                 <Skeleton className="h-7 w-20 md:w-24" />
-                <Skeleton className="h-4 w-12 md:w-16 border-0 bg-white/10" />
+                <Skeleton className="h-4 w-12 border-0 bg-foreground/10 md:w-16" />
               </div>
             ) : viewer ? (
               <>
                 {showGlobalWriteButton ? (
-                  <Button asChild className="rounded-none bg-primary text-black hover:bg-primary/80">
+                  <Button asChild className="rounded-none uppercase tracking-widest font-bold">
                     <Link href={globalWriteHref}>리뷰 작성</Link>
                   </Button>
                 ) : null}
-                <LogoutButton className="rounded-none border-white/10 hover:bg-white/5">로그아웃</LogoutButton>
+                <LogoutButton className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold">로그아웃</LogoutButton>
               </>
             ) : (
               <>
-                <Button asChild className="rounded-none border-white/10 hover:bg-white/5" variant="outline">
+                <Button asChild className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold" variant="outline">
                   <Link href="/login">로그인</Link>
                 </Button>
-                <Button asChild className="rounded-none border-white/10 hover:bg-white/5" variant="outline">
+                <Button asChild className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold" variant="outline">
                   <Link href="/signup">가입</Link>
                 </Button>
               </>
@@ -494,13 +494,13 @@ function DesktopNodeSearch({
       <label className="sr-only" htmlFor="desktop-node-search">
         항목 검색
       </label>
-      <div className="flex h-11 items-center gap-3 border border-white/10 bg-[#131313] px-4 text-sm text-white/70 transition-colors focus-within:border-primary/40">
-        <SearchIcon className="h-4 w-4 shrink-0 text-white/35" />
+      <div className="flex h-11 items-center gap-3 border border-border bg-surface-low px-4 text-sm text-muted-foreground transition-colors focus-within:border-primary/40">
+        <SearchIcon className="h-4 w-4 shrink-0 text-muted-foreground/60" />
         <input
           aria-autocomplete="list"
           aria-controls="desktop-node-search-results"
           aria-expanded={isOpen && (!!matches.length || hasNoResults)}
-          className="w-full bg-transparent text-sm font-medium text-white outline-none placeholder:text-white/20"
+          className="w-full bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground/60"
           id="desktop-node-search"
           onChange={(event) => {
             setSearch(event.currentTarget.value);
@@ -519,17 +519,17 @@ function DesktopNodeSearch({
       </div>
       {isOpen && search.trim() ? (
         <div
-          className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-30 overflow-hidden border border-white/10 bg-[#131313] shadow-2xl"
+          className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-30 overflow-hidden border border-border bg-surface-low shadow-2xl"
           id="desktop-node-search-results"
           role="listbox"
         >
           {matches.length ? (
-            <div className="grid gap-px bg-white/5">
+            <div className="grid gap-px bg-border">
               {matches.map((item, index) => (
                 <button
                   aria-selected={index === activeIndex}
-                  className={`flex items-center justify-between gap-3 bg-[#101010] px-4 py-3 text-left transition-colors ${
-                    index === activeIndex ? "bg-[#181818]" : "hover:bg-[#181818]"
+                  className={`flex items-center justify-between gap-3 bg-surface-lowest px-4 py-3 text-left transition-colors ${
+                    index === activeIndex ? "bg-surface-high" : "hover:bg-surface-high"
                   }`}
                   key={item.id}
                   onClick={() => navigateToItem(item)}
@@ -537,13 +537,13 @@ function DesktopNodeSearch({
                   role="option"
                   type="button"
                 >
-                  <span className="min-w-0 truncate text-sm font-semibold tracking-tight text-white">{item.title}</span>
+                  <span className="min-w-0 truncate text-sm font-semibold tracking-tight text-foreground">{item.title}</span>
                   <span className="shrink-0 text-[11px] font-black uppercase tracking-[0.2em] text-primary">{item.categorySlug}</span>
                 </button>
               ))}
             </div>
           ) : hasNoResults ? (
-            <div className="px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-[#c2c6d8]/30">
+            <div className="px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60">
               일치하는 항목이 없습니다.
             </div>
           ) : null}
@@ -770,7 +770,7 @@ function RailLink({
 }) {
   return (
     <Link
-      className={`flex aspect-square w-full flex-col items-center justify-center gap-0.5 transition-all duration-300 rounded-none ${active ? "bg-[#1c1b1b] text-primary border-l-4 border-primary" : "text-muted-foreground/40 hover:text-primary hover:bg-[#1c1b1b]/50"}`}
+      className={`flex aspect-square w-full flex-col items-center justify-center gap-0.5 rounded-none transition-all duration-300 ${active ? "border-l-4 border-primary bg-surface-high text-primary" : "text-muted-foreground/60 hover:bg-surface-high hover:text-primary"}`}
       href={href}
     >
       <AppIcon className="size-5" name={icon} strokeWidth={active ? 2.6 : 2.2} />
@@ -792,7 +792,7 @@ function DrawerLink({
 }) {
   return (
     <Link
-      className={`flex w-full items-center gap-3 px-3 py-0 min-h-11 leading-none transition-all duration-300 rounded-none ${active ? "bg-[#1c1b1b] text-primary font-bold" : "text-muted-foreground/60 hover:text-primary hover:bg-[#1c1b1b]/50"}`}
+      className={`flex min-h-11 w-full items-center gap-3 rounded-none px-3 py-0 leading-none transition-all duration-300 ${active ? "bg-surface-high font-bold text-primary" : "text-muted-foreground hover:bg-surface-high hover:text-primary"}`}
       href={href}
     >
       <span className="flex h-5 w-5 shrink-0 items-center justify-center">
@@ -824,7 +824,7 @@ function CollectionLink({
 }) {
   return (
     <Link
-      className={`group block cursor-pointer rounded-none px-3 py-2 transition-colors duration-200 ${active ? "bg-[#1c1b1b]" : "hover:bg-[#1c1b1b]/50"
+      className={`group block cursor-pointer rounded-none px-3 py-2 transition-colors duration-200 ${active ? "bg-surface-high" : "hover:bg-surface-high"
         }`}
       href={href}
     >
@@ -832,18 +832,18 @@ function CollectionLink({
         className={`block truncate text-sm tracking-tight transition-colors duration-200 ${
           spoiler
             ? active
-              ? "text-red-300"
-              : "text-red-300/80 group-hover:text-red-200 group-hover:opacity-100"
+              ? "text-[var(--spoiler)]"
+              : "text-[color:color-mix(in_srgb,var(--spoiler)_82%,transparent)] group-hover:text-[var(--spoiler)] group-hover:opacity-100"
             : active
               ? "text-primary"
-              : "text-white/70 group-hover:text-primary group-hover:opacity-100"
+              : "text-foreground/70 group-hover:text-primary group-hover:opacity-100"
           }`}
       >
         {title}
       </span>
       {category ? (
         <span
-          className={`block text-[10px] font-bold uppercase tracking-widest mt-1 transition-colors duration-200 ${active ? "text-primary/80" : "text-muted-foreground/60 group-hover:text-white/80"
+          className={`mt-1 block text-[10px] font-bold uppercase tracking-widest transition-colors duration-200 ${active ? "text-primary/80" : "text-muted-foreground group-hover:text-foreground/100"
             }`}
         >
           {category}
@@ -851,13 +851,13 @@ function CollectionLink({
       ) : null}
       {(author || typeof score === "number" || itemName) ? (
         <span
-          className={`mt-0.5 block text-[10px] leading-tight transition-colors duration-200 ${active ? "text-white/60" : "text-muted-foreground/55"
+          className={`mt-0.5 block text-[10px] leading-tight transition-colors duration-200 ${active ? "text-foreground/60" : "text-muted-foreground/80"
             }`}
         >
           {author ? <span>{author}</span> : null}
-          {author && typeof score === "number" ? <span className="text-[#aeb5d5]"> · </span> : null}
+          {author && typeof score === "number" ? <span className="text-muted-foreground/70"> · </span> : null}
           {typeof score === "number" ? <span>{formatCompactRating(score)}</span> : null}
-          {(author || typeof score === "number") && itemName ? <span className="text-[#aeb5d5]"> · </span> : null}
+          {(author || typeof score === "number") && itemName ? <span className="text-muted-foreground/70"> · </span> : null}
           {itemName ? <span>{itemName}</span> : null}
         </span>
       ) : null}

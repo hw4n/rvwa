@@ -186,7 +186,7 @@ function Sidebar({
         data-sidebar="sidebar"
         data-slot="sidebar"
         data-mobile="true"
-          className="w-(--sidebar-width) border-white/8 bg-[#0e0e0e]/94 p-0 text-sidebar-foreground backdrop-blur-2xl [&>button]:hidden"
+          className="w-(--sidebar-width) border-border bg-surface-lowest/94 p-0 text-sidebar-foreground backdrop-blur-2xl [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -241,7 +241,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="flex size-full flex-col bg-[#0e0e0e]/92 backdrop-blur-2xl group-data-[variant=floating]:rounded-[26px] group-data-[variant=floating]:shadow-[0_32px_72px_-42px_rgba(0,0,0,0.85)] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-white/6"
+          className="flex size-full flex-col bg-surface-lowest/92 backdrop-blur-2xl group-data-[variant=floating]:rounded-[26px] group-data-[variant=floating]:shadow-[0_32px_72px_-42px_rgba(0,0,0,0.85)] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-white/6"
         >
           {children}
         </div>
@@ -322,7 +322,7 @@ function SidebarInput({
     <Input
       data-slot="sidebar-input"
       data-sidebar="input"
-      className={cn("h-10 w-full rounded-full border-white/6 bg-white/6 px-4 shadow-none placeholder:text-muted-foreground/70", className)}
+      className={cn("h-10 w-full rounded-full border-border bg-foreground/6 px-4 shadow-none placeholder:text-muted-foreground/70", className)}
       {...props}
     />
   )

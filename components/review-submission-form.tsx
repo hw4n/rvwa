@@ -117,7 +117,7 @@ export function ReviewSubmissionForm({
 
         {!selectedItem && customItemTitle ? (
           <div className="px-1">
-            <p className="text-sm font-black tracking-[0.15em] text-yellow-200">
+            <p className="text-sm font-black uppercase tracking-widest text-yellow-200">
               새 항목 추가 - <span className="text-orange-200">{customItemTitle}</span>
             </p>
           </div>
@@ -127,7 +127,7 @@ export function ReviewSubmissionForm({
           <div className="space-y-4">
             <p className="text-sm font-black text-primary tracking-[0.3em] uppercase">리뷰 세부</p>
             <input
-              className="w-full bg-transparent border-b border-white/5 px-0 py-2 text-xl font-black tracking-tight text-white focus:border-primary/40 transition-colors placeholder:text-white/10"
+              className="w-full bg-transparent border-b border-border px-0 py-2 text-xl font-black tracking-tight text-foreground focus:border-primary/40 transition-colors placeholder:text-foreground/10"
               onChange={(event) => setTitle(event.currentTarget.value)}
               placeholder="리뷰 제목 (선택)"
               value={title}
@@ -140,7 +140,7 @@ export function ReviewSubmissionForm({
               <span className="ml-1 text-red-500">*</span>
             </p>
             <textarea
-              className="min-h-[260px] w-full bg-surface-low border border-white/5 p-4 text-base leading-relaxed text-[#c2c6d8] focus:border-primary/20 transition-all placeholder:text-white/5"
+              className="min-h-[260px] w-full bg-surface-low border border-border p-4 text-base leading-relaxed text-muted-foreground focus:border-primary/20 transition-all placeholder:text-foreground/5"
               ref={bodyInputRef}
               onChange={(event) => setBody(event.currentTarget.value)}
               placeholder={reviewBodyTemplate}
@@ -160,15 +160,15 @@ export function ReviewSubmissionForm({
         <div className="flex flex-col md:flex-row md:items-center gap-4">
           <label className="inline-flex items-center gap-3 cursor-pointer group">
             <div
-              className={`w-4 h-4 border-2 transition-all flex items-center justify-center ${spoiler ? "bg-primary border-primary" : "border-white/10 group-hover:border-primary/40"}`}
+              className={`w-4 h-4 border-2 transition-all flex items-center justify-center ${spoiler ? "bg-primary border-primary" : "border-border group-hover:border-primary/40"}`}
             >
-              {spoiler && <div className="w-2 h-2 bg-black rounded-none" />}
+              {spoiler && <div className="w-2 h-2 bg-primary-foreground rounded-none" />}
             </div>
             <input checked={spoiler} className="hidden" onChange={(event) => setSpoiler(event.currentTarget.checked)} type="checkbox" />
-            <span className="text-sm font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">스포일러 포함</span>
+            <span className="text-sm font-black uppercase tracking-widest text-foreground/80 group-hover:text-foreground transition-colors">스포일러 포함</span>
           </label>
           <Button
-            className="rounded-none bg-primary text-black hover:bg-primary/80"
+            className="rounded-none uppercase tracking-widest font-bold"
             disabled={!body.trim() || (!selectedItem && !proposedTitle) || pending}
             onClick={() => void submitReview()}
             type="button"
@@ -180,14 +180,14 @@ export function ReviewSubmissionForm({
       </section>
 
       <aside className="space-y-6">
-        <div className="bg-surface-lowest p-6 border border-white/5">
+        <div className="bg-surface-lowest p-6 border border-border">
           <p className="text-sm font-black text-primary tracking-[0.3em] uppercase mb-4">미리보기</p>
           {previewTitle ? (
-            <h2 className="text-2xl font-black tracking-tight text-white uppercase leading-tight mb-4">
+            <h2 className="text-2xl font-black tracking-tight text-foreground uppercase leading-tight mb-4">
               {previewTitle}
             </h2>
           ) : null}
-          <div className="text-sm text-[#c2c6d8]/40 leading-relaxed">
+          <div className="text-sm text-muted-foreground/40 leading-relaxed">
             <MarkdownPreview body={body.trim() || "_미리보기 준비중..._"} />
           </div>
         </div>

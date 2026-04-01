@@ -44,7 +44,7 @@ export function CompactHeaderSkeleton({
 export function ReviewPosterSkeleton() {
   return (
     <div className="group space-y-4">
-      <div className="aspect-[2/3] bg-surface-low border border-white/5 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      <div className="aspect-[2/3] bg-surface-low border border-border flex flex-col items-center justify-center p-6 relative overflow-hidden">
         <Skeleton className="absolute inset-0 h-full w-full" />
         <Skeleton className="relative z-10 mt-auto h-1 w-6" />
       </div>
@@ -79,7 +79,7 @@ export function ReviewListSkeleton({ rows = 6 }) {
     <div className="space-y-6">
       {Array.from({ length: rows }).map((_, index) => (
         <div
-          className="border-b border-white/5 pb-8 last:border-0 last:pb-0"
+          className="border-b border-border pb-8 last:border-0 last:pb-0"
           key={`review-item-${index}`}
         >
           <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
@@ -100,16 +100,16 @@ export function ReviewListSkeleton({ rows = 6 }) {
 export function NodeReviewLayoutSkeleton() {
   return (
     <section className="grid gap-6 xl:grid-cols-[1fr_360px] xl:items-start">
-      <div className="bg-surface-low border border-white/5 p-6">
+      <div className="bg-surface-low border border-border p-6">
         <ReviewListSkeleton rows={5} />
       </div>
       <div className="space-y-6">
-        <div className="overflow-hidden border border-white/5 bg-surface-low">
-          <div className="aspect-[2/3] bg-[#0e0e0e]">
+        <div className="overflow-hidden border border-border bg-surface-low">
+          <div className="aspect-[2/3] bg-surface-lowest">
             <Skeleton className="h-full w-full" />
           </div>
         </div>
-        <div className="bg-surface-low p-6 border border-white/5">
+        <div className="bg-surface-low p-6 border border-border">
           <div className="space-y-6">
             <Skeleton className="h-4 w-16" />
             <div className="flex flex-wrap gap-3">
@@ -119,10 +119,10 @@ export function NodeReviewLayoutSkeleton() {
             </div>
           </div>
         </div>
-        <div className="bg-surface-low p-6 border border-white/5">
+        <div className="bg-surface-low p-6 border border-border">
           <div className="space-y-6">
             <Skeleton className="h-4 w-16" />
-            <div className="grid gap-px bg-white/5 overflow-hidden">
+            <div className="grid gap-px bg-foreground/5 overflow-hidden">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div className="bg-surface-lowest p-3 space-y-2" key={`meta-row-${index}`}>
                   <Skeleton className="h-4 w-20" />
@@ -194,7 +194,7 @@ export function WritePageSkeleton() {
         </div>
       </section>
       <aside className="sticky top-10 space-y-6">
-        <div className="bg-surface-lowest p-6 border border-white/5">
+        <div className="bg-surface-lowest p-6 border border-border">
           <Skeleton className="h-3 w-24 mb-4" />
           <Skeleton className="h-10 w-5/6" />
           <Skeleton className="h-4 w-32 mt-6" />
@@ -208,15 +208,15 @@ export function WritePageSkeleton() {
 export function AdminReviewListSkeleton({ rows = 6 }) {
   return (
     <section className="space-y-4">
-      <div className="border border-white/10">
-        <div className="grid grid-cols-[42%_20%_16%_22%] border-b border-white/10 bg-[#131313] px-3 py-3 gap-3">
+      <div className="border border-border">
+        <div className="grid grid-cols-[42%_20%_16%_22%] border-b border-border bg-surface-low px-3 py-3 gap-3">
           <Skeleton className="h-3 w-12" />
           <Skeleton className="h-3 w-12" />
           <Skeleton className="h-3 w-10" />
           <Skeleton className="h-3 w-12" />
         </div>
         {Array.from({ length: rows }).map((_, index) => (
-          <div className="grid grid-cols-[42%_20%_16%_22%] items-center px-3 py-4 gap-3 border-b border-white/5 last:border-0" key={`admin-row-${index}`}>
+          <div className="grid grid-cols-[42%_20%_16%_22%] items-center px-3 py-4 gap-3 border-b border-border last:border-0" key={`admin-row-${index}`}>
             <Skeleton className="h-4 w-5/6" />
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-4 w-10" />

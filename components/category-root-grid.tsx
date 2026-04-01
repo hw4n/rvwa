@@ -51,7 +51,7 @@ export function CategoryRootGrid({
             href={`/n/${node.slug}`}
             key={node.id}
           >
-            <div className="relative flex aspect-[2/3] flex-col items-center justify-center overflow-hidden border border-white/5 bg-surface-low p-6 transition-all group-hover:scale-[1.02] group-hover:border-primary/30">
+            <div className="relative flex aspect-[2/3] flex-col items-center justify-center overflow-hidden border border-border bg-surface-low p-6 transition-all group-hover:scale-[1.02] group-hover:border-primary/30">
               {node.coverImage ? (
                 <Image
                   alt={node.title}
@@ -65,9 +65,9 @@ export function CategoryRootGrid({
               ) : null}
               <PosterRatingBadge rating={node.rating} />
               <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-surface-lowest/90 via-surface-lowest/10 to-transparent" />
               {!node.coverImage ? (
-                <span className="mb-4 select-none text-6xl font-black uppercase tracking-tighter text-white/5 transition-transform group-hover:scale-110">
+                <span className="mb-4 select-none text-6xl font-black uppercase tracking-tighter text-foreground/5 transition-transform group-hover:scale-110">
                   {node.title.charAt(0)}
                 </span>
               ) : null}
@@ -76,7 +76,7 @@ export function CategoryRootGrid({
               </div>
             </div>
             <div className="space-y-1">
-              <h3 className="line-clamp-1 text-center text-sm font-black tracking-tight text-white transition-colors group-hover:text-primary">
+              <h3 className="line-clamp-1 text-center text-sm font-black tracking-tight text-foreground transition-colors group-hover:text-primary">
                 {node.title}
               </h3>
             </div>
@@ -85,8 +85,8 @@ export function CategoryRootGrid({
       </div>
 
       {!results.length && !isLoading ? (
-        <div className="border border-white/5 bg-surface-low p-10 text-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+        <div className="border border-border bg-surface-low p-10 text-center">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/20">
             표시할 상위 항목이 없습니다.
           </p>
         </div>
@@ -95,7 +95,7 @@ export function CategoryRootGrid({
       {status !== "Exhausted" ? <div className="h-8" ref={loadMoreRef} /> : null}
       {status === "LoadingMore" ? (
         <div className="flex justify-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/25">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/25">
             더 불러오는 중
           </p>
         </div>

@@ -26,7 +26,7 @@ export default async function ReviewPage({
     <div className="flex flex-wrap gap-3">
       {isOwner ? (
         <Button
-          className="rounded-none uppercase tracking-[0.15em] text-black"
+          className="rounded-none uppercase tracking-[0.15em] text-primary-foreground"
           asChild
         >
           <Link href={`/write?review=${review.id}`}>수정</Link>

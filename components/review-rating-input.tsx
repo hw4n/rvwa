@@ -48,7 +48,7 @@ function StarButton({
 
   return (
     <button
-      className="relative size-8 shrink-0 text-white/15 transition-colors hover:text-primary/40"
+      className="relative size-8 shrink-0 text-foreground/15 transition-colors hover:text-primary/40"
       onClick={() => onSelect(index)}
       type="button"
     >
@@ -103,7 +103,7 @@ export function ReviewRatingInput({
 
         <div className="relative min-w-[128px]">
           <input
-            className="w-full bg-surface-low border border-white/10 px-3 py-2 pr-8 text-base font-black tracking-tight text-white focus:border-primary/40 transition-all placeholder:text-white/10"
+            className="w-full bg-surface-low border border-border px-3 py-2 pr-8 text-base font-black tracking-tight text-foreground focus:border-primary/40 transition-all placeholder:text-foreground/10"
             inputMode="decimal"
             max="5"
             min="0"
@@ -119,7 +119,7 @@ export function ReviewRatingInput({
             value={value}
           />
           <button
-            className={`absolute right-2 top-1/2 -translate-y-1/2 text-white/40 transition-opacity ${value ? "opacity-100" : "opacity-0 pointer-events-none"} hover:text-white`}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 text-foreground/40 transition-opacity ${value ? "opacity-100" : "opacity-0 pointer-events-none"} hover:text-foreground`}
             onClick={() => onChange("")}
             type="button"
           >

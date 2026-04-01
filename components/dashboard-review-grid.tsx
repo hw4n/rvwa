@@ -41,8 +41,8 @@ export function DashboardReviewGrid() {
 
   if (!isLoading && results.length === 0) {
     return (
-      <div className="border border-white/5 bg-surface-low p-10 text-center md:p-20">
-        <p className="text-xs font-black uppercase tracking-[0.4em] text-white/20">
+      <div className="border border-border bg-surface-low p-10 text-center md:p-20">
+        <p className="text-xs font-black uppercase tracking-[0.4em] text-foreground/20">
           승인된 리뷰가 아직 없습니다.
         </p>
       </div>
@@ -58,7 +58,7 @@ export function DashboardReviewGrid() {
             href={`/r/${review.id}`}
             className="group space-y-4"
           >
-            <div className="relative flex aspect-[2/3] flex-col items-center justify-center overflow-hidden border border-white/5 bg-surface-low p-6 transition-all group-hover:scale-[1.02] group-hover:border-primary/40">
+            <div className="relative flex aspect-[2/3] flex-col items-center justify-center overflow-hidden border border-border bg-surface-low p-6 transition-all group-hover:scale-[1.02] group-hover:border-primary/40">
               {review.coverImage ? (
                 <Image
                   alt={getReviewDisplayTitle(review)}
@@ -71,10 +71,10 @@ export function DashboardReviewGrid() {
                 />
               ) : null}
               <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-surface-lowest/90 via-surface-lowest/10 to-transparent" />
               <PosterRatingBadge rating={review.rating} />
               {!review.coverImage ? (
-                <span className="mb-4 select-none text-7xl font-black uppercase tracking-tighter text-white/5 transition-transform group-hover:scale-110">
+                <span className="mb-4 select-none text-7xl font-black uppercase tracking-tighter text-foreground/5 transition-transform group-hover:scale-110">
                   {(review.nodeTitle ?? review.proposedTitle ?? "R").charAt(0)}
                 </span>
               ) : null}
@@ -83,7 +83,7 @@ export function DashboardReviewGrid() {
               </div>
             </div>
             <div className="space-y-2">
-              <h3 className="line-clamp-2 text-center text-sm font-black leading-tight tracking-tight text-white transition-colors group-hover:text-primary">
+              <h3 className="line-clamp-2 text-center text-sm font-black leading-tight tracking-tight text-foreground transition-colors group-hover:text-primary">
                 {getReviewDisplayTitle(review)}
               </h3>
             </div>
@@ -94,7 +94,7 @@ export function DashboardReviewGrid() {
       {status !== "Exhausted" ? <div className="h-8" ref={loadMoreRef} /> : null}
       {status === "LoadingMore" ? (
         <div className="flex justify-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/25">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/25">
             더 불러오는 중
           </p>
         </div>

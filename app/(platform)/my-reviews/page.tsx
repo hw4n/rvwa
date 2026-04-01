@@ -17,7 +17,7 @@ export default async function MyReviewsPage() {
           {reviews.map((review) => (
             <div key={review.id} className="group space-y-4">
               <Link href={`/r/${review.id}`} className="block space-y-4">
-                <div className="aspect-[2/3] bg-surface-low border border-white/5 flex flex-col items-center justify-center p-6 relative overflow-hidden transition-all group-hover:scale-[1.02] group-hover:border-primary/40">
+                <div className="aspect-[2/3] bg-surface-low border border-border flex flex-col items-center justify-center p-6 relative overflow-hidden transition-all group-hover:scale-[1.02] group-hover:border-primary/40">
                   {review.coverImage ? (
                     <Image
                       alt={getReviewDisplayTitle(review)}
@@ -30,12 +30,12 @@ export default async function MyReviewsPage() {
                     />
                   ) : null}
                   <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-surface-lowest/90 via-surface-lowest/10 to-transparent" />
 
                   <PosterRatingBadge rating={review.rating} />
 
                   {!review.coverImage ? (
-                    <span className="text-7xl font-black text-white/5 tracking-tighter uppercase mb-4 select-none group-hover:scale-110 transition-transform">
+                    <span className="text-7xl font-black text-foreground/5 tracking-tighter uppercase mb-4 select-none group-hover:scale-110 transition-transform">
                       {(review.nodeTitle ?? review.proposedTitle ?? "R").charAt(0)}
                     </span>
                   ) : null}
@@ -45,7 +45,7 @@ export default async function MyReviewsPage() {
                 </div>
                 </div>
 
-                <h3 className="text-sm font-black text-white tracking-tight group-hover:text-primary transition-colors line-clamp-2 text-center leading-tight">
+                <h3 className="text-sm font-black text-foreground tracking-tight group-hover:text-primary transition-colors line-clamp-2 text-center leading-tight">
                   {getReviewDisplayTitle(review)}
                 </h3>
               </Link>
@@ -54,8 +54,8 @@ export default async function MyReviewsPage() {
         </div>
 
         {reviews.length === 0 ? (
-          <div className="bg-surface-low p-10 md:p-20 text-center border border-white/5">
-            <p className="text-xs font-black uppercase text-white/20 tracking-[0.4em]">리뷰가 없습니다.</p>
+          <div className="bg-surface-low p-10 md:p-20 text-center border border-border">
+            <p className="text-xs font-black uppercase text-foreground/20 tracking-[0.4em]">리뷰가 없습니다.</p>
           </div>
         ) : null}
       </section>

@@ -47,26 +47,26 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
 
   return (
     <form
-      className="w-full max-w-md bg-[#131313] p-6 md:p-10 border-l-2 border-primary/50 space-y-6"
+      className="w-full max-w-md space-y-6 border-l-2 border-primary/50 bg-surface-low p-6 md:p-10"
       onSubmit={onSubmit}
     >
       {mode === "signUp" ? (
         <Input
-          className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+          className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
           onChange={(event) => setDisplayName(event.currentTarget.value)}
           placeholder="display name"
           value={displayName}
         />
       ) : null}
       <Input
-        className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+        className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
         onChange={(event) => setEmail(event.currentTarget.value)}
         placeholder="email"
         type="email"
         value={email}
       />
       <Input
-        className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+        className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
         onChange={(event) => setPassword(event.currentTarget.value)}
         placeholder="password"
         type="password"
@@ -75,13 +75,13 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
       {error ? <p className="text-[11px] font-bold uppercase tracking-widest text-red-400">{error}</p> : null}
       <div className="flex flex-col md:flex-row gap-3">
         <Button
-          className="rounded-none bg-primary hover:bg-primary/80 w-full md:w-auto"
+          className="w-full rounded-none uppercase tracking-widest font-bold md:w-auto"
           disabled={pending}
           type="submit"
         >
           {mode === "signIn" ? "로그인" : "가입"}
         </Button>
-        <Button asChild className="rounded-none border-white/10 w-full md:w-auto" variant="outline">
+        <Button asChild className="w-full rounded-none uppercase tracking-widest font-bold md:w-auto" variant="outline">
           <Link href={mode === "signIn" ? "/signup" : "/login"}>
             {mode === "signIn" ? "가입" : "로그인"}
           </Link>

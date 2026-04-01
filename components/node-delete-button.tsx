@@ -13,7 +13,7 @@ export function NodeDeleteButton({ slug }: { slug: string }) {
 
   return (
     <Button
-      className="rounded-none"
+      className="rounded-none uppercase tracking-widest font-bold"
       disabled={pending}
       onClick={async () => {
         if (!window.confirm("항목을 삭제하시겠습니까?")) {

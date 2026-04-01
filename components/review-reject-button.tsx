@@ -13,7 +13,7 @@ export function ReviewRejectButton({ reviewId }: { reviewId: string }) {
 
   return (
     <Button
-      className="rounded-none uppercase tracking-[0.15em]"
+      className="rounded-none uppercase tracking-widest font-bold"
       disabled={pending}
       onClick={async () => {
         if (!window.confirm("반려 상태로 바꾸시겠습니까?")) {
@@ -29,7 +29,7 @@ export function ReviewRejectButton({ reviewId }: { reviewId: string }) {
         }
       }}
       type="button"
-      variant="outline"
+      variant="warning"
     >
       반려
     </Button>

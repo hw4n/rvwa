@@ -72,7 +72,7 @@ export function CategoryCreateForm({
 
   return (
     <form
-      className="bg-[#131313] p-10 border-l-2 border-primary/50 space-y-6"
+      className="bg-surface-low p-10 border-l-2 border-primary/50 space-y-6"
       onSubmit={async (event) => {
         event.preventDefault();
         setError("");
@@ -98,11 +98,11 @@ export function CategoryCreateForm({
         }
       }}
     >
-      <Input className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white" onChange={(event) => setName(event.currentTarget.value)} placeholder="카테고리 이름" value={name} />
-      <Input className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white" onChange={(event) => setSlug(event.currentTarget.value)} placeholder="slug" value={slug} />
+      <Input className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground" onChange={(event) => setName(event.currentTarget.value)} placeholder="카테고리 이름" value={name} />
+      <Input className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground" onChange={(event) => setSlug(event.currentTarget.value)} placeholder="slug" value={slug} />
       <Popover onOpenChange={setIconOpen} open={iconOpen}>
         <PopoverTrigger asChild>
-          <Button className="w-full rounded-none border-white/5 bg-[#0e0e0e] hover:bg-[#1c1b1b]" type="button" variant="outline">
+          <Button className="w-full rounded-none border-border bg-surface-lowest hover:bg-surface-high" type="button" variant="outline">
             <span className="flex flex-1 items-center gap-3">
               <AppIcon className="size-4" name={icon} />
               <span>{icon}</span>
@@ -114,7 +114,7 @@ export function CategoryCreateForm({
           <div className="grid grid-cols-5 gap-1">
             {categoryIconOptions.map((option) => (
               <Button
-                className={option === icon ? "bg-[#1c1b1b] text-primary" : "bg-[#0e0e0e] text-white hover:bg-[#1c1b1b]"}
+                className={option === icon ? "bg-surface-high text-primary" : "bg-surface-lowest text-foreground hover:bg-surface-high"}
                 key={option}
                 onClick={() => {
                   setIcon(option);
@@ -130,12 +130,12 @@ export function CategoryCreateForm({
           </div>
         </PopoverContent>
       </Popover>
-      <textarea className="min-h-[180px] w-full border border-white/5 bg-[#0e0e0e] p-4 text-sm text-white focus:border-primary/30" onChange={(event) => setDescription(event.currentTarget.value)} placeholder="설명" value={description} />
+      <textarea className="min-h-[180px] w-full border border-border bg-surface-lowest p-4 text-sm text-foreground focus:border-primary/30" onChange={(event) => setDescription(event.currentTarget.value)} placeholder="설명" value={description} />
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm font-bold text-white">메타데이터 필드</span>
+          <span className="text-sm font-bold text-foreground">메타데이터 필드</span>
           <Button
-            className="rounded-none border-white/10"
+            className="rounded-none border-border"
             onClick={() =>
               setFieldDefinitions((current) => [...current, { key: "", label: "", type: "text" }])
             }
@@ -148,7 +148,7 @@ export function CategoryCreateForm({
         {fieldDefinitions.map((field, index) => (
           <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_140px_auto]" key={index}>
             <Input
-              className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+              className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
               onBlur={() => {
                 if (!field.key.trim() && field.label.trim()) {
                   const key = normalizeMetadataKey(field.label);
@@ -173,7 +173,7 @@ export function CategoryCreateForm({
               value={field.label}
             />
             <Input
-              className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+              className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
               onBlur={(event) => {
                 const key = normalizeMetadataKey(event.currentTarget.value);
                 setFieldDefinitions((current) =>
@@ -196,7 +196,7 @@ export function CategoryCreateForm({
               value={field.key}
             />
             <select
-              className="h-12 w-full rounded-none border border-white/5 bg-[#0e0e0e] px-4 text-white"
+              className="h-12 w-full rounded-none border border-border bg-surface-lowest px-4 text-foreground"
               onChange={(event) =>
                 {
                   const value = event.currentTarget.value as MetadataFieldDefinition["type"];
@@ -216,12 +216,12 @@ export function CategoryCreateForm({
               ))}
             </select>
             <Button
-              className="rounded-none border-red-600 text-red-500 hover:bg-red-600/10 hover:text-red-400"
+              className="rounded-none uppercase tracking-widest font-bold"
               onClick={() =>
                 setFieldDefinitions((current) => current.filter((_, entryIndex) => entryIndex !== index))
               }
               type="button"
-              variant="outline"
+              variant="destructive"
             >
               삭제
             </Button>
@@ -229,7 +229,7 @@ export function CategoryCreateForm({
         ))}
       </div>
       {error ? <p className="text-[11px] font-bold uppercase tracking-widest text-red-400">{error}</p> : null}
-      <Button className="rounded-none bg-primary hover:bg-primary/80" type="submit">
+      <Button className="rounded-none uppercase tracking-widest font-bold" type="submit">
         {isEdit ? "저장" : "생성"}
       </Button>
     </form>

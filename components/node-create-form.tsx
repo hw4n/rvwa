@@ -74,8 +74,8 @@ function MetadataValueInput({
 }) {
   if (type === "boolean") {
     return (
-      <div className="flex h-12 items-center justify-between border border-white/5 bg-[#0e0e0e] px-4">
-        <span className="text-sm font-bold text-white">{value ? "true" : "false"}</span>
+      <div className="flex h-12 items-center justify-between border border-border bg-surface-lowest px-4">
+        <span className="text-sm font-bold text-foreground">{value ? "true" : "false"}</span>
         <Switch checked={Boolean(value)} onCheckedChange={onChange} />
       </div>
     );
@@ -83,7 +83,7 @@ function MetadataValueInput({
 
   return (
     <Input
-      className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+      className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
       onChange={(event) => onChange(event.currentTarget.value)}
       placeholder={type === "list" ? "a, b, c" : type}
       value={String(value)}
@@ -389,7 +389,7 @@ export function NodeCreateForm({
 
   return (
     <form
-      className="bg-[#131313] p-10 border-l-2 border-primary/50 space-y-6"
+      className="bg-surface-low p-10 border-l-2 border-primary/50 space-y-6"
       ref={formRef}
       onSubmit={async (event) => {
         event.preventDefault();
@@ -431,9 +431,9 @@ export function NodeCreateForm({
         }
       }}
     >
-      <Input className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white" onChange={(event) => setTitle(event.currentTarget.value)} placeholder="항목 제목" value={title} />
-      <Input className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white" onChange={(event) => setSlug(event.currentTarget.value)} placeholder="slug" value={slug} />
-      <Input className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white" onChange={(event) => setTags(event.currentTarget.value)} placeholder="tags, comma, separated" value={tags} />
+      <Input className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground" onChange={(event) => setTitle(event.currentTarget.value)} placeholder="항목 제목" value={title} />
+      <Input className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground" onChange={(event) => setSlug(event.currentTarget.value)} placeholder="slug" value={slug} />
+      <Input className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground" onChange={(event) => setTags(event.currentTarget.value)} placeholder="tags, comma, separated" value={tags} />
       <PosterUploadField
         initialValue={initialNode?.coverImage}
         onChange={(value) => setCoverImage(value ?? "")}
@@ -443,7 +443,7 @@ export function NodeCreateForm({
         title={title || initialNode?.title || "포스터"}
         value={coverImage || undefined}
       />
-      <select className="h-12 w-full rounded-none border border-white/5 bg-[#0e0e0e] px-4 text-white" onChange={(event) => setParentId(event.currentTarget.value)} value={parentId}>
+      <select className="h-12 w-full rounded-none border border-border bg-surface-lowest px-4 text-foreground" onChange={(event) => setParentId(event.currentTarget.value)} value={parentId}>
         <option value="">상위 없음</option>
         {nodes.map((node) => (
           <option key={node.id} value={node.id}>
@@ -451,13 +451,13 @@ export function NodeCreateForm({
           </option>
         ))}
       </select>
-      <textarea className="min-h-[220px] w-full border border-white/5 bg-[#0e0e0e] p-4 text-sm text-white focus:border-primary/30" onChange={(event) => setSummary(event.currentTarget.value)} placeholder="요약" value={summary} />
+      <textarea className="min-h-[220px] w-full border border-border bg-surface-lowest p-4 text-sm text-foreground focus:border-primary/30" onChange={(event) => setSummary(event.currentTarget.value)} placeholder="요약" value={summary} />
       {category.fieldDefinitions.length ? (
         <div className="space-y-3">
-          <span className="text-sm font-bold text-white">메타데이터</span>
+          <span className="text-sm font-bold text-foreground">메타데이터</span>
           {category.fieldDefinitions.map((field) => (
             <div className="grid gap-3 md:grid-cols-[180px_minmax(0,1fr)]" key={field.key}>
-              <div className="flex h-12 items-center border border-white/5 bg-[#0e0e0e] px-4 text-sm font-bold text-white">
+              <div className="flex h-12 items-center border border-border bg-surface-lowest px-4 text-sm font-bold text-foreground">
                 {field.label}
               </div>
               <MetadataValueInput
@@ -476,9 +476,9 @@ export function NodeCreateForm({
       ) : null}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm font-bold text-white">추가 메타데이터</span>
+          <span className="text-sm font-bold text-foreground">추가 메타데이터</span>
           <Button
-            className="rounded-none border-white/10"
+            className="rounded-none border-border"
             onClick={() => setCustomRows((current) => [...current, createEmptyMetadataRow()])}
             type="button"
             variant="outline"
@@ -489,7 +489,7 @@ export function NodeCreateForm({
         {customRows.map((row, index) => (
           <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_140px_minmax(0,1fr)_auto]" key={row.id}>
             <Input
-              className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+              className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
               onBlur={(event) => {
                 const key = normalizeMetadataKey(event.currentTarget.value);
                 setCustomRows((current) =>
@@ -512,7 +512,7 @@ export function NodeCreateForm({
               value={row.key}
             />
             <select
-              className="h-12 w-full rounded-none border border-white/5 bg-[#0e0e0e] px-4 text-white"
+              className="h-12 w-full rounded-none border border-border bg-surface-lowest px-4 text-foreground"
               onChange={(event) =>
                 {
                   const value = event.currentTarget.value as MetadataFieldType;
@@ -554,12 +554,12 @@ export function NodeCreateForm({
               value={row.value}
             />
             <Button
-              className="rounded-none border-red-600 text-red-500 hover:bg-red-600/10 hover:text-red-400"
+              className="rounded-none uppercase tracking-widest font-bold"
               onClick={() =>
                 setCustomRows((current) => current.filter((_, entryIndex) => entryIndex !== index))
               }
               type="button"
-              variant="outline"
+              variant="destructive"
             >
               삭제
             </Button>
@@ -568,7 +568,7 @@ export function NodeCreateForm({
       </div>
       {clipboardMessage ? <p className="text-[11px] font-bold uppercase tracking-widest text-primary">{clipboardMessage}</p> : null}
       {error ? <p className="text-[11px] font-bold uppercase tracking-widest text-red-400">{error}</p> : null}
-      <Button className="rounded-none bg-primary hover:bg-primary/80" disabled={isSubmitting} type="submit">
+      <Button className="rounded-none uppercase tracking-widest font-bold" disabled={isSubmitting} type="submit">
         {isEdit ? "저장" : "생성"}
       </Button>
     </form>

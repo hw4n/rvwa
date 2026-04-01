@@ -44,13 +44,13 @@ export default async function CategoryPage({
         actions={
           <div className="flex flex-col md:flex-row gap-3 md:gap-4">
             {viewer?.role === "admin" ? (
-              <Button asChild className="rounded-none border-white/10 hover:bg-white/5" variant="outline">
+              <Button asChild className="rounded-none border-border hover:bg-foreground/5" variant="outline">
                 <Link href={`/admin/categories/${category.slug}/edit`}>수정</Link>
               </Button>
             ) : null}
             {viewer?.role === "admin" && category.slug !== "uncategorized" ? <CategoryDeleteButton slug={category.slug} /> : null}
             {viewer?.role === "admin" ? (
-              <Button asChild className="rounded-none bg-primary text-black hover:bg-primary/80">
+              <Button asChild className="rounded-none bg-primary text-primary-foreground hover:bg-primary/80">
                 <Link href={`/admin/nodes/new/${category.slug}`}>항목 추가</Link>
               </Button>
             ) : null}

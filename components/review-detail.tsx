@@ -17,8 +17,8 @@ export function ReviewDetail({
 }) {
   if (!review) {
     return (
-      <div className="bg-surface-low p-20 text-center border border-white/5">
-        <p className="text-[10px] font-black uppercase text-white/20 tracking-[0.4em]">Review not found</p>
+      <div className="bg-surface-low p-20 text-center border border-border">
+        <p className="text-[10px] font-black uppercase text-foreground/20 tracking-[0.4em]">Review not found</p>
       </div>
     );
   }
@@ -35,14 +35,14 @@ export function ReviewDetail({
         {review.status}
       </span>
       {review.spoiler ? (
-        <span className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border border-red-500/25 text-red-300 bg-red-500/10">
+        <span className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] text-[var(--spoiler)]">
           Spoiler
         </span>
       ) : null}
     </div>
   );
   const posterCard = (
-    <div className="relative flex aspect-[2/3] w-full max-w-44 items-center justify-center overflow-hidden border border-white/5 bg-surface-low">
+    <div className="relative flex aspect-[2/3] w-full max-w-44 items-center justify-center overflow-hidden border border-border bg-surface-low">
       {review.coverImage ? (
         <Image
           alt={posterTitle}
@@ -54,9 +54,9 @@ export function ReviewDetail({
           unoptimized
         />
       ) : null}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-surface-lowest/90 via-surface-lowest/10 to-transparent" />
       {!review.coverImage ? (
-        <span className="relative z-10 select-none text-7xl font-black uppercase tracking-tighter text-white/10">
+        <span className="relative z-10 select-none text-7xl font-black uppercase tracking-tighter text-foreground/10">
           {posterTitle.charAt(0)}
         </span>
       ) : null}
@@ -65,11 +65,11 @@ export function ReviewDetail({
   const reviewContent = (
     <div className="min-w-0 space-y-4">
       {reviewTitle ? (
-        <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-tight">
+        <h2 className="text-4xl font-black text-foreground tracking-tighter uppercase leading-tight">
           {reviewTitle}
         </h2>
       ) : null}
-      <div className="leading-relaxed font-medium text-[#c2c6d8]">
+      <div className="leading-relaxed font-medium text-muted-foreground">
         <MarkdownPreview body={review.body} />
       </div>
     </div>
@@ -100,14 +100,14 @@ export function ReviewDetail({
                 ) : null}
               </div>
               <div className="min-w-0 space-y-4">
-                <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
+                <div className="text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
                   {new Date(review.createdAt).toLocaleDateString("ko-KR", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                   })}
                 </div>
-                <div className="text-xs font-black tracking-[0.2em] text-[#ff9b70]/90">
+                <div className="text-xs font-black tracking-[0.2em] text-tertiary/90">
                   {review.author?.name ?? "익명"}
                 </div>
                 {review.spoiler ? (

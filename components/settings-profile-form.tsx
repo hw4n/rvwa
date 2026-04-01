@@ -40,7 +40,7 @@ export function SettingsProfileForm({
 
   return (
     <form
-      className="space-y-8 border border-white/5 bg-surface-low p-6 md:p-8"
+      className="space-y-8 border border-border bg-surface-low p-6 md:p-8"
       onSubmit={onSubmit}
     >
       <div className="space-y-2">
@@ -49,11 +49,11 @@ export function SettingsProfileForm({
 
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="space-y-2">
-          <label className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40" htmlFor="display-name">
+          <label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground" htmlFor="display-name">
             Display name
           </label>
           <Input
-            className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white"
+            className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
             id="display-name"
             maxLength={40}
             onChange={(event) => setDisplayName(event.currentTarget.value)}
@@ -63,11 +63,11 @@ export function SettingsProfileForm({
         </div>
 
         <div className="space-y-2">
-          <label className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40" htmlFor="email">
+          <label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground" htmlFor="email">
             Email
           </label>
           <Input
-            className="h-12 rounded-none border-white/5 bg-[#0e0e0e] px-4 text-white/50"
+            className="h-12 rounded-none border-border bg-surface-lowest px-4 text-muted-foreground"
             id="email"
             readOnly
             value={email}
@@ -80,7 +80,7 @@ export function SettingsProfileForm({
 
       <div className="flex flex-wrap gap-3">
         <Button
-          className="rounded-none bg-primary text-black hover:bg-primary/80"
+          className="rounded-none uppercase tracking-widest font-bold"
           disabled={pending}
           type="submit"
         >

@@ -129,7 +129,7 @@ export function PosterUploadField({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-bold text-white">포스터</span>
+        <span className="text-sm font-bold text-foreground">포스터</span>
         <input
           accept="image/jpeg,image/png,image/webp,image/avif"
           className="hidden"
@@ -139,7 +139,7 @@ export function PosterUploadField({
         />
         <div className="flex gap-2">
           <Button
-            className="rounded-none border-white/10"
+            className="rounded-none border-border"
             disabled={isUploading}
             onClick={() => inputRef.current?.click()}
             type="button"
@@ -149,18 +149,18 @@ export function PosterUploadField({
           </Button>
           {value ? (
             <Button
-              className="rounded-none border-red-600 text-red-500 hover:bg-red-600/10 hover:text-red-400"
+              className="rounded-none uppercase tracking-widest font-bold"
               disabled={isUploading}
               onClick={handleRemove}
               type="button"
-              variant="outline"
+              variant="destructive"
             >
               삭제
             </Button>
           ) : null}
         </div>
       </div>
-      <div className="aspect-[2/3] w-full max-w-[220px] overflow-hidden border border-white/5 bg-[#0e0e0e]">
+      <div className="aspect-[2/3] w-full max-w-[220px] overflow-hidden border border-border bg-surface-lowest">
         {previewUrl ? (
           <img
             alt={`${title} 포스터`}
@@ -169,7 +169,7 @@ export function PosterUploadField({
             src={previewUrl}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-lg font-black text-white/20">
+          <div className="flex h-full w-full items-center justify-center text-lg font-black text-foreground/20">
             {title.charAt(0) || "P"}
           </div>
         )}

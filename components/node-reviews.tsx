@@ -60,8 +60,8 @@ export function NodeReviews({
   return (
     <div className="space-y-8">
       {reviews.length ? null : (
-        <div className="text-center border border-white/5 bg-surface-low p-10">
-          <p className="text-[10px] font-black uppercase text-white/20 tracking-[0.4em]">
+        <div className="text-center border border-border bg-surface-low p-10">
+          <p className="text-[10px] font-black uppercase text-foreground/20 tracking-[0.4em]">
             작성된 리뷰가 아직 없습니다.
           </p>
         </div>
@@ -69,7 +69,7 @@ export function NodeReviews({
       {visibleReviews.map((review) => {
         const previewText = getReviewPreview(review);
         const reviewBody = (
-          <p className="mt-0.5 text-sm leading-relaxed text-[#c2c6d8] font-medium line-clamp-3">
+          <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground font-medium line-clamp-3">
             {previewText}
           </p>
         );
@@ -77,24 +77,24 @@ export function NodeReviews({
         if (review.spoiler) {
           return (
             <article
-              className="space-y-4 border border-red-500/20 bg-red-500/5 p-5"
+              className="space-y-4 border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] p-5"
               key={review.id}
             >
               <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
                 <div className="min-w-0">
                   <div className="space-y-2">
-                    <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
+                    <div className="text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
                       {new Date(review.updatedAt).toLocaleDateString("ko-KR", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
                       })}
                     </div>
-                    <div className="text-xs font-black tracking-[0.2em] text-[#ff9b70]/90">
+                    <div className="text-xs font-black tracking-[0.2em] text-tertiary/90">
                       {review.author?.name ?? "익명"}
                     </div>
                   </div>
-                  <div className="mt-3 inline-flex items-center gap-2 border border-red-500/25 bg-red-500/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-red-300">
+                  <div className="mt-3 inline-flex items-center gap-2 border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--spoiler)]">
                     <span>!</span>
                     <span>스포일러 리뷰</span>
                   </div>
@@ -111,11 +111,11 @@ export function NodeReviews({
                 <ReviewRatingDisplay rating={review.rating} size="compact" />
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className="inline-block border border-red-500/25 bg-red-500/10 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-red-300">
+                <span className="inline-block border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] px-2 py-1 text-[9px] font-black uppercase tracking-widest text-[var(--spoiler)]">
                   열기 전 주의
                 </span>
                 <Link
-                  className="text-[10px] font-black uppercase tracking-[0.2em] text-red-200/70 transition-colors hover:text-red-100"
+                  className="text-[10px] font-black uppercase tracking-[0.2em] text-[color:color-mix(in_srgb,var(--spoiler)_72%,transparent)] transition-colors hover:text-[var(--spoiler)]"
                   href={`/r/${review.id}`}
                 >
                   상세 보기
@@ -129,20 +129,20 @@ export function NodeReviews({
         <Link
           href={`/r/${review.id}`}
           key={review.id}
-          className="block group border-b border-white/5 pb-8 last:border-0 last:pb-0"
+          className="block group border-b border-border pb-8 last:border-0 last:pb-0"
         >
           <article className="space-y-4">
               <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
               <div className="min-w-0">
                 <div className="space-y-2">
-                  <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
+                  <div className="text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
                     {new Date(review.updatedAt).toLocaleDateString("ko-KR", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
                     })}
                   </div>
-                <div className="text-xs font-black tracking-[0.2em] text-[#ff9b70]/90">
+                <div className="text-xs font-black tracking-[0.2em] text-tertiary/90">
                   {review.author?.name ?? "익명"}
                 </div>
                 </div>

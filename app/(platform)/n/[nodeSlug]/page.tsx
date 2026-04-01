@@ -45,6 +45,7 @@ export default async function NodePage({
         eyebrow={category?.name ?? "Collection"}
         title={node.title}
         description={node.summary}
+        titleClassName="text-2xl sm:text-3xl lg:text-4xl"
         crumbs={[
           category ? { label: category.name, href: `/c/${category.slug}` } : { label: "Inventory" },
           { label: node.title },
@@ -66,7 +67,7 @@ export default async function NodePage({
 
       <section className="space-y-6">
         <div className="grid gap-6 xl:grid-cols-[1fr_360px] xl:items-start">
-          <div className="bg-surface-low border border-border p-6">
+          <div className="bg-surface-low border border-border p-5 sm:p-6">
             <NodeReviews reviews={approvedReviews} />
           </div>
 
@@ -88,29 +89,29 @@ export default async function NodePage({
               </div>
             </div>
 
-            <div className="bg-surface-low p-6 border border-border">
+            <div className="bg-surface-low p-5 sm:p-6 border border-border">
               <div className="space-y-6">
-                <p className="text-[14px] font-black text-primary uppercase tracking-[0.3em] mt-1">Tags</p>
+                <p className="mt-1 text-xs font-black uppercase tracking-[0.24em] text-primary sm:text-[14px] sm:tracking-[0.3em]">Tags</p>
                 <div className="flex flex-wrap gap-3">
                   {node.tagSlugs.length ? (
                     node.tagSlugs.map((tag) => (
                       <span
                         key={tag}
-                        className="bg-surface-high border border-border px-3 py-1.5 text-[14px] font-black uppercase tracking-widest text-foreground/40"
+                        className="bg-surface-high border border-border px-2.5 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-foreground/40 sm:px-3 sm:text-[14px] sm:tracking-widest"
                       >
                         #{tag}
                       </span>
                     ))
                   ) : (
-                    <span className="text-[14px] font-bold text-muted-foreground/20 italic">No tags assigned</span>
+                    <span className="text-xs font-bold italic text-muted-foreground/20 sm:text-[14px]">No tags assigned</span>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="bg-surface-low p-6 border border-border">
+            <div className="bg-surface-low p-5 sm:p-6 border border-border">
               <div className="space-y-6">
-                <p className="text-[14px] font-black text-primary uppercase tracking-[0.3em] mt-1">Info</p>
+                <p className="mt-1 text-xs font-black uppercase tracking-[0.24em] text-primary sm:text-[14px] sm:tracking-[0.3em]">Info</p>
                 <div className="grid gap-px bg-foreground/5 overflow-hidden">
                   {attributeEntries.length ? (
                     attributeEntries.map(({ key, label, value }) => (
@@ -118,17 +119,17 @@ export default async function NodePage({
                         key={key}
                         className="bg-surface-lowest p-3 transition-colors hover:bg-surface-low"
                       >
-                        <div className="text-[14px] font-black text-foreground/20 uppercase tracking-[0.2em]">
+                        <div className="text-xs font-black uppercase tracking-[0.16em] text-foreground/20 sm:text-[14px] sm:tracking-[0.2em]">
                           {label}
                         </div>
-                        <div className="ml-4 mt-1 text-[14px] font-bold text-foreground/80">
+                        <div className="ml-3 mt-1 text-xs font-bold text-foreground/80 sm:ml-4 sm:text-[14px]">
                           {Array.isArray(value) ? value.join(", ") : String(value)}
                         </div>
                       </div>
                     ))
                   ) : (
                     <div className="bg-surface-lowest p-3">
-                      <span className="text-[14px] font-bold text-muted-foreground/20 italic">No attributes defined</span>
+                      <span className="text-xs font-bold italic text-muted-foreground/20 sm:text-[14px]">No attributes defined</span>
                     </div>
                   )}
                 </div>

@@ -5,7 +5,7 @@ import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import Link from "next/link";
-import { MenuIcon, SearchIcon, XIcon } from "lucide-react";
+import { MenuIcon, SearchIcon } from "lucide-react";
 import { AppIcon } from "@/components/app-icon";
 import { useContentNodePicker } from "@/components/content-node-picker";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetTitle,
   SheetTrigger,
@@ -34,7 +33,7 @@ export function PlatformShell({
 }: {
   children: React.ReactNode;
 }) {
-  const WRITE_BUTTON_LABEL = "새로운 리뷰 작성";
+  const WRITE_BUTTON_LABEL = "새 리뷰 작성";
   const SIDEBAR_PAGE_SIZE = 12;
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -132,7 +131,7 @@ export function PlatformShell({
             ? false
             : sidebarMode === "settings"
               ? false
-            : sidebarRecentReviews.length >= recentReviewLimit;
+              : sidebarRecentReviews.length >= recentReviewLimit;
   const pendingCount = viewer?.role === "admin" ? pendingReviews.length : 0;
   const topCrumbs = resolveTopCrumbs(pathname, searchParams, categories, items, currentReview, editingReview);
   const sidebarTopCrumbs = pathname.startsWith("/r/") ? topCrumbs.slice(0, -1) : topCrumbs;
@@ -217,24 +216,21 @@ export function PlatformShell({
       <DrawerLink active={pathname === "/dashboard"} href="/dashboard" icon="history" label="모든 리뷰" />
       {!authIsPending && viewer ? (
         <div
-          className={`group flex min-h-11 items-center gap-2 pr-3 transition-colors duration-300 ${
-            pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "bg-surface-high" : ""
-          } ${
-            pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "" : "hover:bg-surface-high"
-          }`}
+          className={`group flex min-h-11 items-center gap-2 pr-3 transition-colors duration-300 ${pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "bg-surface-high" : ""
+            } ${pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "" : "hover:bg-surface-high"
+            }`}
         >
           <Link
-            className={`flex min-h-11 min-w-0 flex-1 items-center gap-3 px-3 py-0 leading-none transition-all duration-300 ${
-              pathname.startsWith("/my-reviews") || pathname.startsWith("/write")
-                ? "font-bold text-primary"
-                : "text-muted-foreground group-hover:text-primary"
-            }`}
+            className={`flex min-h-11 min-w-0 flex-1 items-center gap-3 px-3 py-0 leading-none transition-all duration-300 ${pathname.startsWith("/my-reviews") || pathname.startsWith("/write")
+              ? "font-bold text-primary"
+              : "text-muted-foreground group-hover:text-primary"
+              }`}
             href="/my-reviews"
           >
             <span className="flex h-5 w-5 shrink-0 items-center justify-center">
               <AppIcon className="size-4" name="book" />
             </span>
-            <span className="flex items-center text-xs font-bold leading-none tracking-tight">내 리뷰</span>
+            <span className="flex items-center whitespace-nowrap text-xs font-bold leading-none tracking-tight">내 리뷰</span>
           </Link>
           {showGlobalWriteButton ? (
             <Button asChild className="ml-auto shrink-0 rounded-none px-3 uppercase tracking-widest font-bold">
@@ -320,44 +316,24 @@ export function PlatformShell({
 
   const mobileDrawerNavigation = (
     <>
-      <div
-        className={`flex min-h-11 items-center gap-2 pr-3 ${
-          pathname === "/dashboard" ? "bg-surface-high" : ""
-        }`}
-      >
-        <div className="min-w-0 flex-1">
-          <DrawerLink
-            active={pathname === "/dashboard"}
-            href="/dashboard"
-            icon="history"
-            label="모든 리뷰"
-            onClick={keepMobileNavOpenOnNextRouteChange}
-          />
-        </div>
-        <SheetClose asChild>
-          <Button
-            className="ml-auto shrink-0 border-border text-foreground hover:bg-surface-lowest"
-            size="icon-sm"
-            variant="outline"
-          >
-            <XIcon className="h-4 w-4" />
-            <span className="sr-only">메뉴 닫기</span>
-          </Button>
-        </SheetClose>
-      </div>
+      <DrawerLink
+        active={pathname === "/dashboard"}
+        href="/dashboard"
+        icon="history"
+        label="모든 리뷰"
+        onClick={keepMobileNavOpenOnNextRouteChange}
+      />
 
       {!authIsPending && viewer ? (
         <div
-          className={`flex min-h-11 items-center gap-2 pr-3 ${
-            pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "bg-surface-high" : ""
-          }`}
+          className={`flex min-h-11 items-center gap-2 pr-3 ${pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "bg-surface-high" : ""
+            }`}
         >
           <Link
-            className={`flex min-h-11 min-w-0 flex-1 items-center gap-3 px-3 py-0 leading-none transition-all duration-300 ${
-              pathname.startsWith("/my-reviews") || pathname.startsWith("/write")
-                ? "font-bold text-primary"
-                : "text-muted-foreground hover:text-primary"
-            }`}
+            className={`flex min-h-11 min-w-0 flex-1 items-center gap-2 px-3 py-0 leading-none transition-all duration-300 ${pathname.startsWith("/my-reviews") || pathname.startsWith("/write")
+              ? "font-bold text-primary"
+              : "text-muted-foreground hover:text-primary"
+              }`}
             href="/my-reviews"
             onClick={keepMobileNavOpenOnNextRouteChange}
           >
@@ -499,71 +475,71 @@ export function PlatformShell({
 
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-border bg-surface-mid/80 px-4 backdrop-blur-xl lg:h-16 lg:px-10">
-          
-          <div className="flex min-w-0 flex-1 items-center gap-2 lg:gap-3">
-            <Sheet onOpenChange={setMobileNavOpen} open={mobileNavOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  className="shrink-0 border-border text-foreground lg:hidden"
-                  size="icon-sm"
-                  variant="outline"
+
+            <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-3">
+              <Sheet onOpenChange={setMobileNavOpen} open={mobileNavOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    className="shrink-0 border-border text-foreground lg:hidden"
+                    size="icon-sm"
+                    variant="outline"
+                  >
+                    <MenuIcon className="h-4 w-4" />
+                    <span className="sr-only">메뉴 열기</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent
+                  className="w-[min(100vw,24rem)] min-w-[16rem] border-r border-border bg-surface-mid p-0 text-foreground"
+                  side="left"
+                  showCloseButton={false}
                 >
-                  <MenuIcon className="h-4 w-4" />
-                  <span className="sr-only">메뉴 열기</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                className="w-[min(92vw,24rem)] border-r border-border bg-surface-mid p-0 text-foreground"
-                side="left"
-                showCloseButton={false}
-              >
-                <SheetTitle className="sr-only">네비게이션</SheetTitle>
-                <div className="flex min-h-0 flex-1 overflow-hidden">
-                  <aside className="icon-rail-scrollbar flex h-full w-14 shrink-0 flex-col items-stretch overflow-x-hidden overflow-y-auto border-r border-border bg-surface-lowest">
-                    {railNavigation}
-                  </aside>
-                  <div className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto bg-surface-low">
-                    {mobileDrawerNavigation}
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-
-            <nav className="min-w-0 flex-1 overflow-hidden text-[10px] font-bold uppercase tracking-widest text-muted-foreground lg:hidden">
-              <Breadcrumb>
-                <BreadcrumbList className="flex-wrap gap-y-1">
-                  {topCrumbs.map((crumb, index) => (
-                    <div className="contents" key={`${crumb.label}-${index}`}>
-                      <BreadcrumbItem>
-                        {crumb.href ? (
-                          <BreadcrumbLink asChild>
-                            <Link href={crumb.href} className="hover:text-primary transition-colors">
-                              {crumb.label}
-                            </Link>
-                          </BreadcrumbLink>
-                        ) : (
-                          <BreadcrumbPage className="font-black tracking-[0.2em] text-foreground">
-                            {crumb.label}
-                          </BreadcrumbPage>
-                        )}
-                      </BreadcrumbItem>
-                      {index < topCrumbs.length - 1 ? (
-                        <BreadcrumbSeparator className="text-foreground/10 opacity-30">
-                          <span className="mx-1">/</span>
-                        </BreadcrumbSeparator>
-                      ) : null}
+                  <SheetTitle className="sr-only">네비게이션</SheetTitle>
+                  <div className="flex min-h-0 flex-1 overflow-hidden">
+                    <aside className="icon-rail-scrollbar flex h-full w-14 shrink-0 flex-col items-stretch overflow-x-hidden overflow-y-auto border-r border-border bg-surface-lowest">
+                      {railNavigation}
+                    </aside>
+                    <div className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto bg-surface-low">
+                      {mobileDrawerNavigation}
                     </div>
-                  ))}
-                </BreadcrumbList>
-              </Breadcrumb>
-            </nav>
+                  </div>
+                </SheetContent>
+              </Sheet>
 
-            <div className="hidden min-w-0 flex-1 lg:block">
-              <DesktopNodeSearch items={items} pathname={pathname} searchParamsKey={searchParamsKey} />
+              <nav className="min-w-0 flex-1 overflow-hidden text-[9px] font-bold text-muted-foreground lg:hidden sm:text-[10px]">
+                <Breadcrumb>
+                  <BreadcrumbList className="flex-wrap gap-y-1 text-[9px] sm:text-[10px]">
+                    {topCrumbs.map((crumb, index) => (
+                      <div className="contents" key={`${crumb.label}-${index}`}>
+                        <BreadcrumbItem>
+                          {crumb.href ? (
+                            <BreadcrumbLink asChild>
+                              <Link href={crumb.href} className="block max-w-24 truncate transition-colors hover:text-primary sm:max-w-32">
+                                {crumb.label}
+                              </Link>
+                            </BreadcrumbLink>
+                          ) : (
+                            <BreadcrumbPage className="block max-w-24 truncate font-black text-foreground sm:max-w-32">
+                              {crumb.label}
+                            </BreadcrumbPage>
+                          )}
+                        </BreadcrumbItem>
+                        {index < topCrumbs.length - 1 ? (
+                          <BreadcrumbSeparator className="text-foreground/10 opacity-30">
+                            <span className="mx-1">/</span>
+                          </BreadcrumbSeparator>
+                        ) : null}
+                      </div>
+                    ))}
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </nav>
+
+              <div className="hidden min-w-0 flex-1 lg:block">
+                <DesktopNodeSearch items={items} pathname={pathname} searchParamsKey={searchParamsKey} />
+              </div>
             </div>
-          </div>
 
-        </header>
+          </header>
           <div className="custom-scrollbar px-4 py-6 lg:px-10 lg:py-10 w-full min-h-0 overflow-y-auto flex-1">{children}</div>
         </main>
       </div>
@@ -702,9 +678,8 @@ function DesktopNodeSearch({
               {matches.map((item, index) => (
                 <button
                   aria-selected={index === activeIndex}
-                  className={`flex items-center justify-between gap-3 bg-surface-lowest px-4 py-3 text-left transition-colors ${
-                    index === activeIndex ? "bg-surface-high" : "hover:bg-surface-high"
-                  }`}
+                  className={`flex items-center justify-between gap-3 bg-surface-lowest px-4 py-3 text-left transition-colors ${index === activeIndex ? "bg-surface-high" : "hover:bg-surface-high"
+                    }`}
                   key={item.id}
                   onClick={() => navigateToItem(item)}
                   onMouseEnter={() => setActiveIndex(index)}
@@ -983,14 +958,14 @@ function DrawerLink({
 }) {
   return (
     <Link
-      className={`flex min-h-11 w-full items-center gap-3 rounded-none px-3 py-0 leading-none transition-all duration-300 ${active ? "bg-surface-high font-bold text-primary" : "text-muted-foreground hover:bg-surface-high hover:text-primary"}`}
+      className={`flex min-h-11 w-full items-center gap-2 rounded-none px-3 py-0 leading-none transition-all duration-300 ${active ? "bg-surface-high font-bold text-primary" : "text-muted-foreground hover:bg-surface-high hover:text-primary"}`}
       href={href}
       onClick={onClick}
     >
       <span className="flex h-5 w-5 shrink-0 items-center justify-center">
         <AppIcon className="size-4" name={icon} />
       </span>
-      <span className="flex items-center text-xs font-bold leading-none tracking-tight">{label}</span>
+      <span className="flex items-center whitespace-nowrap text-xs font-bold leading-none tracking-tight">{label}</span>
     </Link>
   );
 }
@@ -1021,14 +996,13 @@ function CollectionLink({
       href={href}
     >
       <span
-        className={`block truncate text-sm tracking-tight transition-colors duration-200 ${
-          spoiler
-            ? active
-              ? "text-[var(--spoiler)]"
-              : "text-[color:color-mix(in_srgb,var(--spoiler)_82%,transparent)] group-hover:text-[var(--spoiler)] group-hover:opacity-100"
-            : active
-              ? "text-primary"
-              : "text-foreground/70 group-hover:text-primary group-hover:opacity-100"
+        className={`block truncate text-sm tracking-tight transition-colors duration-200 ${spoiler
+          ? active
+            ? "text-[var(--spoiler)]"
+            : "text-[color:color-mix(in_srgb,var(--spoiler)_82%,transparent)] group-hover:text-[var(--spoiler)] group-hover:opacity-100"
+          : active
+            ? "text-primary"
+            : "text-foreground/70 group-hover:text-primary group-hover:opacity-100"
           }`}
       >
         {title}

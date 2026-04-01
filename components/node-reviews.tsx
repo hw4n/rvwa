@@ -71,7 +71,7 @@ export function NodeReviews({
       {visibleReviews.map((review) => {
         const previewText = getReviewPreview(review);
         const reviewBody = (
-          <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground font-medium line-clamp-3">
+          <p className="mt-0.5 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-3 sm:text-sm">
             {previewText}
           </p>
         );
@@ -82,17 +82,17 @@ export function NodeReviews({
               className="space-y-4 border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] p-5"
               key={review.id}
             >
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
+              <div className="grid gap-4 items-start sm:grid-cols-[minmax(0,1fr)_auto]">
                 <div className="min-w-0">
                   <div className="space-y-2">
-                    <div className="text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
+                    <div className="text-[9px] font-black uppercase leading-none tracking-[0.16em] text-foreground/40 sm:text-[10px] sm:tracking-[0.2em]">
                       {new Date(review.updatedAt).toLocaleDateString("ko-KR", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
                       })}
                     </div>
-                    <div className="text-xs font-black tracking-[0.2em] text-tertiary/90">
+                    <div className="text-[11px] font-black tracking-[0.16em] text-tertiary/90 sm:text-xs sm:tracking-[0.2em]">
                       {review.author?.name ?? "익명"}
                     </div>
                   </div>
@@ -100,9 +100,9 @@ export function NodeReviews({
                     className="mt-3"
                     spoiler
                     title={getReviewDisplayTitle(review)}
-                    titleClassName="text-sm"
+                    titleClassName="text-[13px] sm:text-sm"
                   />
-                  <div className="mt-3 inline-flex items-center gap-2 border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--spoiler)]">
+                  <div className="mt-3 inline-flex items-center gap-2 border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-[var(--spoiler)] sm:text-[10px] sm:tracking-[0.2em]">
                     <span>!</span>
                     <span>스포일러 리뷰</span>
                   </div>
@@ -116,14 +116,16 @@ export function NodeReviews({
                     {reviewBody}
                   </ReviewSpoilerGate>
                 </div>
-                <ReviewRatingDisplay rating={review.rating} size="compact" />
+                <div className="justify-self-start sm:justify-self-end">
+                  <ReviewRatingDisplay rating={review.rating} size="compact" />
+                </div>
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className="inline-block border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] px-2 py-1 text-[9px] font-black uppercase tracking-widest text-[var(--spoiler)]">
+                <span className="inline-block border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] px-2 py-1 text-[8px] font-black uppercase tracking-[0.16em] text-[var(--spoiler)] sm:text-[9px] sm:tracking-widest">
                   열기 전 주의
                 </span>
                 <Link
-                  className="text-[10px] font-black uppercase tracking-[0.2em] text-[color:color-mix(in_srgb,var(--spoiler)_72%,transparent)] transition-colors hover:text-[var(--spoiler)]"
+                  className="text-[9px] font-black uppercase tracking-[0.16em] text-[color:color-mix(in_srgb,var(--spoiler)_72%,transparent)] transition-colors hover:text-[var(--spoiler)] sm:text-[10px] sm:tracking-[0.2em]"
                   href={`/r/${review.id}`}
                 >
                   상세 보기
@@ -140,17 +142,17 @@ export function NodeReviews({
           className="block group border-b border-border pb-8 last:border-0 last:pb-0"
         >
           <article className="space-y-4">
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
+              <div className="grid gap-4 items-start sm:grid-cols-[minmax(0,1fr)_auto]">
               <div className="min-w-0">
                 <div className="space-y-2">
-                  <div className="text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
+                  <div className="text-[9px] font-black uppercase leading-none tracking-[0.16em] text-foreground/40 sm:text-[10px] sm:tracking-[0.2em]">
                     {new Date(review.updatedAt).toLocaleDateString("ko-KR", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
                     })}
                   </div>
-                <div className="text-xs font-black tracking-[0.2em] text-tertiary/90">
+                <div className="text-[11px] font-black tracking-[0.16em] text-tertiary/90 sm:text-xs sm:tracking-[0.2em]">
                   {review.author?.name ?? "익명"}
                 </div>
                 </div>
@@ -158,12 +160,14 @@ export function NodeReviews({
                   <ReviewItemTitle
                     className="mt-3"
                     title={getReviewDisplayTitle(review)}
-                    titleClassName="text-sm"
+                    titleClassName="text-[13px] sm:text-sm"
                   />
                 ) : null}
                 {reviewBody}
               </div>
-              <ReviewRatingDisplay rating={review.rating} size="compact" />
+              <div className="justify-self-start sm:justify-self-end">
+                <ReviewRatingDisplay rating={review.rating} size="compact" />
+              </div>
             </div>
           </article>
         </Link>

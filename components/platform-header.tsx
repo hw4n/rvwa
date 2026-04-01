@@ -77,7 +77,6 @@ export function PlatformHeader({
            </span>
            <div className="mt-auto flex flex-col items-center gap-2">
              <span className="text-xs md:text-sm font-black text-primary/40 uppercase tracking-[0.4em]">카탈로그</span>
-             <div className="w-8 h-px bg-primary/20" />
            </div>
         </div>
 

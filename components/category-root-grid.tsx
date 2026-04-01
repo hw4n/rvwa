@@ -71,9 +71,6 @@ export function CategoryRootGrid({
                   {node.title.charAt(0)}
                 </span>
               ) : null}
-              <div className="relative z-10 mt-auto flex flex-col items-center gap-1 opacity-40 transition-opacity group-hover:opacity-100">
-                <div className="h-px w-6 bg-primary/20" />
-              </div>
             </div>
             <div className="space-y-1">
               <h3 className="line-clamp-1 text-center text-sm font-black tracking-tight text-foreground transition-colors group-hover:text-primary">

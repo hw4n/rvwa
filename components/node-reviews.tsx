@@ -3,8 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import type { Review } from "@/lib/domain";
+import { ReviewItemTitle } from "@/components/review-item-title";
 import { ReviewRatingDisplay } from "@/components/review-rating-display";
 import { getReviewExplicitTitle } from "@/lib/review-display";
+import { getReviewDisplayTitle } from "@/lib/review-display";
 import { ReviewSpoilerGate } from "@/components/review-spoiler-gate";
 
 const PAGE_SIZE = 5;
@@ -94,6 +96,12 @@ export function NodeReviews({
                       {review.author?.name ?? "익명"}
                     </div>
                   </div>
+                  <ReviewItemTitle
+                    className="mt-3"
+                    spoiler
+                    title={getReviewDisplayTitle(review)}
+                    titleClassName="text-sm"
+                  />
                   <div className="mt-3 inline-flex items-center gap-2 border border-[color:var(--spoiler-soft)] bg-[var(--spoiler-surface)] px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--spoiler)]">
                     <span>!</span>
                     <span>스포일러 리뷰</span>
@@ -146,6 +154,13 @@ export function NodeReviews({
                   {review.author?.name ?? "익명"}
                 </div>
                 </div>
+                {getReviewExplicitTitle(review) ? (
+                  <ReviewItemTitle
+                    className="mt-3"
+                    title={getReviewDisplayTitle(review)}
+                    titleClassName="text-sm"
+                  />
+                ) : null}
                 {reviewBody}
               </div>
               <ReviewRatingDisplay rating={review.rating} size="compact" />

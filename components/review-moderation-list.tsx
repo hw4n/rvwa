@@ -21,6 +21,7 @@ import {
 } from "@/lib/metadata";
 import { formatCompactRating } from "@/lib/review-rating";
 import { getReviewDisplayTitle } from "@/lib/review-display";
+import { ReviewItemTitle } from "@/components/review-item-title";
 import { ReviewSpoilerGate } from "@/components/review-spoiler-gate";
 import { isValidCategorySlugInput, isValidItemSlugInput, normalizeSearchSlug } from "@/lib/slug";
 
@@ -273,7 +274,11 @@ export function ReviewModerationList() {
               tabIndex={0}
             >
               <TableCell>
-                <p className="font-black tracking-tight text-foreground">{getReviewDisplayTitle(review)}</p>
+                <ReviewItemTitle
+                  spoiler={review.spoiler}
+                  title={getReviewDisplayTitle(review)}
+                  titleClassName="text-sm"
+                />
               </TableCell>
               <TableCell className="text-muted-foreground">{review.author?.name ?? "알 수 없음"}</TableCell>
               <TableCell className="font-black text-tertiary">

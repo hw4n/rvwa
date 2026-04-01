@@ -5,6 +5,7 @@ import { usePaginatedQuery } from "convex/react";
 import Image from "next/image";
 import Link from "next/link";
 import { PosterRatingBadge } from "@/components/poster-rating-badge";
+import { ReviewItemTitle } from "@/components/review-item-title";
 import { api } from "@/convex/_generated/api";
 import { getPosterImageUrl } from "@/lib/poster";
 import { getReviewDisplayTitle } from "@/lib/review-display";
@@ -58,7 +59,13 @@ export function DashboardReviewGrid() {
             href={`/r/${review.id}`}
             className="group space-y-4"
           >
-            <div className="relative flex aspect-[2/3] flex-col items-center justify-center overflow-hidden border border-border bg-surface-low p-6 transition-all group-hover:scale-[1.02] group-hover:border-primary/40">
+            <div
+              className={`relative flex aspect-[2/3] flex-col items-center justify-center overflow-hidden border bg-surface-low p-6 transition-all group-hover:scale-[1.02] ${
+                review.spoiler
+                  ? "border-[color:var(--spoiler-soft)] group-hover:border-[var(--spoiler)]/60"
+                  : "border-border group-hover:border-primary/40"
+              }`}
+            >
               {review.coverImage ? (
                 <Image
                   alt={getReviewDisplayTitle(review)}
@@ -70,7 +77,11 @@ export function DashboardReviewGrid() {
                   unoptimized
                 />
               ) : null}
-              <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100" />
+              <div
+                className={`absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 ${
+                  review.spoiler ? "bg-[var(--spoiler-surface)]" : "bg-primary/5"
+                }`}
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-surface-lowest/90 via-surface-lowest/10 to-transparent" />
               <PosterRatingBadge rating={review.rating} />
               {!review.coverImage ? (
@@ -78,15 +89,15 @@ export function DashboardReviewGrid() {
                   {(review.nodeTitle ?? review.proposedTitle ?? "R").charAt(0)}
                 </span>
               ) : null}
-              <div className="relative z-10 mt-auto flex flex-col items-center gap-1 opacity-40 transition-opacity group-hover:opacity-100">
-                <div className="h-px w-6 bg-primary/20" />
-              </div>
             </div>
-            <div className="space-y-2">
-              <h3 className="line-clamp-2 text-center text-sm font-black leading-tight tracking-tight text-foreground transition-colors group-hover:text-primary">
-                {getReviewDisplayTitle(review)}
-              </h3>
-            </div>
+            <ReviewItemTitle
+              align="center"
+              spoiler={review.spoiler}
+              title={getReviewDisplayTitle(review)}
+              titleClassName={`line-clamp-2 text-sm transition-colors ${
+                review.spoiler ? "group-hover:text-[var(--spoiler)]" : "group-hover:text-primary"
+              }`}
+            />
           </Link>
         ))}
       </div>

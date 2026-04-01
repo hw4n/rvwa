@@ -25,11 +25,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { Category, ContentNode, Review, UserSummary } from "@/lib/domain";
-import { LogoutButton } from "@/components/logout-button";
 import { getReviewDisplayTitle } from "@/lib/review-display";
 import { getReviewExplicitTitle } from "@/lib/review-display";
 import { formatCompactRating } from "@/lib/review-rating";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export function PlatformShell({
   children,
@@ -111,6 +109,7 @@ export function PlatformShell({
   const sidebarRecentReviews = sidebarMode === "dashboard" ? recentReviews : [];
   const sidebarMyReviews = sidebarMode === "mine" ? myReviews : [];
   const sidebarPendingReviews = sidebarMode === "pending" ? pendingReviews : [];
+  const sidebarSettingsReviews: Review[] = sidebarMode === "settings" ? [] : [];
 
   const sidebarReviews =
     sidebarMode === "item"
@@ -119,7 +118,9 @@ export function PlatformShell({
         ? sidebarMyReviews
         : sidebarMode === "pending"
           ? sidebarPendingReviews
-          : sidebarRecentReviews;
+          : sidebarMode === "settings"
+            ? sidebarSettingsReviews
+            : sidebarRecentReviews;
   const hasMoreSidebarItems =
     sidebarMode === "category"
       ? sidebarCategoryNodes.length > categoryItemLimit
@@ -129,6 +130,8 @@ export function PlatformShell({
           ? sidebarMyReviews.length >= myReviewLimit
           : sidebarMode === "pending"
             ? false
+            : sidebarMode === "settings"
+              ? false
             : sidebarRecentReviews.length >= recentReviewLimit;
   const pendingCount = viewer?.role === "admin" ? pendingReviews.length : 0;
   const topCrumbs = resolveTopCrumbs(pathname, searchParams, categories, items, currentReview, editingReview);
@@ -281,35 +284,37 @@ export function PlatformShell({
         </Breadcrumb>
       </nav>
 
-      <div className="space-y-0">
+      {sidebarMode === "settings" ? null : (
         <div className="space-y-0">
-          {sidebarMode === "category"
-            ? sidebarCategoryVisibleNodes.map((entry) => (
-              <CollectionLink
-                active={pathname === `/n/${entry.slug}`}
-                href={`/n/${entry.slug}`}
-                key={entry.id}
-                title={entry.title}
-              />
-            ))
-            : sidebarReviews.map((entry) => {
-              const reviewItemHref = entry.id ? `/r/${entry.id}` : "/dashboard";
-              return (
+          <div className="space-y-0">
+            {sidebarMode === "category"
+              ? sidebarCategoryVisibleNodes.map((entry) => (
                 <CollectionLink
-                  active={isReviewDetail ? entry.id === reviewId : false}
-                  href={reviewItemHref}
+                  active={pathname === `/n/${entry.slug}`}
+                  href={`/n/${entry.slug}`}
                   key={entry.id}
-                  title={entry.spoiler ? "<스포일러 리뷰>" : getReviewDisplayTitle(entry)}
-                  author={entry.author?.name}
-                  itemName={entry.nodeTitle ?? entry.proposedTitle}
-                  spoiler={entry.spoiler}
-                  score={entry.rating}
+                  title={entry.title}
                 />
-              );
-            })}
-          {hasMoreSidebarItems ? <div className="h-4" ref={loadMoreRef} /> : null}
+              ))
+              : sidebarReviews.map((entry) => {
+                const reviewItemHref = entry.id ? `/r/${entry.id}` : "/dashboard";
+                return (
+                  <CollectionLink
+                    active={isReviewDetail ? entry.id === reviewId : false}
+                    href={reviewItemHref}
+                    key={entry.id}
+                    title={entry.spoiler ? "<스포일러 리뷰>" : getReviewDisplayTitle(entry)}
+                    author={entry.author?.name}
+                    itemName={entry.nodeTitle ?? entry.proposedTitle}
+                    spoiler={entry.spoiler}
+                    score={entry.rating}
+                  />
+                );
+              })}
+            {hasMoreSidebarItems ? <div className="h-4" ref={loadMoreRef} /> : null}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 
@@ -410,35 +415,37 @@ export function PlatformShell({
         </Breadcrumb>
       </nav>
 
-      <div className="space-y-0">
+      {sidebarMode === "settings" ? null : (
         <div className="space-y-0">
-          {sidebarMode === "category"
-            ? sidebarCategoryVisibleNodes.map((entry) => (
-              <CollectionLink
-                active={pathname === `/n/${entry.slug}`}
-                href={`/n/${entry.slug}`}
-                key={entry.id}
-                title={entry.title}
-              />
-            ))
-            : sidebarReviews.map((entry) => {
-              const reviewItemHref = entry.id ? `/r/${entry.id}` : "/dashboard";
-              return (
+          <div className="space-y-0">
+            {sidebarMode === "category"
+              ? sidebarCategoryVisibleNodes.map((entry) => (
                 <CollectionLink
-                  active={isReviewDetail ? entry.id === reviewId : false}
-                  href={reviewItemHref}
+                  active={pathname === `/n/${entry.slug}`}
+                  href={`/n/${entry.slug}`}
                   key={entry.id}
-                  title={entry.spoiler ? "<스포일러 리뷰>" : getReviewDisplayTitle(entry)}
-                  author={entry.author?.name}
-                  itemName={entry.nodeTitle ?? entry.proposedTitle}
-                  spoiler={entry.spoiler}
-                  score={entry.rating}
+                  title={entry.title}
                 />
-              );
-            })}
-          {hasMoreSidebarItems ? <div className="h-4" ref={loadMoreRef} /> : null}
+              ))
+              : sidebarReviews.map((entry) => {
+                const reviewItemHref = entry.id ? `/r/${entry.id}` : "/dashboard";
+                return (
+                  <CollectionLink
+                    active={isReviewDetail ? entry.id === reviewId : false}
+                    href={reviewItemHref}
+                    key={entry.id}
+                    title={entry.spoiler ? "<스포일러 리뷰>" : getReviewDisplayTitle(entry)}
+                    author={entry.author?.name}
+                    itemName={entry.nodeTitle ?? entry.proposedTitle}
+                    spoiler={entry.spoiler}
+                    score={entry.rating}
+                  />
+                );
+              })}
+            {hasMoreSidebarItems ? <div className="h-4" ref={loadMoreRef} /> : null}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 
@@ -463,14 +470,17 @@ export function PlatformShell({
           />
         ))}
       </nav>
-      {!authIsPending && viewer ? (
-        <div className="border-t border-border">
-          {viewer.role === "admin" ? (
-            <RailLink active={pathname.startsWith("/admin/categories/")} href="/admin/categories/new" icon="add" label="추가" />
-          ) : null}
-          <RailLink active={pathname.startsWith("/settings")} href="/settings" icon="settings" label="설정" />
-        </div>
-      ) : null}
+      <div className="border-t border-border">
+        {!authIsPending && viewer?.role === "admin" ? (
+          <RailLink active={pathname.startsWith("/admin/categories/")} href="/admin/categories/new" icon="add" label="추가" />
+        ) : null}
+        <RailLink
+          active={pathname.startsWith("/settings")}
+          href="/settings"
+          icon="user-cog"
+          label={viewer ? "계정/설정" : "로그인/설정"}
+        />
+      </div>
     </>
   );
 
@@ -553,24 +563,6 @@ export function PlatformShell({
             </div>
           </div>
 
-          <div className="flex shrink-0 flex-wrap justify-end gap-2 lg:gap-3">
-            {authIsPending ? (
-              <div className="flex items-center gap-2 lg:gap-3">
-                <Skeleton className="h-8 w-20 rounded-none border-0" />
-              </div>
-            ) : viewer ? (
-              <LogoutButton className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold">로그아웃</LogoutButton>
-            ) : (
-              <>
-                <Button asChild className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold" variant="outline">
-                  <Link href="/login">로그인</Link>
-                </Button>
-                <Button asChild className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold" variant="outline">
-                  <Link href="/signup">가입</Link>
-                </Button>
-              </>
-            )}
-          </div>
         </header>
           <div className="custom-scrollbar px-4 py-6 lg:px-10 lg:py-10 w-full min-h-0 overflow-y-auto flex-1">{children}</div>
         </main>
@@ -785,6 +777,10 @@ function resolveCurrentItemSlug(
 function getSidebarMode(pathname: string, currentReview: Review | null) {
   if (pathname.startsWith("/my-reviews") || pathname.startsWith("/write")) {
     return "mine";
+  }
+
+  if (pathname.startsWith("/settings")) {
+    return "settings";
   }
 
   if (pathname.startsWith("/c/")) {

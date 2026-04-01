@@ -1,10 +1,10 @@
 import { PlatformHeader } from "@/components/platform-header";
 import { SettingsProfileForm } from "@/components/settings-profile-form";
 import { SettingsThemeForm } from "@/components/settings-theme-form";
-import { requireViewer } from "@/lib/auth";
+import { getViewer } from "@/lib/auth";
 
 export default async function SettingsPage() {
-  const viewer = await requireViewer();
+  const viewer = await getViewer();
 
   return (
     <div className="space-y-10 md:space-y-12">
@@ -15,11 +15,8 @@ export default async function SettingsPage() {
         variant="compact"
       />
 
+      <SettingsProfileForm viewer={viewer} />
       <SettingsThemeForm />
-      <SettingsProfileForm
-        email={viewer.email}
-        initialDisplayName={viewer.name}
-      />
     </div>
   );
 }

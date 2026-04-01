@@ -8,10 +8,21 @@ import { useConvexAuth } from "convex/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
+type AuthMode = "signIn" | "signUp";
+
+export function AuthForm({
+  mode,
+  redirectTo = "/dashboard",
+  variant = "page",
+}: {
+  mode: AuthMode;
+  redirectTo?: string | null;
+  variant?: "page" | "embedded";
+}) {
   const router = useRouter();
   const { signIn } = useAuthActions();
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const [currentMode, setCurrentMode] = React.useState<AuthMode>(mode);
   const [displayName, setDisplayName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -19,10 +30,14 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
   const [pending, setPending] = React.useState(false);
 
   React.useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.replace("/dashboard");
+    setCurrentMode(mode);
+  }, [mode]);
+
+  React.useEffect(() => {
+    if (variant === "page" && !isLoading && isAuthenticated && redirectTo) {
+      router.replace(redirectTo);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, redirectTo, router, variant]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,12 +46,14 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
 
     try {
       await signIn("password", {
-        flow: mode,
+        flow: currentMode,
         email,
         password,
         displayName,
       });
-      router.replace("/dashboard");
+      if (redirectTo) {
+        router.replace(redirectTo);
+      }
       router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "인증에 실패했습니다.");
@@ -47,21 +64,25 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
 
   return (
     <form
-      className="w-full max-w-md space-y-6 border-l-2 border-primary/50 bg-surface-low p-6 md:p-10"
+      className={`space-y-6 ${
+        variant === "embedded"
+          ? "w-full"
+          : "w-full max-w-md border-l-2 border-primary/50 bg-surface-low p-6 md:p-10"
+      }`}
       onSubmit={onSubmit}
     >
-      {mode === "signUp" ? (
+      {currentMode === "signUp" ? (
         <Input
           className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
           onChange={(event) => setDisplayName(event.currentTarget.value)}
-          placeholder="display name"
+          placeholder="(변경가능) display name"
           value={displayName}
         />
       ) : null}
       <Input
         className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground"
         onChange={(event) => setEmail(event.currentTarget.value)}
-        placeholder="email"
+        placeholder={currentMode === "signUp" ? "(변경불가) email" : "email"}
         type="email"
         value={email}
       />
@@ -79,13 +100,27 @@ export function AuthForm({ mode }: { mode: "signIn" | "signUp" }) {
           disabled={pending}
           type="submit"
         >
-          {mode === "signIn" ? "로그인" : "가입"}
+          {currentMode === "signIn" ? "로그인" : "가입한다"}
         </Button>
-        <Button asChild className="w-full rounded-none uppercase tracking-widest font-bold md:w-auto" variant="outline">
-          <Link href={mode === "signIn" ? "/signup" : "/login"}>
-            {mode === "signIn" ? "가입" : "로그인"}
-          </Link>
-        </Button>
+        {variant === "embedded" ? (
+          <Button
+            className="w-full rounded-none uppercase tracking-widest font-bold md:w-auto"
+            onClick={() => {
+              setCurrentMode((current) => current === "signIn" ? "signUp" : "signIn");
+              setError("");
+            }}
+            type="button"
+            variant="outline"
+          >
+            {currentMode === "signIn" ? "회원이 되고 싶습니다" : "저는 이미 회원입니다"}
+          </Button>
+        ) : (
+          <Button asChild className="w-full rounded-none uppercase tracking-widest font-bold md:w-auto" variant="outline">
+            <Link href={currentMode === "signIn" ? "/signup" : "/login"}>
+              {currentMode === "signIn" ? "회원이 되고 싶습니다" : "저는 이미 회원입니다"}
+            </Link>
+          </Button>
+        )}
       </div>
     </form>
   );

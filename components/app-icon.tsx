@@ -14,6 +14,7 @@ import {
   Settings,
   Sparkles,
   Tv,
+  UserCog,
   UtensilsCrossed,
   Waypoints,
 } from "lucide-react";
@@ -37,6 +38,7 @@ const iconMap: Record<string, LucideIcon> = {
   settings: Settings,
   sparkles: Sparkles,
   tv: Tv,
+  "user-cog": UserCog,
   "utensils-crossed": UtensilsCrossed,
   waypoints: Waypoints,
 };

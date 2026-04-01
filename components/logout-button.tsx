@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 export function LogoutButton({
   className,
   children,
+  redirectTo = "/login",
 }: {
   className?: string;
   children: React.ReactNode;
+  redirectTo?: string | null;
 }) {
   const { signOut } = useAuthActions();
   const router = useRouter();
@@ -24,7 +26,11 @@ export function LogoutButton({
         setPending(true);
         try {
           await signOut();
-          router.push("/login");
+          if (redirectTo) {
+            router.push(redirectTo);
+          } else {
+            router.refresh();
+          }
         } finally {
           setPending(false);
         }

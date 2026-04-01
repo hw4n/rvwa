@@ -474,7 +474,7 @@ export function PlatformShell({
         </aside>
 
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-border bg-surface-mid/80 px-4 backdrop-blur-xl lg:h-16 lg:px-10">
+          <header className="sticky top-0 z-20 flex h-11 w-full items-center justify-between border-b border-border bg-surface-mid/80 px-4 backdrop-blur-xl lg:px-10">
 
             <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-3">
               <Sheet onOpenChange={setMobileNavOpen} open={mobileNavOpen}>
@@ -563,7 +563,7 @@ function DesktopNodeSearch({
   const [activeIndex, setActiveIndex] = React.useState(-1);
   const { hasNoResults, matches } = useContentNodePicker({
     items,
-    limit: 8,
+    limit: items.length,
     search,
   });
 
@@ -674,7 +674,7 @@ function DesktopNodeSearch({
           role="listbox"
         >
           {matches.length ? (
-            <div className="grid gap-px bg-border">
+            <div className="custom-scrollbar grid max-h-[min(24rem,calc(100vh-10rem))] gap-px overflow-y-auto bg-border">
               {matches.map((item, index) => (
                 <button
                   aria-selected={index === activeIndex}

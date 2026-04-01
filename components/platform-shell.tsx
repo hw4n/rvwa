@@ -207,7 +207,34 @@ export function PlatformShell({
   const drawerNavigation = (
     <>
       <DrawerLink active={pathname === "/dashboard"} href="/dashboard" icon="history" label="모든 리뷰" />
-      {!authIsPending && viewer ? <DrawerLink active={pathname.startsWith("/my-reviews")} href="/my-reviews" icon="book" label="내 리뷰" /> : null}
+      {!authIsPending && viewer ? (
+        <div
+          className={`group flex min-h-11 items-center gap-2 pr-3 transition-colors duration-300 ${
+            pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "bg-surface-high" : ""
+          } ${
+            pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "" : "hover:bg-surface-high"
+          }`}
+        >
+          <Link
+            className={`flex min-h-11 min-w-0 flex-1 items-center gap-3 px-3 py-0 leading-none transition-all duration-300 ${
+              pathname.startsWith("/my-reviews") || pathname.startsWith("/write")
+                ? "font-bold text-primary"
+                : "text-muted-foreground group-hover:text-primary"
+            }`}
+            href="/my-reviews"
+          >
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+              <AppIcon className="size-4" name="book" />
+            </span>
+            <span className="flex items-center text-xs font-bold leading-none tracking-tight">내 리뷰</span>
+          </Link>
+          {showGlobalWriteButton ? (
+            <Button asChild className="ml-auto shrink-0 rounded-none px-3 uppercase tracking-widest font-bold">
+              <Link href={globalWriteHref}>{WRITE_BUTTON_LABEL}</Link>
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
       {!authIsPending && viewer?.role === "admin" ? (
         <DrawerLink
           active={pathname.startsWith("/admin/reviews")}
@@ -312,12 +339,12 @@ export function PlatformShell({
       {!authIsPending && viewer ? (
         <div
           className={`flex min-h-11 items-center gap-2 pr-3 ${
-            pathname.startsWith("/my-reviews") ? "bg-surface-high" : ""
+            pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "bg-surface-high" : ""
           }`}
         >
           <Link
             className={`flex min-h-11 min-w-0 flex-1 items-center gap-3 px-3 py-0 leading-none transition-all duration-300 ${
-              pathname.startsWith("/my-reviews")
+              pathname.startsWith("/my-reviews") || pathname.startsWith("/write")
                 ? "font-bold text-primary"
                 : "text-muted-foreground hover:text-primary"
             }`}
@@ -524,18 +551,10 @@ export function PlatformShell({
           <div className="flex shrink-0 flex-wrap justify-end gap-2 lg:gap-3">
             {authIsPending ? (
               <div className="flex items-center gap-2 lg:gap-3">
-                <Skeleton className="h-8 w-20 lg:w-24" />
                 <Skeleton className="h-4 w-12 border-0 bg-foreground/10 lg:w-16" />
               </div>
             ) : viewer ? (
-              <>
-                {showGlobalWriteButton ? (
-                  <Button asChild className="rounded-none uppercase tracking-widest font-bold">
-                    <Link href={globalWriteHref}>{WRITE_BUTTON_LABEL}</Link>
-                  </Button>
-                ) : null}
-                <LogoutButton className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold">로그아웃</LogoutButton>
-              </>
+              <LogoutButton className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold">로그아웃</LogoutButton>
             ) : (
               <>
                 <Button asChild className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold" variant="outline">
@@ -759,7 +778,7 @@ function resolveCurrentItemSlug(
 }
 
 function getSidebarMode(pathname: string, currentReview: Review | null) {
-  if (pathname.startsWith("/my-reviews")) {
+  if (pathname.startsWith("/my-reviews") || pathname.startsWith("/write")) {
     return "mine";
   }
 

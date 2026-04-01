@@ -44,7 +44,7 @@ export function CategoryRootGrid({
 
   return (
     <section className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:gap-6">
         {results.map((node) => (
           <Link
             className="group space-y-4"

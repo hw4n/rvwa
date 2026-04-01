@@ -77,10 +77,10 @@ export function ReviewDetail({
 
   return (
     <article className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
+      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
         <div className="flex-1 max-w-4xl">
           <div className="grid items-start gap-4">
-            <div className="grid gap-6 md:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] md:gap-8">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] lg:gap-8">
               <div className="flex w-full max-w-44 flex-col items-start gap-4">
                 {review.nodeSlug ? (
                   <Link className="block w-full max-w-44 transition-transform hover:scale-[1.02]" href={`/n/${review.nodeSlug}`}>
@@ -90,11 +90,11 @@ export function ReviewDetail({
                   posterCard
                 )}
                 <ReviewRatingDisplay rating={review.rating} size="detail" />
-                <div className="md:hidden">
+                <div className="lg:hidden">
                   {statusBadges}
                 </div>
                 {actions ? (
-                  <div className="flex flex-wrap gap-3 md:hidden">
+                  <div className="flex flex-wrap gap-3 lg:hidden">
                     {actions}
                   </div>
                 ) : null}
@@ -122,10 +122,10 @@ export function ReviewDetail({
           </div>
         </div>
         
-        <div className="shrink-0 flex flex-col items-start md:items-end gap-3">
-          <div className="flex flex-col items-start gap-3 md:items-end">
-            {actions ? <div className="hidden flex-wrap justify-end gap-3 md:flex">{actions}</div> : null}
-            <div className="hidden md:flex">
+        <div className="shrink-0 flex flex-col items-start lg:items-end gap-3">
+          <div className="flex flex-col items-start gap-3 lg:items-end">
+            {actions ? <div className="hidden flex-wrap justify-end gap-3 lg:flex">{actions}</div> : null}
+            <div className="hidden lg:flex">
               {statusBadges}
             </div>
           </div>

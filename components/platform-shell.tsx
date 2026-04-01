@@ -288,24 +288,24 @@ export function PlatformShell({
   return (
     <div className="relative flex h-screen min-h-0 flex-col overflow-hidden bg-surface-mid text-foreground selection:bg-primary/20">
       <div className="flex min-h-0 w-full flex-1 overflow-hidden">
-        <aside className="icon-rail-scrollbar hidden h-full w-16 shrink-0 flex-col items-stretch overflow-x-hidden overflow-y-auto border-r border-border bg-surface-lowest md:flex">
+        <aside className="icon-rail-scrollbar hidden h-full w-16 shrink-0 flex-col items-stretch overflow-x-hidden overflow-y-auto border-r border-border bg-surface-lowest lg:flex">
           {railNavigation}
         </aside>
 
-        <aside className="hidden h-full w-60 shrink-0 flex-col border-r border-border bg-surface-low md:flex">
+        <aside className="hidden h-full w-60 shrink-0 flex-col border-r border-border bg-surface-low lg:flex">
           <div className="flex-1 overflow-y-auto custom-scrollbar" ref={sidebarScrollRef}>
             {drawerNavigation}
           </div>
         </aside>
 
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-border bg-surface-mid/80 px-4 backdrop-blur-xl md:h-16 md:px-10">
+          <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-border bg-surface-mid/80 px-4 backdrop-blur-xl lg:h-16 lg:px-10">
           
-          <div className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 lg:gap-3">
             <Sheet onOpenChange={setMobileNavOpen} open={mobileNavOpen}>
               <SheetTrigger asChild>
                 <Button
-                  className="shrink-0 border-border text-foreground md:hidden"
+                  className="shrink-0 border-border text-foreground lg:hidden"
                   size="icon-sm"
                   variant="outline"
                 >
@@ -329,7 +329,7 @@ export function PlatformShell({
               </SheetContent>
             </Sheet>
 
-            <nav className="min-w-0 flex-1 overflow-hidden text-[10px] font-bold uppercase tracking-widest text-muted-foreground md:hidden">
+            <nav className="min-w-0 flex-1 overflow-hidden text-[10px] font-bold uppercase tracking-widest text-muted-foreground lg:hidden">
               <Breadcrumb>
                 <BreadcrumbList className="flex-wrap gap-y-1">
                   {topCrumbs.map((crumb, index) => (
@@ -358,16 +358,16 @@ export function PlatformShell({
               </Breadcrumb>
             </nav>
 
-            <div className="hidden min-w-0 flex-1 md:block">
+            <div className="hidden min-w-0 flex-1 lg:block">
               <DesktopNodeSearch items={items} pathname={pathname} searchParamsKey={searchParamsKey} />
             </div>
           </div>
 
-          <div className="flex shrink-0 flex-wrap justify-end gap-2 md:gap-3">
+          <div className="flex shrink-0 flex-wrap justify-end gap-2 lg:gap-3">
             {authIsPending ? (
-              <div className="flex items-center gap-2 md:gap-3">
-                <Skeleton className="h-7 w-20 md:w-24" />
-                <Skeleton className="h-4 w-12 border-0 bg-foreground/10 md:w-16" />
+              <div className="flex items-center gap-2 lg:gap-3">
+                <Skeleton className="h-8 w-20 lg:w-24" />
+                <Skeleton className="h-4 w-12 border-0 bg-foreground/10 lg:w-16" />
               </div>
             ) : viewer ? (
               <>
@@ -390,7 +390,7 @@ export function PlatformShell({
             )}
           </div>
         </header>
-          <div className="custom-scrollbar px-4 py-6 md:px-10 md:py-10 w-full min-h-0 overflow-y-auto flex-1">{children}</div>
+          <div className="custom-scrollbar px-4 py-6 lg:px-10 lg:py-10 w-full min-h-0 overflow-y-auto flex-1">{children}</div>
         </main>
       </div>
     </div>
@@ -494,7 +494,7 @@ function DesktopNodeSearch({
       <label className="sr-only" htmlFor="desktop-node-search">
         항목 검색
       </label>
-      <div className="flex h-11 items-center gap-3 border border-border bg-surface-low px-4 text-sm text-muted-foreground transition-colors focus-within:border-primary/40">
+      <div className="flex h-8 items-center gap-3 border border-border bg-surface-low px-4 text-sm text-muted-foreground transition-colors focus-within:border-primary/40">
         <SearchIcon className="h-4 w-4 shrink-0 text-muted-foreground/60" />
         <input
           aria-autocomplete="list"

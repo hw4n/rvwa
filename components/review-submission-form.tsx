@@ -148,7 +148,7 @@ export function ReviewSubmissionForm({
             />
           </div>
 
-          <div className="grid gap-5 md:grid-cols-[160px_1fr] items-end">
+          <div className="grid gap-5 lg:grid-cols-[160px_1fr] items-end">
             <div className="space-y-4">
               <p className="text-sm font-black text-primary tracking-[0.3em] uppercase">점수</p>
               <ReviewRatingInput onChange={setRating} value={rating} />
@@ -157,7 +157,7 @@ export function ReviewSubmissionForm({
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           <label className="inline-flex items-center gap-3 cursor-pointer group">
             <div
               className={`w-4 h-4 border-2 transition-all flex items-center justify-center ${spoiler ? "bg-primary border-primary" : "border-border group-hover:border-primary/40"}`}

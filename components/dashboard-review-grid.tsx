@@ -52,7 +52,7 @@ export function DashboardReviewGrid() {
 
   return (
     <section className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-8 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:gap-8">
         {results.map((review) => (
           <Link
             key={review.id}

@@ -121,7 +121,7 @@ export function ReviewComposer({
             />
           </div>
 
-          <div className="grid gap-10 md:grid-cols-[200px_1fr]">
+          <div className="grid gap-10 lg:grid-cols-[200px_1fr]">
             <div className="space-y-4">
               <span className="text-xs font-bold text-muted-foreground/30 uppercase tracking-widest">평점 (0-100)</span>
               <input

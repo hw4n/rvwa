@@ -24,7 +24,8 @@ export function ReviewItemTitle({
     <div className={wrapperClassName}>
       <div
         className={cn(
-          "font-black leading-tight tracking-tight",
+          "font-black leading-snug tracking-tight break-keep [word-break:keep-all]",
+          align === "center" ? "mx-auto text-[clamp(0.72rem,2vw,0.875rem)] sm:text-sm" : null,
           spoiler ? "text-[var(--spoiler)]" : "text-foreground",
           titleClassName
         )}

@@ -116,7 +116,7 @@ export function MyReviewsGrid() {
               align="center"
               spoiler={review.spoiler}
               title={getReviewDisplayTitle(review)}
-              titleClassName={`line-clamp-2 text-sm transition-colors ${
+              titleClassName={`line-clamp-2 transition-colors ${
                 review.spoiler ? "group-hover:text-[var(--spoiler)]" : "group-hover:text-primary"
               }`}
             />

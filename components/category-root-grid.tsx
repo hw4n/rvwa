@@ -73,7 +73,7 @@ export function CategoryRootGrid({
               ) : null}
             </div>
             <div className="space-y-1">
-              <h3 className="line-clamp-1 text-center text-sm font-black tracking-tight text-foreground transition-colors group-hover:text-primary">
+              <h3 className="mx-auto line-clamp-2 break-keep text-center text-[clamp(0.72rem,2vw,0.875rem)] font-black leading-snug tracking-tight text-foreground transition-colors [word-break:keep-all] group-hover:text-primary sm:text-sm">
                 {node.title}
               </h3>
             </div>

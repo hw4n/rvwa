@@ -247,7 +247,7 @@ export function PlatformShell({
             }`}
         >
           <Link
-            className={`flex min-h-11 min-w-0 flex-1 items-center gap-3 px-3 py-0 leading-none transition-all duration-300 ${pathname.startsWith("/my-reviews") || pathname.startsWith("/write")
+            className={`flex min-h-11 min-w-0 flex-1 items-center gap-2 px-3 py-0 leading-none transition-all duration-300 ${pathname.startsWith("/my-reviews") || pathname.startsWith("/write")
               ? "font-bold text-primary"
               : "text-muted-foreground group-hover:text-primary"
               }`}
@@ -531,9 +531,9 @@ export function PlatformShell({
                 </SheetContent>
               </Sheet>
 
-              <nav className="min-w-0 flex-1 overflow-hidden text-[9px] font-bold text-muted-foreground lg:hidden sm:text-[10px]">
+              <nav className="min-w-0 flex-1 overflow-hidden text-[11px] font-bold text-muted-foreground lg:hidden sm:text-xs">
                 <Breadcrumb>
-                  <BreadcrumbList className="flex-wrap gap-y-1 text-[9px] sm:text-[10px]">
+                  <BreadcrumbList className="flex-wrap gap-y-1 text-[11px] sm:text-xs">
                     {topCrumbs.map((crumb, index) => (
                       <div className="contents" key={`${crumb.label}-${index}`}>
                         <BreadcrumbItem>

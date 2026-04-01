@@ -100,6 +100,7 @@ export default defineSchema({
   })
     .index("by_node", ["nodeId"])
     .index("by_author", ["authorId"])
+    .index("by_author_id_and_updated_at", ["authorId", "updatedAt"])
     .index("by_status", ["status"])
     .index("by_status_and_updated_at", ["status", "updatedAt"]),
 

@@ -46,7 +46,6 @@ export function ReviewPosterSkeleton() {
     <div className="group space-y-4">
       <div className="aspect-[2/3] bg-surface-low border border-border flex flex-col items-center justify-center p-6 relative overflow-hidden">
         <Skeleton className="absolute inset-0 h-full w-full" />
-        <Skeleton className="relative z-10 mt-auto h-1 w-6" />
       </div>
       <div className="space-y-2">
         <Skeleton className="h-4 w-4/5 mx-auto" />

@@ -108,6 +108,27 @@ export const listRecent = query({
   },
 });
 
+export const listMine = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const viewer = await getViewerDoc(ctx);
+    if (!viewer) {
+      return [];
+    }
+
+    const limit = Math.max(1, Math.min(Math.floor(args.limit ?? 4), 120));
+    const reviews = await ctx.db
+      .query("reviews")
+      .withIndex("by_author_id_and_updated_at", (q) => q.eq("authorId", viewer._id))
+      .order("desc")
+      .take(limit);
+
+    return await Promise.all(
+      reviews.map((review) => toReview(ctx, review as any))
+    );
+  },
+});
+
 export const listRecentPage = query({
   args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, args) => {
@@ -342,24 +363,30 @@ export const listPending = query({
   },
 });
 
-export const listMine = query({
-  args: {},
-  handler: async (ctx) => {
+export const listMinePage = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
     const viewer = await getViewerDoc(ctx);
     if (!viewer) {
-      return [];
+      return {
+        page: [],
+        isDone: true,
+        continueCursor: args.paginationOpts.cursor ?? "",
+      };
     }
 
-    const reviews = await ctx.db
+    const page = await ctx.db
       .query("reviews")
-      .withIndex("by_author", (q) => q.eq("authorId", viewer._id))
-      .collect();
+      .withIndex("by_author_id_and_updated_at", (q) => q.eq("authorId", viewer._id))
+      .order("desc")
+      .paginate(args.paginationOpts);
 
-    return await Promise.all(
-      reviews
-        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-        .map((review) => toReview(ctx, review as any))
-    );
+    return {
+      ...page,
+      page: await Promise.all(
+        page.page.map((review) => toReview(ctx, review as any))
+      ),
+    };
   },
 });
 

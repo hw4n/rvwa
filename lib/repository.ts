@@ -103,7 +103,3 @@ export async function getReviewById(reviewId: string) {
 export async function getPendingReviews() {
   return (await authQuery<Review[]>("reviews:listPending")) ?? [];
 }
-
-export async function getMyReviews() {
-  return (await authQuery<Review[]>("reviews:listMine")) ?? [];
-}

@@ -42,6 +42,7 @@ export function PlatformShell({
   const { isLoading: isAuthLoading } = useConvexAuth();
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const [recentReviewLimit, setRecentReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
+  const [myReviewLimit, setMyReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const [categoryItemLimit, setCategoryItemLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const [itemReviewLimit, setItemReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const sidebarScrollRef = React.useRef<HTMLDivElement | null>(null);
@@ -49,6 +50,7 @@ export function PlatformShell({
   const categories = (useQuery("categories:list" as any) as Category[] | undefined) ?? [];
   const items = (useQuery("nodes:listIndex" as any) as ContentNode[] | undefined) ?? [];
   const recentReviews = (useQuery("reviews:listRecent" as any, { limit: recentReviewLimit }) as Review[] | undefined) ?? [];
+  const myReviews = (useQuery("reviews:listMine" as any, { limit: myReviewLimit }) as Review[] | undefined) ?? [];
   const pendingReviews = (useQuery("reviews:listPending" as any) as Review[] | undefined) ?? [];
   const viewerQuery = useQuery("users:viewer" as any) as UserSummary | null | undefined;
   const viewer = viewerQuery ?? null;
@@ -104,13 +106,21 @@ export function PlatformShell({
       : [];
   const sidebarItemVisibleReviews = sidebarItemReviews.slice(0, itemReviewLimit);
   const sidebarRecentReviews = sidebarMode === "dashboard" ? recentReviews : [];
+  const sidebarMyReviews = sidebarMode === "mine" ? myReviews : [];
 
-  const sidebarReviews = sidebarMode === "item" ? sidebarItemVisibleReviews : sidebarRecentReviews;
+  const sidebarReviews =
+    sidebarMode === "item"
+      ? sidebarItemVisibleReviews
+      : sidebarMode === "mine"
+        ? sidebarMyReviews
+        : sidebarRecentReviews;
   const hasMoreSidebarItems =
     sidebarMode === "category"
       ? sidebarCategoryNodes.length > categoryItemLimit
       : sidebarMode === "item"
         ? sidebarItemReviews.length > itemReviewLimit
+        : sidebarMode === "mine"
+          ? sidebarMyReviews.length >= myReviewLimit
         : sidebarRecentReviews.length >= recentReviewLimit;
   const pendingCount = viewer?.role === "admin" ? pendingReviews.length : 0;
   const topCrumbs = resolveTopCrumbs(pathname, searchParams, categories, items, currentReview, editingReview);
@@ -128,6 +138,8 @@ export function PlatformShell({
       setCategoryItemLimit(SIDEBAR_PAGE_SIZE);
     } else if (sidebarMode === "item") {
       setItemReviewLimit(SIDEBAR_PAGE_SIZE);
+    } else if (sidebarMode === "mine") {
+      setMyReviewLimit(SIDEBAR_PAGE_SIZE);
     } else {
       setRecentReviewLimit(SIDEBAR_PAGE_SIZE);
     }
@@ -163,6 +175,8 @@ export function PlatformShell({
             setCategoryItemLimit((current) => current + SIDEBAR_PAGE_SIZE);
           } else if (sidebarMode === "item") {
             setItemReviewLimit((current) => current + SIDEBAR_PAGE_SIZE);
+          } else if (sidebarMode === "mine") {
+            setMyReviewLimit((current) => current + SIDEBAR_PAGE_SIZE);
           } else {
             setRecentReviewLimit((current) => current + SIDEBAR_PAGE_SIZE);
           }
@@ -180,7 +194,7 @@ export function PlatformShell({
 
   const drawerNavigation = (
     <>
-      <DrawerLink active={pathname === "/dashboard"} href="/dashboard" icon="history" label="최근 리뷰" />
+      <DrawerLink active={pathname === "/dashboard"} href="/dashboard" icon="history" label="모든 리뷰" />
       {!authIsPending && viewer ? <DrawerLink active={pathname.startsWith("/my-reviews")} href="/my-reviews" icon="book" label="내 리뷰" /> : null}
       {!authIsPending && viewer?.role === "admin" ? (
         <DrawerLink
@@ -189,9 +203,6 @@ export function PlatformShell({
           icon="pending_actions"
           label={pendingCount ? `검토 대기 ${pendingCount}` : "검토 대기"}
         />
-      ) : null}
-      {!authIsPending && viewer ? (
-        <DrawerLink active={pathname.startsWith("/settings")} href="/settings" icon="settings" label="설정" />
       ) : null}
       <div className="border-t border-border" />
       <nav className="min-h-9 px-3 py-2 text-[11px] text-muted-foreground">
@@ -601,6 +612,10 @@ function resolveCurrentItemSlug(
 }
 
 function getSidebarMode(pathname: string, currentReview: Review | null) {
+  if (pathname.startsWith("/my-reviews")) {
+    return "mine";
+  }
+
   if (pathname.startsWith("/c/")) {
     return "category";
   }
@@ -648,7 +663,7 @@ function resolveTopCrumbs(
   const category = item ? categories.find((entry) => entry.slug === item.categorySlug) : null;
 
   if (pathname === "/dashboard") {
-    return [{ label: "최근 리뷰" }];
+    return [{ label: "모든 리뷰" }];
   }
 
   if (pathname.startsWith("/my-reviews")) {

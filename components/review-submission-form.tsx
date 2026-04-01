@@ -5,6 +5,7 @@ import * as React from "react";
 import { startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
+import { toast } from "sonner";
 import type { Category, ContentNode, Review } from "@/lib/domain";
 import { Button } from "@/components/ui/button";
 import { ContentNodePicker, useContentNodePicker } from "@/components/content-node-picker";
@@ -39,7 +40,6 @@ export function ReviewSubmissionForm({
   const [rating, setRating] = React.useState(formatRatingInputValue(initialReview?.rating));
   const [spoiler, setSpoiler] = React.useState(initialReview?.spoiler ?? false);
   const [pending, setPending] = React.useState(false);
-  const [message, setMessage] = React.useState("");
   const bodyInputRef = React.useRef<HTMLTextAreaElement | null>(null);
   const selectedItem = selectedItemSlug ? items.find((item) => item.slug === selectedItemSlug) : undefined;
   const { matches } = useContentNodePicker({ items, search, selectedItem });
@@ -48,7 +48,6 @@ export function ReviewSubmissionForm({
 
   async function submitReview() {
     setPending(true);
-    setMessage("");
 
     try {
       const payload = {
@@ -61,16 +60,17 @@ export function ReviewSubmissionForm({
       };
       const result = initialReview
         ? await updateSubmission({
-          reviewId: initialReview.id,
-          ...payload,
-        })
+            reviewId: initialReview.id,
+            ...payload,
+          })
         : await submit(payload);
 
+      toast.success(initialReview ? "리뷰를 수정했습니다." : "리뷰를 작성했습니다.");
       startTransition(() => {
         router.push(`/r/${result.reviewId}`);
       });
     } catch (caught) {
-      setMessage(caught instanceof Error ? caught.message : "저장에 실패했습니다.");
+      toast.error(caught instanceof Error ? caught.message : "저장에 실패했습니다.");
       setPending(false);
     }
   }
@@ -175,7 +175,6 @@ export function ReviewSubmissionForm({
           >
             {initialReview ? "리뷰 수정" : "리뷰 작성"}
           </Button>
-          {message ? <p className="text-xs font-black uppercase tracking-widest text-red-400">{message}</p> : null}
         </div>
       </section>
 

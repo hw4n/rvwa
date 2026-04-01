@@ -6,6 +6,18 @@ import * as React from "react";
 import { startTransition, useDeferredValue } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import type { ContentNode, ReviewDraft } from "@/lib/domain";
 import { Button } from "@/components/ui/button";
 import { MarkdownPreview } from "@/components/markdown-preview";
@@ -45,8 +57,8 @@ export function ReviewComposer({
 }) {
   const router = useRouter();
   const [draft, setDraft] = React.useState<ReviewDraft>(() => resolveDraft(initialDraft));
-  const [message, setMessage] = React.useState("");
   const [pending, setPending] = React.useState(false);
+  const [discardOpen, setDiscardOpen] = React.useState(false);
   const deferredBody = useDeferredValue(draft.body);
   const saveDraft = useMutation("reviews:upsertDraft" as any);
   const publish = useMutation("reviews:publish" as any);
@@ -76,7 +88,6 @@ export function ReviewComposer({
 
   async function publishReview() {
     setPending(true);
-    setMessage("");
     try {
       const result = await publish({
         nodeId: node.id,
@@ -85,11 +96,26 @@ export function ReviewComposer({
         rating: draft.rating ? Number(draft.rating) : undefined,
         spoiler: draft.spoiler,
       });
+      toast.success("리뷰를 등록했습니다.");
       startTransition(() => {
         router.push(`/r/${result.reviewId}`);
       });
     } catch (caught) {
-      setMessage(caught instanceof Error ? caught.message : "저장에 실패했습니다.");
+      toast.error(caught instanceof Error ? caught.message : "저장에 실패했습니다.");
+      setPending(false);
+    }
+  }
+
+  async function discardCurrentDraft() {
+    setPending(true);
+    try {
+      await discardDraft({ nodeId: node.id });
+      setDraft(resolveDraft());
+      toast.success("초안을 비웠습니다.");
+      setDiscardOpen(false);
+    } catch (caught) {
+      toast.error(caught instanceof Error ? caught.message : "초안 파기에 실패했습니다.");
+    } finally {
       setPending(false);
     }
   }
@@ -167,22 +193,54 @@ export function ReviewComposer({
           <Button asChild variant="outline" className="rounded-none border-border text-muted-foreground hover:bg-foreground/5 uppercase">
             <Link href={`/n/${node.slug}`}>중단 / 복귀</Link>
           </Button>
-          <Button
-            onClick={() => {
-              if(confirm("전송 버퍼를 비우시겠습니까?")) {
-                void discardDraft({ nodeId: node.id });
-                setDraft(resolveDraft());
-                setMessage("초안을 비웠습니다.");
+          <AlertDialog
+            open={discardOpen}
+            onOpenChange={(nextOpen) => {
+              if (!pending) {
+                setDiscardOpen(nextOpen);
               }
             }}
-            variant="ghost"
-            className="rounded-none text-red-400/60 hover:text-red-400 hover:bg-red-400/5 uppercase ml-auto"
           >
-            초안 파기
-          </Button>
+            <AlertDialogTrigger asChild>
+              <Button
+                className="rounded-none text-red-400/60 hover:text-red-400 hover:bg-red-400/5 uppercase ml-auto"
+                disabled={pending}
+                type="button"
+                variant="ghost"
+              >
+                초안 파기
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>전송 버퍼를 비우시겠습니까?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  현재 초안 내용은 제거되며, 되돌릴 수 없습니다.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel asChild>
+                  <Button disabled={pending} type="button" variant="outline">
+                    취소
+                  </Button>
+                </AlertDialogCancel>
+                <AlertDialogAction asChild>
+                  <Button
+                    disabled={pending}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      void discardCurrentDraft();
+                    }}
+                    type="button"
+                    variant="destructive"
+                  >
+                    초안 파기
+                  </Button>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
-
-        {message ? <p className="mt-8 text-sm font-mono font-bold uppercase tracking-widest text-primary/40 italic">{message}</p> : null}
       </section>
 
       <aside className="space-y-6">

@@ -4,6 +4,7 @@ import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ThemeController } from "@/components/theme-controller";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getThemeInitializationScript } from "@/lib/theme";
 import "./globals.css";
@@ -43,6 +44,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <ThemeController />
         <TooltipProvider delayDuration={150}>
           <ConvexClientProvider>{children}</ConvexClientProvider>
+          <Toaster />
         </TooltipProvider>
       </body>
     </html>

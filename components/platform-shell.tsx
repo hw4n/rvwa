@@ -5,7 +5,7 @@ import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import Link from "next/link";
-import { MenuIcon, SearchIcon } from "lucide-react";
+import { MenuIcon, SearchIcon, XIcon } from "lucide-react";
 import { AppIcon } from "@/components/app-icon";
 import { useContentNodePicker } from "@/components/content-node-picker";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetTitle,
   SheetTrigger,
@@ -35,6 +36,7 @@ export function PlatformShell({
 }: {
   children: React.ReactNode;
 }) {
+  const WRITE_BUTTON_LABEL = "새로운 리뷰 작성";
   const SIDEBAR_PAGE_SIZE = 12;
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -45,6 +47,7 @@ export function PlatformShell({
   const [myReviewLimit, setMyReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const [categoryItemLimit, setCategoryItemLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const [itemReviewLimit, setItemReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
+  const preserveMobileNavOnRouteChangeRef = React.useRef(false);
   const sidebarScrollRef = React.useRef<HTMLDivElement | null>(null);
   const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
   const categories = (useQuery("categories:list" as any) as Category[] | undefined) ?? [];
@@ -160,6 +163,11 @@ export function PlatformShell({
   }, [currentItemSlug, sidebarMode]);
 
   React.useEffect(() => {
+    if (preserveMobileNavOnRouteChangeRef.current) {
+      preserveMobileNavOnRouteChangeRef.current = false;
+      return;
+    }
+
     setMobileNavOpen(false);
   }, [pathname, searchParamsKey]);
 
@@ -191,6 +199,10 @@ export function PlatformShell({
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [hasMoreSidebarItems, sidebarMode, sidebarReviews.length]);
+
+  const keepMobileNavOpenOnNextRouteChange = React.useCallback(() => {
+    preserveMobileNavOnRouteChangeRef.current = true;
+  }, []);
 
   const drawerNavigation = (
     <>
@@ -269,9 +281,142 @@ export function PlatformShell({
     </>
   );
 
+  const mobileDrawerNavigation = (
+    <>
+      <div
+        className={`flex min-h-11 items-center gap-2 pr-3 ${
+          pathname === "/dashboard" ? "bg-surface-high" : ""
+        }`}
+      >
+        <div className="min-w-0 flex-1">
+          <DrawerLink
+            active={pathname === "/dashboard"}
+            href="/dashboard"
+            icon="history"
+            label="모든 리뷰"
+            onClick={keepMobileNavOpenOnNextRouteChange}
+          />
+        </div>
+        <SheetClose asChild>
+          <Button
+            className="ml-auto shrink-0 border-border text-foreground hover:bg-surface-lowest"
+            size="icon-sm"
+            variant="outline"
+          >
+            <XIcon className="h-4 w-4" />
+            <span className="sr-only">메뉴 닫기</span>
+          </Button>
+        </SheetClose>
+      </div>
+
+      {!authIsPending && viewer ? (
+        <div
+          className={`flex min-h-11 items-center gap-2 pr-3 ${
+            pathname.startsWith("/my-reviews") ? "bg-surface-high" : ""
+          }`}
+        >
+          <Link
+            className={`flex min-h-11 min-w-0 flex-1 items-center gap-3 px-3 py-0 leading-none transition-all duration-300 ${
+              pathname.startsWith("/my-reviews")
+                ? "font-bold text-primary"
+                : "text-muted-foreground hover:text-primary"
+            }`}
+            href="/my-reviews"
+            onClick={keepMobileNavOpenOnNextRouteChange}
+          >
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+              <AppIcon className="size-4" name="book" />
+            </span>
+            <span className="flex items-center text-xs font-bold leading-none tracking-tight">내 리뷰</span>
+          </Link>
+          {showGlobalWriteButton ? (
+            <Button asChild className="ml-auto shrink-0 rounded-none px-3 uppercase tracking-widest font-bold">
+              <Link href={globalWriteHref}>{WRITE_BUTTON_LABEL}</Link>
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!authIsPending && viewer?.role === "admin" ? (
+        <DrawerLink
+          active={pathname.startsWith("/admin/reviews")}
+          href="/admin/reviews"
+          icon="pending_actions"
+          label={pendingCount ? `검토 대기 ${pendingCount}` : "검토 대기"}
+        />
+      ) : null}
+      <div className="border-t border-border" />
+      <nav className="min-h-9 px-3 py-2 text-[11px] text-muted-foreground">
+        <Breadcrumb>
+          <BreadcrumbList className="flex min-h-5 items-center gap-1 whitespace-nowrap">
+            {sidebarTopCrumbs.map((crumb, index) => (
+              <div className="contents" key={`${crumb.label}-${index}`}>
+                <BreadcrumbItem>
+                  {crumb.href ? (
+                    <BreadcrumbLink asChild>
+                      <Link
+                        href={crumb.href}
+                        className="hover:text-primary transition-colors text-[11px] max-w-40 truncate block"
+                      >
+                        {crumb.label}
+                      </Link>
+                    </BreadcrumbLink>
+                  ) : (
+                    <BreadcrumbPage className="block max-w-40 truncate text-[11px] font-medium text-foreground">
+                      {crumb.label}
+                    </BreadcrumbPage>
+                  )}
+                </BreadcrumbItem>
+                {index < sidebarTopCrumbs.length - 1 ? (
+                  <BreadcrumbSeparator className="text-foreground/20 opacity-30">
+                    <span className="mx-1">/</span>
+                  </BreadcrumbSeparator>
+                ) : null}
+              </div>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </nav>
+
+      <div className="space-y-0">
+        <div className="space-y-0">
+          {sidebarMode === "category"
+            ? sidebarCategoryVisibleNodes.map((entry) => (
+              <CollectionLink
+                active={pathname === `/n/${entry.slug}`}
+                href={`/n/${entry.slug}`}
+                key={entry.id}
+                title={entry.title}
+              />
+            ))
+            : sidebarReviews.map((entry) => {
+              const reviewItemHref = entry.id ? `/r/${entry.id}` : "/dashboard";
+              return (
+                <CollectionLink
+                  active={isReviewDetail ? entry.id === reviewId : false}
+                  href={reviewItemHref}
+                  key={entry.id}
+                  title={entry.spoiler ? "<스포일러 리뷰>" : getReviewDisplayTitle(entry)}
+                  author={entry.author?.name}
+                  itemName={entry.nodeTitle ?? entry.proposedTitle}
+                  spoiler={entry.spoiler}
+                  score={entry.rating}
+                />
+              );
+            })}
+          {hasMoreSidebarItems ? <div className="h-4" ref={loadMoreRef} /> : null}
+        </div>
+      </div>
+    </>
+  );
+
   const railNavigation = (
     <>
-      <Link className="flex h-16 w-full items-center justify-center" href="/dashboard">
+      <Link
+        className="flex h-16 w-full items-center justify-center"
+        href="/dashboard"
+        onClick={keepMobileNavOpenOnNextRouteChange}
+      >
         <AppIcon className="size-6 text-primary" name="hub" strokeWidth={2.4} />
       </Link>
       <nav className="flex w-full flex-1 flex-col gap-0">
@@ -282,6 +427,7 @@ export function PlatformShell({
             icon={category.icon}
             key={category.id}
             label={category.name}
+            onClick={keepMobileNavOpenOnNextRouteChange}
           />
         ))}
       </nav>
@@ -327,6 +473,7 @@ export function PlatformShell({
               <SheetContent
                 className="w-[min(92vw,24rem)] border-r border-border bg-surface-mid p-0 text-foreground"
                 side="left"
+                showCloseButton={false}
               >
                 <SheetTitle className="sr-only">네비게이션</SheetTitle>
                 <div className="flex min-h-0 flex-1 overflow-hidden">
@@ -334,7 +481,7 @@ export function PlatformShell({
                     {railNavigation}
                   </aside>
                   <div className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto bg-surface-low">
-                    {drawerNavigation}
+                    {mobileDrawerNavigation}
                   </div>
                 </div>
               </SheetContent>
@@ -384,7 +531,7 @@ export function PlatformShell({
               <>
                 {showGlobalWriteButton ? (
                   <Button asChild className="rounded-none uppercase tracking-widest font-bold">
-                    <Link href={globalWriteHref}>리뷰 작성</Link>
+                    <Link href={globalWriteHref}>{WRITE_BUTTON_LABEL}</Link>
                   </Button>
                 ) : null}
                 <LogoutButton className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold">로그아웃</LogoutButton>
@@ -777,16 +924,19 @@ function RailLink({
   icon,
   label,
   active = false,
+  onClick,
 }: {
   href: string;
   icon: string;
   label: string;
   active?: boolean;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }) {
   return (
     <Link
       className={`flex aspect-square w-full flex-col items-center justify-center gap-0.5 rounded-none transition-all duration-300 ${active ? "border-l-4 border-primary bg-surface-high text-primary" : "text-muted-foreground/60 hover:bg-surface-high hover:text-primary"}`}
       href={href}
+      onClick={onClick}
     >
       <AppIcon className="size-5" name={icon} strokeWidth={active ? 2.6 : 2.2} />
       <span className="text-[10px] md:text-[12px] font-bold leading-none tracking-tight">{label}</span>
@@ -799,16 +949,19 @@ function DrawerLink({
   icon,
   label,
   active = false,
+  onClick,
 }: {
   href: string;
   icon: string;
   label: string;
   active?: boolean;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }) {
   return (
     <Link
       className={`flex min-h-11 w-full items-center gap-3 rounded-none px-3 py-0 leading-none transition-all duration-300 ${active ? "bg-surface-high font-bold text-primary" : "text-muted-foreground hover:bg-surface-high hover:text-primary"}`}
       href={href}
+      onClick={onClick}
     >
       <span className="flex h-5 w-5 shrink-0 items-center justify-center">
         <AppIcon className="size-4" name={icon} />

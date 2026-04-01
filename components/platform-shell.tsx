@@ -551,7 +551,7 @@ export function PlatformShell({
           <div className="flex shrink-0 flex-wrap justify-end gap-2 lg:gap-3">
             {authIsPending ? (
               <div className="flex items-center gap-2 lg:gap-3">
-                <Skeleton className="h-4 w-12 border-0 bg-foreground/10 lg:w-16" />
+                <Skeleton className="h-8 w-20 rounded-none border-0" />
               </div>
             ) : viewer ? (
               <LogoutButton className="rounded-none border-border hover:bg-surface-high uppercase tracking-widest font-bold">로그아웃</LogoutButton>

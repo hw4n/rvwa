@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, usePaginatedQuery, useQuery } from "convex/react";
 import Link from "next/link";
 import { MenuIcon, SearchIcon } from "lucide-react";
 import { AppIcon } from "@/components/app-icon";
@@ -23,6 +23,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { api } from "@/convex/_generated/api";
 import type { Category, ContentNode, Review, UserSummary } from "@/lib/domain";
 import { getReviewDisplayTitle } from "@/lib/review-display";
 import { getReviewExplicitTitle } from "@/lib/review-display";
@@ -40,8 +41,6 @@ export function PlatformShell({
   const searchParamsKey = searchParams.toString();
   const { isLoading: isAuthLoading } = useConvexAuth();
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
-  const [recentReviewLimit, setRecentReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
-  const [myReviewLimit, setMyReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const [categoryItemLimit, setCategoryItemLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const [itemReviewLimit, setItemReviewLimit] = React.useState(SIDEBAR_PAGE_SIZE);
   const preserveMobileNavOnRouteChangeRef = React.useRef(false);
@@ -49,8 +48,6 @@ export function PlatformShell({
   const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
   const categories = (useQuery("categories:list" as any) as Category[] | undefined) ?? [];
   const items = (useQuery("nodes:listIndex" as any) as ContentNode[] | undefined) ?? [];
-  const recentReviews = (useQuery("reviews:listRecent" as any, { limit: recentReviewLimit }) as Review[] | undefined) ?? [];
-  const myReviews = (useQuery("reviews:listMine" as any, { limit: myReviewLimit }) as Review[] | undefined) ?? [];
   const pendingReviews = (useQuery("reviews:listPending" as any) as Review[] | undefined) ?? [];
   const viewerQuery = useQuery("users:viewer" as any) as UserSummary | null | undefined;
   const viewer = viewerQuery ?? null;
@@ -61,6 +58,24 @@ export function PlatformShell({
     (useQuery("reviews:getById" as any, editingReviewId ? { reviewId: editingReviewId } : "skip") as Review | null | undefined) ??
     null;
   const sidebarMode = getSidebarMode(pathname, currentReview);
+  const {
+    results: recentSidebarResults,
+    status: recentSidebarStatus,
+    loadMore: loadMoreRecentSidebar,
+  } = usePaginatedQuery(
+    api.reviews.listRecentPage,
+    sidebarMode === "dashboard" ? {} : "skip",
+    { initialNumItems: SIDEBAR_PAGE_SIZE }
+  );
+  const {
+    results: mySidebarResults,
+    status: mySidebarStatus,
+    loadMore: loadMoreMySidebar,
+  } = usePaginatedQuery(
+    api.reviews.listMinePage,
+    !isAuthLoading && sidebarMode === "mine" ? {} : "skip",
+    { initialNumItems: SIDEBAR_PAGE_SIZE }
+  );
   const currentCategorySlug = resolveCurrentCategorySlug(pathname, searchParams, currentReview, items);
   const currentItemSlug = resolveCurrentItemSlug(pathname, searchParams, currentReview);
   const isReviewDetail = pathname.startsWith("/r/");
@@ -105,8 +120,8 @@ export function PlatformShell({
       ? itemView.reviews.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       : [];
   const sidebarItemVisibleReviews = sidebarItemReviews.slice(0, itemReviewLimit);
-  const sidebarRecentReviews = sidebarMode === "dashboard" ? recentReviews : [];
-  const sidebarMyReviews = sidebarMode === "mine" ? myReviews : [];
+  const sidebarRecentReviews = sidebarMode === "dashboard" ? recentSidebarResults as Review[] : [];
+  const sidebarMyReviews = sidebarMode === "mine" ? mySidebarResults as Review[] : [];
   const sidebarPendingReviews = sidebarMode === "pending" ? pendingReviews : [];
   const sidebarSettingsReviews: Review[] = sidebarMode === "settings" ? [] : [];
 
@@ -126,12 +141,12 @@ export function PlatformShell({
       : sidebarMode === "item"
         ? sidebarItemReviews.length > itemReviewLimit
         : sidebarMode === "mine"
-          ? sidebarMyReviews.length >= myReviewLimit
+          ? mySidebarStatus === "CanLoadMore"
           : sidebarMode === "pending"
             ? false
             : sidebarMode === "settings"
               ? false
-              : sidebarRecentReviews.length >= recentReviewLimit;
+              : recentSidebarStatus === "CanLoadMore";
   const pendingCount = viewer?.role === "admin" ? pendingReviews.length : 0;
   const topCrumbs = resolveTopCrumbs(pathname, searchParams, categories, items, currentReview, editingReview);
   const sidebarTopCrumbs = pathname.startsWith("/r/") ? topCrumbs.slice(0, -1) : topCrumbs;
@@ -148,10 +163,6 @@ export function PlatformShell({
       setCategoryItemLimit(SIDEBAR_PAGE_SIZE);
     } else if (sidebarMode === "item") {
       setItemReviewLimit(SIDEBAR_PAGE_SIZE);
-    } else if (sidebarMode === "mine") {
-      setMyReviewLimit(SIDEBAR_PAGE_SIZE);
-    } else {
-      setRecentReviewLimit(SIDEBAR_PAGE_SIZE);
     }
   }, [sidebarMode]);
 
@@ -183,19 +194,26 @@ export function PlatformShell({
       return;
     }
 
+    let wasIntersecting = false;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting) {
+        const isIntersecting = Boolean(entries[0]?.isIntersecting);
+        if (isIntersecting && !wasIntersecting) {
           if (sidebarMode === "category") {
             setCategoryItemLimit((current) => current + SIDEBAR_PAGE_SIZE);
           } else if (sidebarMode === "item") {
             setItemReviewLimit((current) => current + SIDEBAR_PAGE_SIZE);
           } else if (sidebarMode === "mine") {
-            setMyReviewLimit((current) => current + SIDEBAR_PAGE_SIZE);
-          } else {
-            setRecentReviewLimit((current) => current + SIDEBAR_PAGE_SIZE);
+            if (mySidebarStatus === "CanLoadMore") {
+              loadMoreMySidebar(SIDEBAR_PAGE_SIZE);
+            }
+          } else if (sidebarMode === "dashboard") {
+            if (recentSidebarStatus === "CanLoadMore") {
+              loadMoreRecentSidebar(SIDEBAR_PAGE_SIZE);
+            }
           }
         }
+        wasIntersecting = isIntersecting;
       },
       {
         root: sidebarScrollRef.current,
@@ -205,7 +223,15 @@ export function PlatformShell({
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [hasMoreSidebarItems, sidebarMode, sidebarReviews.length]);
+  }, [
+    hasMoreSidebarItems,
+    loadMoreMySidebar,
+    loadMoreRecentSidebar,
+    mySidebarStatus,
+    recentSidebarStatus,
+    sidebarMode,
+    sidebarReviews.length,
+  ]);
 
   const keepMobileNavOpenOnNextRouteChange = React.useCallback(() => {
     preserveMobileNavOnRouteChangeRef.current = true;

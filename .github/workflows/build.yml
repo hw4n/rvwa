@@ -11,6 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     environment: production
+    env:
+      NEXT_PUBLIC_CONVEX_URL: ${{ vars.NEXT_PUBLIC_CONVEX_URL }}
     timeout-minutes: 20
 
     steps:

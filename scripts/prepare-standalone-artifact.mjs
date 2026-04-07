@@ -47,11 +47,14 @@ function copyRealEntry(sourcePath, destinationPath) {
   ensureParent(destinationPath);
 
   if (stats.isDirectory()) {
-    fs.cpSync(sourcePath, destinationPath, {
-      recursive: true,
-      force: true,
-      dereference: true,
-    });
+    fs.mkdirSync(destinationPath, { recursive: true });
+
+    for (const entry of fs.readdirSync(sourcePath)) {
+      copyRealEntry(
+        path.join(sourcePath, entry),
+        path.join(destinationPath, entry),
+      );
+    }
     return;
   }
 

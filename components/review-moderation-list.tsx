@@ -84,11 +84,12 @@ function MetadataValueInput({
 }
 
 export function ReviewModerationList() {
-  const reviews = (useQuery("reviews:listPending" as any) as Review[] | undefined) ?? [];
+  const reviews = (useQuery("reviews:listModeration" as any) as Review[] | undefined) ?? [];
   const categories = (useQuery("categories:list" as any) as Category[] | undefined) ?? [];
   const items = (useQuery("nodes:listIndex" as any) as ContentNode[] | undefined) ?? [];
   const resolveAndApprove = useMutation("reviews:resolveAndApprove" as any);
   const reject = useMutation("reviews:reject" as any);
+  const moveToPending = useMutation("reviews:moveToPending" as any);
 
   const [openReviewId, setOpenReviewId] = React.useState<string | null>(null);
   const [pendingId, setPendingId] = React.useState<string | null>(null);
@@ -140,9 +141,10 @@ export function ReviewModerationList() {
   const activeDefinedValues = activeReview ? definedValuesByReview[activeReview.id] ?? {} : {};
   const activeCustomRows = activeReview ? customRowsByReview[activeReview.id] ?? [] : [];
   const message = activeReview ? messages[activeReview.id] : "";
+  const isRejectedReview = activeReview?.status === "rejected";
 
   if (!reviews.length) {
-    return <div className="text-sm text-muted-foreground">승인 대기 중인 리뷰가 없습니다.</div>;
+    return <div className="text-sm text-muted-foreground">검토할 리뷰가 없습니다.</div>;
   }
 
   function getAttributes(reviewId: string, category: Category | undefined) {
@@ -248,15 +250,34 @@ export function ReviewModerationList() {
     }
   }
 
+  async function handleMoveToPending() {
+    if (!activeReview) return;
+
+    setPendingId(activeReview.id);
+    setMessages((current) => ({ ...current, [activeReview.id]: "" }));
+
+    try {
+      await moveToPending({ reviewId: activeReview.id });
+    } catch (caught) {
+      setMessages((current) => ({
+        ...current,
+        [activeReview.id]: caught instanceof Error ? caught.message : "검토 대기 이동에 실패했습니다.",
+      }));
+    } finally {
+      setPendingId(null);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <Table className="border border-border">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[42%]">리뷰</TableHead>
-            <TableHead className="w-[20%]">작성자</TableHead>
-            <TableHead className="w-[16%]">점수</TableHead>
-            <TableHead className="w-[22%]">요청일</TableHead>
+            <TableHead className="w-[36%]">리뷰</TableHead>
+            <TableHead className="w-[18%]">상태</TableHead>
+            <TableHead className="w-[18%]">작성자</TableHead>
+            <TableHead className="w-[12%]">점수</TableHead>
+            <TableHead className="w-[16%]">요청일</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -279,6 +300,17 @@ export function ReviewModerationList() {
                   title={getReviewDisplayTitle(review)}
                   titleClassName="text-sm"
                 />
+              </TableCell>
+              <TableCell>
+                <span
+                  className={`inline-flex px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.15em] ${
+                    review.status === "pending"
+                      ? "border border-yellow-400/20 bg-yellow-400/5 text-yellow-400/70"
+                      : "border border-red-400/20 bg-red-400/5 text-red-400/70"
+                  }`}
+                >
+                  {review.status === "pending" ? "대기" : "반려"}
+                </span>
               </TableCell>
               <TableCell className="text-muted-foreground">{review.author?.name ?? "알 수 없음"}</TableCell>
               <TableCell className="font-black text-tertiary">
@@ -324,6 +356,17 @@ export function ReviewModerationList() {
                   </div>
                 )}
               </section>
+
+              {isRejectedReview ? (
+                <section className="space-y-2">
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                    현재 상태
+                  </p>
+                  <div className="border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-300/90">
+                    이 리뷰는 반려 상태입니다. 관리자 검토 화면에서 항목 연결, 카테고리 재지정, 새 항목 생성 후 승인하거나 검토 대기로 다시 돌릴 수 있습니다.
+                  </div>
+                </section>
+              ) : null}
 
               <section className="space-y-2">
                 <ContentNodePicker
@@ -588,6 +631,17 @@ export function ReviewModerationList() {
                 >
                   반려
                 </Button>
+                {isRejectedReview ? (
+                  <Button
+                    className="rounded-none uppercase tracking-widest"
+                    disabled={pendingId === activeReview.id}
+                    onClick={handleMoveToPending}
+                    type="button"
+                    variant="secondary"
+                  >
+                    검토 대기로 이동
+                  </Button>
+                ) : null}
                 <ReviewDeleteButton redirectHref="/admin/reviews" reviewId={activeReview.id} />
 
                 {message ? <p className="self-center text-[11px] font-bold uppercase tracking-widest text-red-400">{message}</p> : null}

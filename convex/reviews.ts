@@ -363,6 +363,33 @@ export const listPending = query({
   },
 });
 
+export const listModeration = query({
+  args: {},
+  handler: async (ctx) => {
+    const viewer = await getViewerDoc(ctx);
+    if (!viewer || viewer.role !== "admin") {
+      return [];
+    }
+
+    const [pendingReviews, rejectedReviews] = await Promise.all([
+      ctx.db
+        .query("reviews")
+        .withIndex("by_status", (q) => q.eq("status", "pending"))
+        .collect(),
+      ctx.db
+        .query("reviews")
+        .withIndex("by_status", (q) => q.eq("status", "rejected"))
+        .collect(),
+    ]);
+
+    return await Promise.all(
+      [...pendingReviews, ...rejectedReviews]
+        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+        .map((review) => toReview(ctx, review as any))
+    );
+  },
+});
+
 export const listMinePage = query({
   args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, args) => {
@@ -512,6 +539,29 @@ export const reject = mutation({
       rejectedBy: admin._id as any,
       approvedAt: undefined,
       approvedBy: undefined,
+    });
+  },
+});
+
+export const moveToPending = mutation({
+  args: { reviewId: v.id("reviews") },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const review = await ctx.db.get(args.reviewId);
+
+    if (!review) {
+      throw new Error("Review not found");
+    }
+
+    const timestamp = nowIso();
+    await ctx.db.patch(args.reviewId, {
+      status: "pending",
+      updatedAt: timestamp,
+      submittedAt: timestamp,
+      approvedAt: undefined,
+      approvedBy: undefined,
+      rejectedAt: undefined,
+      rejectedBy: undefined,
     });
   },
 });

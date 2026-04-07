@@ -1,4 +1,4 @@
-name: Build Standalone Artifact
+name: Build Artifact
 
 on:
   workflow_dispatch:
@@ -33,25 +33,20 @@ jobs:
       - name: Build application
         run: pnpm build
 
-      - name: Prepare standalone bundle
+      - name: Collect build artifact
         run: |
-          mkdir -p .next/standalone/.next
-          cp -R .next/static .next/standalone/.next/static
+          mkdir -p dist-artifacts/next-build
+          cp -R .next dist-artifacts/next-build/.next
+          rm -rf dist-artifacts/next-build/.next/cache
           if [ -d public ]; then
-            cp -R public .next/standalone/public
+            cp -R public dist-artifacts/next-build/public
           fi
-          find .next/standalone -maxdepth 1 -type f -name '.env*' -delete
-          node scripts/prepare-standalone-artifact.mjs
+          cp package.json pnpm-lock.yaml next.config.ts dist-artifacts/next-build/
 
-      - name: Archive standalone bundle
-        run: |
-          mkdir -p dist-artifacts
-          tar -czf dist-artifacts/next-standalone.tar.gz -C .next standalone
-
-      - name: Upload standalone artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: next-standalone
-          path: dist-artifacts/next-standalone.tar.gz
+          name: next-build
+          path: dist-artifacts/next-build
           if-no-files-found: error
           retention-days: 7

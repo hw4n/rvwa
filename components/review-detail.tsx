@@ -99,19 +99,17 @@ export function ReviewDetail({
     </div>
   );
   const renderReviewContent = (content: ReactNode) => review.spoiler ? (
-    <ReviewSpoilerGate className="min-w-0" title="스포일러 리뷰">
+    <ReviewSpoilerGate
+      className="min-w-0"
+      confirmLabel="스포일러가 담긴 내용 확인"
+      hideLabel="스포일러가 담긴 내용 숨기기"
+      variant="toggle"
+    >
       {content}
     </ReviewSpoilerGate>
   ) : (
     content
   );
-  const tabletReviewBody = (
-    <div className="min-w-0 space-y-4">
-      {reviewMeta}
-      {reviewBody}
-    </div>
-  );
-
   return (
     <article className="space-y-8">
       <div className="grid gap-8 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-6 xl:hidden">
@@ -126,8 +124,9 @@ export function ReviewDetail({
           <ReviewRatingDisplay rating={review.rating} size="detail" />
         </div>
         {topControls}
-        <div className="min-w-0 md:col-span-2">
-          {renderReviewContent(tabletReviewBody)}
+        <div className="min-w-0 space-y-4 md:col-span-2">
+          {reviewMeta}
+          {renderReviewContent(reviewBody)}
         </div>
       </div>
       <div className="hidden items-start justify-between gap-8 xl:flex">

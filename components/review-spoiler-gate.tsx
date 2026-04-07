@@ -8,6 +8,7 @@ export function ReviewSpoilerGate({
   className,
   confirmLabel = "확인하고 읽기",
   description,
+  hideLabel = "내용 숨기기",
   title = "스포일러 경고",
   variant = "detail",
 }: {
@@ -15,10 +16,40 @@ export function ReviewSpoilerGate({
   className?: string;
   confirmLabel?: string;
   description?: string;
+  hideLabel?: string;
   title?: string;
-  variant?: "compact" | "detail";
+  variant?: "compact" | "detail" | "toggle";
 }) {
   const [revealed, setRevealed] = React.useState(false);
+
+  if (variant === "toggle") {
+    if (revealed) {
+      return (
+        <div className={`space-y-2 ${className ?? ""}`}>
+          <button
+            className="inline-flex items-center border border-[color:var(--spoiler-soft)] px-3 py-1.5 text-left text-[10px] font-black leading-relaxed tracking-[0.08em] text-[var(--spoiler)] transition-colors hover:bg-[var(--spoiler-surface)] sm:text-[11px] sm:tracking-[0.12em]"
+            onClick={() => setRevealed(false)}
+            type="button"
+          >
+            {hideLabel}
+          </button>
+          {children}
+        </div>
+      );
+    }
+
+    return (
+      <div className={`flex flex-wrap items-center gap-2 ${className ?? ""}`}>
+        <button
+          className="inline-flex items-center border border-[color:var(--spoiler-soft)] px-3 py-1.5 text-left text-[10px] font-black leading-relaxed tracking-[0.08em] text-[var(--spoiler)] transition-colors hover:bg-[var(--spoiler-surface)] sm:text-[11px] sm:tracking-[0.12em]"
+          onClick={() => setRevealed(true)}
+          type="button"
+        >
+          {confirmLabel}
+        </button>
+      </div>
+    );
+  }
 
   if (revealed) {
     return <>{children}</>;

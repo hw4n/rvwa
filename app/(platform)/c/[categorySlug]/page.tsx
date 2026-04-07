@@ -7,7 +7,7 @@ import { PlatformHeader } from "@/components/platform-header";
 import { Button } from "@/components/ui/button";
 import { getViewer } from "@/lib/auth";
 import { getCategoryBySlug } from "@/lib/repository";
-import { buildBrandedTitle } from "@/lib/share-metadata";
+import { buildBrandedTitle, getDefaultShareImageUrl } from "@/lib/share-metadata";
 
 function decodeRouteSegment(value: string | undefined) {
   if (!value) {
@@ -86,6 +86,7 @@ export async function generateMetadata({
 
   const title = buildBrandedTitle([category.name]);
   const description = category.description;
+  const imageUrl = getDefaultShareImageUrl();
 
   return {
     title,
@@ -95,11 +96,20 @@ export async function generateMetadata({
       title,
       description,
       siteName: "R.",
+      images: [
+        {
+          url: imageUrl,
+          width: 192,
+          height: 192,
+          alt: category.name,
+        },
+      ],
     },
     twitter: {
       card: "summary",
       title,
       description,
+      images: [imageUrl],
     },
   };
 }

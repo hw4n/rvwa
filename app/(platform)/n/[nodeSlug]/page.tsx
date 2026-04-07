@@ -10,7 +10,7 @@ import { getViewer } from "@/lib/auth";
 import { sortAttributeEntries } from "@/lib/metadata";
 import { getPosterImageUrl } from "@/lib/poster";
 import { getNodeView } from "@/lib/repository";
-import { buildBrandedTitle } from "@/lib/share-metadata";
+import { buildBrandedTitle, getDefaultShareImageUrl } from "@/lib/share-metadata";
 
 function decodeRouteSegment(value: string | undefined) {
   if (!value) {
@@ -165,7 +165,7 @@ export async function generateMetadata({
 
   const title = buildBrandedTitle([view.node.title]);
   const description = view.node.summary;
-  const imageUrl = getPosterImageUrl(view.node.coverImage, "card");
+  const imageUrl = getPosterImageUrl(view.node.coverImage, "card") ?? getDefaultShareImageUrl();
 
   return {
     title,
@@ -175,22 +175,20 @@ export async function generateMetadata({
       title,
       description,
       siteName: "R.",
-      images: imageUrl
-        ? [
-            {
-              url: imageUrl,
-              width: 360,
-              height: 540,
-              alt: view.node.title,
-            },
-          ]
-        : undefined,
+      images: [
+        {
+          url: imageUrl,
+          width: view.node.coverImage ? 360 : 192,
+          height: view.node.coverImage ? 540 : 192,
+          alt: view.node.title,
+        },
+      ],
     },
     twitter: {
-      card: imageUrl ? "summary_large_image" : "summary",
+      card: view.node.coverImage ? "summary_large_image" : "summary",
       title,
       description,
-      images: imageUrl ? [imageUrl] : undefined,
+      images: [imageUrl],
     },
   };
 }

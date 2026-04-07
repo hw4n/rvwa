@@ -10,7 +10,12 @@ import { getViewer } from "@/lib/auth";
 import { getPosterImageUrl } from "@/lib/poster";
 import { getReviewExplicitTitle } from "@/lib/review-display";
 import { getReviewByIdForShare } from "@/lib/repository";
-import { buildBrandedTitle, buildExcerpt, SPOILER_SHARE_LABEL } from "@/lib/share-metadata";
+import {
+  buildBrandedTitle,
+  buildExcerpt,
+  getDefaultShareImageUrl,
+  SPOILER_SHARE_LABEL,
+} from "@/lib/share-metadata";
 
 const EMBED_DESCRIPTION_LIMIT = 220;
 function getReviewEmbedHeading(review: {
@@ -82,7 +87,7 @@ export async function generateMetadata({
         getReviewEmbedHeading(review),
       ]);
   const description = getReviewEmbedDescription(review);
-  const imageUrl = getPosterImageUrl(review.coverImage, "card");
+  const imageUrl = getPosterImageUrl(review.coverImage, "card") ?? getDefaultShareImageUrl();
   const isApproved = review.status === "approved";
 
   return {
@@ -99,22 +104,20 @@ export async function generateMetadata({
       title,
       description,
       siteName: "R.",
-      images: imageUrl
-        ? [
-            {
-              url: imageUrl,
-              width: 360,
-              height: 540,
-              alt: title,
-            },
-          ]
-        : undefined,
+      images: [
+        {
+          url: imageUrl,
+          width: review.coverImage ? 360 : 192,
+          height: review.coverImage ? 540 : 192,
+          alt: title,
+        },
+      ],
     },
     twitter: {
-      card: imageUrl ? "summary_large_image" : "summary",
+      card: review.coverImage ? "summary_large_image" : "summary",
       title,
       description,
-      images: imageUrl ? [imageUrl] : undefined,
+      images: [imageUrl],
     },
   };
 }

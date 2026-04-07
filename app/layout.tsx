@@ -6,6 +6,7 @@ import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ThemeController } from "@/components/theme-controller";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { getDefaultShareImageUrl, getMetadataBase } from "@/lib/share-metadata";
 import { getThemeInitializationScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -16,7 +17,11 @@ const noto_sans_kr = Noto_Sans_KR({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
+const metadataBase = getMetadataBase();
+const defaultShareImageUrl = getDefaultShareImageUrl();
+
 export const metadata: Metadata = {
+  metadataBase,
   title: "R.",
   description:
     "모든 것에 대하여 리뷰를 작성하고 공유할 수 있는 곳.",
@@ -26,7 +31,7 @@ export const metadata: Metadata = {
     siteName: "R.",
     images: [
       {
-        url: "/web-app-manifest-192x192.png",
+        url: defaultShareImageUrl,
         width: 192,
         height: 192,
         alt: "R.",
@@ -37,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "R.",
     description: "모든 것에 대하여 리뷰를 작성하고 공유할 수 있는 곳.",
-    images: ["/web-app-manifest-192x192.png"],
+    images: [defaultShareImageUrl],
   },
 };
 

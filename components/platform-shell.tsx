@@ -7,6 +7,7 @@ import { useConvexAuth, usePaginatedQuery, useQuery } from "convex/react";
 import Link from "next/link";
 import { MenuIcon, SearchIcon } from "lucide-react";
 import { AppIcon } from "@/components/app-icon";
+import { ChangelogPopover } from "@/components/changelog-popover";
 import { useContentNodePicker } from "@/components/content-node-picker";
 import { Button } from "@/components/ui/button";
 import {
@@ -501,7 +502,6 @@ export function PlatformShell({
 
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <header className="sticky top-0 z-20 flex h-11 w-full items-center justify-between border-b border-border bg-surface-mid/80 px-4 backdrop-blur-xl lg:px-10">
-
             <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-3">
               <Sheet onOpenChange={setMobileNavOpen} open={mobileNavOpen}>
                 <SheetTrigger asChild>
@@ -564,7 +564,9 @@ export function PlatformShell({
                 <DesktopNodeSearch items={items} pathname={pathname} searchParamsKey={searchParamsKey} />
               </div>
             </div>
-
+            <div className="hidden shrink-0 items-center gap-2 lg:flex">
+              <ChangelogPopover />
+            </div>
           </header>
           <div className="custom-scrollbar px-4 py-6 lg:px-10 lg:py-10 w-full min-h-0 overflow-y-auto flex-1">{children}</div>
         </main>

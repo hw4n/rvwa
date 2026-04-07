@@ -100,6 +100,10 @@ export async function getReviewById(reviewId: string) {
   return (await authQuery<Review | null>("reviews:getById", { reviewId })) ?? null;
 }
 
+export async function getReviewByIdForShare(reviewId: string) {
+  return (await authQuery<Review | null>("reviews:getByIdForShare", { reviewId })) ?? null;
+}
+
 export async function getPendingReviews() {
   return (await authQuery<Review[]>("reviews:listPending")) ?? [];
 }

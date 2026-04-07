@@ -186,6 +186,28 @@ export const getById = query({
   },
 });
 
+export const getByIdForShare = query({
+  args: { reviewId: v.id("reviews") },
+  handler: async (ctx, args) => {
+    const review = await ctx.db.get(args.reviewId);
+    if (!review) {
+      return null;
+    }
+
+    const viewer = await getViewerDoc(ctx);
+    const isLinkReadable =
+      review.status === "approved" ||
+      review.status === "pending" ||
+      review.status === "rejected";
+
+    if (!isLinkReadable && !canReadReview(viewer as any, review as any)) {
+      return null;
+    }
+
+    return await toReview(ctx, review as any);
+  },
+});
+
 export const upsertDraft = mutation({
   args: {
     nodeId: v.id("nodes"),

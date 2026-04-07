@@ -1,0 +1,51 @@
+name: Build Standalone Artifact
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Prepare standalone bundle
+        run: |
+          mkdir -p .next/standalone/.next
+          cp -R .next/static .next/standalone/.next/static
+          if [ -d public ]; then
+            cp -R public .next/standalone/public
+          fi
+          find .next/standalone -maxdepth 1 -type f -name '.env*' -delete
+
+      - name: Upload standalone artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-standalone
+          path: .next/standalone
+          if-no-files-found: error
+          retention-days: 7

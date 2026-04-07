@@ -10,37 +10,26 @@ import { getViewer } from "@/lib/auth";
 import { getPosterImageUrl } from "@/lib/poster";
 import { getReviewExplicitTitle } from "@/lib/review-display";
 import { getReviewByIdForShare } from "@/lib/repository";
+import { buildBrandedTitle, buildExcerpt, SPOILER_SHARE_LABEL } from "@/lib/share-metadata";
 
 const EMBED_DESCRIPTION_LIMIT = 220;
-const SPOILER_LABEL = "<스포일러 리뷰>";
-
-function compactText(value: string) {
-  return value.replace(/[#>*`_\-\[\]\(\)]/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function truncateText(value: string, maxLength: number) {
-  if (value.length <= maxLength) {
-    return value;
-  }
-
-  return `${value.slice(0, maxLength).trimEnd()}...`;
-}
-
-function getReviewEmbedTitle(review: {
+function getReviewEmbedHeading(review: {
   spoiler: boolean;
   title?: string;
-  nodeTitle?: string;
-  proposedTitle?: string;
+  body: string;
 }) {
-  if (review.spoiler) {
-    return SPOILER_LABEL;
-  }
-
   const explicitTitle = getReviewExplicitTitle(review);
   if (explicitTitle) {
     return explicitTitle;
   }
 
+  return buildExcerpt(review.body, 50) || "리뷰";
+}
+
+function getReviewEmbedContentTitle(review: {
+  nodeTitle?: string;
+  proposedTitle?: string;
+}) {
   return review.nodeTitle ?? review.proposedTitle ?? "리뷰";
 }
 
@@ -49,15 +38,15 @@ function getReviewEmbedDescription(review: {
   body: string;
 }) {
   if (review.spoiler) {
-    return SPOILER_LABEL;
+    return SPOILER_SHARE_LABEL;
   }
 
-  const compactBody = compactText(review.body);
-  if (!compactBody) {
+  const excerpt = buildExcerpt(review.body, EMBED_DESCRIPTION_LIMIT);
+  if (!excerpt) {
     return "리뷰 내용이 없습니다.";
   }
 
-  return truncateText(compactBody, EMBED_DESCRIPTION_LIMIT);
+  return excerpt;
 }
 
 const getSharedReview = cache(async (reviewId: string) => {
@@ -83,7 +72,15 @@ export async function generateMetadata({
     };
   }
 
-  const title = getReviewEmbedTitle(review);
+  const title = review.spoiler
+    ? buildBrandedTitle([
+        getReviewEmbedContentTitle(review),
+        SPOILER_SHARE_LABEL,
+      ])
+    : buildBrandedTitle([
+        getReviewEmbedContentTitle(review),
+        getReviewEmbedHeading(review),
+      ]);
   const description = getReviewEmbedDescription(review);
   const imageUrl = getPosterImageUrl(review.coverImage, "card");
   const isApproved = review.status === "approved";

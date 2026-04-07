@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,6 +10,7 @@ import { getViewer } from "@/lib/auth";
 import { sortAttributeEntries } from "@/lib/metadata";
 import { getPosterImageUrl } from "@/lib/poster";
 import { getNodeView } from "@/lib/repository";
+import { buildBrandedTitle } from "@/lib/share-metadata";
 
 function decodeRouteSegment(value: string | undefined) {
   if (!value) {
@@ -140,4 +142,55 @@ export default async function NodePage({
       </section>
     </div>
   );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ nodeSlug: string }>;
+}): Promise<Metadata> {
+  const { nodeSlug } = await params;
+  const view = await getNodeView(decodeRouteSegment(nodeSlug));
+
+  if (!view) {
+    return {
+      title: buildBrandedTitle(["항목을 찾을 수 없음"]),
+      description: "존재하지 않는 항목입니다.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const title = buildBrandedTitle([view.node.title]);
+  const description = view.node.summary;
+  const imageUrl = getPosterImageUrl(view.node.coverImage, "card");
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      siteName: "R.",
+      images: imageUrl
+        ? [
+            {
+              url: imageUrl,
+              width: 360,
+              height: 540,
+              alt: view.node.title,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: imageUrl ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: imageUrl ? [imageUrl] : undefined,
+    },
+  };
 }

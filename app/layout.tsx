@@ -20,6 +20,25 @@ export const metadata: Metadata = {
   title: "R.",
   description:
     "모든 것에 대하여 리뷰를 작성하고 공유할 수 있는 곳.",
+  openGraph: {
+    title: "R.",
+    description: "모든 것에 대하여 리뷰를 작성하고 공유할 수 있는 곳.",
+    siteName: "R.",
+    images: [
+      {
+        url: "/web-app-manifest-192x192.png",
+        width: 192,
+        height: 192,
+        alt: "R.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "R.",
+    description: "모든 것에 대하여 리뷰를 작성하고 공유할 수 있는 곳.",
+    images: ["/web-app-manifest-192x192.png"],
+  },
 };
 
 export const viewport: Viewport = {

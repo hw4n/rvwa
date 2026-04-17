@@ -11,6 +11,12 @@ import { Separator } from "@/components/ui/separator";
 
 const CHANGELOG_ENTRIES = [
   {
+    date: "2026.04.17",
+    title: "제작사, [방영/출시/등장...] 시기 탭",
+    summary:
+      "유의미한 그룹으로 등록된 항목들을 나열할 수 있는 기능을 추가.",
+  },
+  {
     date: "2026.04.07",
     title: "디스코드 임베드 지원",
     summary:

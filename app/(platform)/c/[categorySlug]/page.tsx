@@ -60,7 +60,11 @@ export default async function CategoryPage({
         }
       />
 
-      <CategoryRootGrid categorySlug={category.slug} />
+      <CategoryRootGrid
+        categorySlug={category.slug}
+        hasStudioField={category.fieldDefinitions.some((field) => field.key === "studio")}
+        hasTimelineField={category.fieldDefinitions.some((field) => field.key === "airing-quarter")}
+      />
     </div>
   );
 }

@@ -77,9 +77,6 @@ function buildStudioGroups(nodes: CategoryGridNode[]) {
         return -1;
       }
 
-      if (right.nodes.length !== left.nodes.length) {
-        return right.nodes.length - left.nodes.length;
-      }
       return left.label.localeCompare(right.label, "ko");
     });
 }
@@ -326,7 +323,7 @@ export function CategoryRootGrid({
     return () => observer.disconnect();
   }, [loadMore, status]);
 
-  const defaultTab = hasStudioField ? "studio" : hasTimelineField ? "timeline" : "all";
+  const defaultTab = "all";
   const hasGroupedView = hasStudioField || hasTimelineField;
 
   return (
@@ -334,10 +331,13 @@ export function CategoryRootGrid({
       {hasGroupedView ? (
         <Tabs defaultValue={defaultTab}>
           <TabsList aria-label="카테고리 보기 방식">
-            {hasStudioField ? <TabsTrigger value="studio">제작사</TabsTrigger> : null}
-            {hasTimelineField ? <TabsTrigger value="timeline">시기</TabsTrigger> : null}
             <TabsTrigger value="all">전체</TabsTrigger>
+            {hasTimelineField ? <TabsTrigger value="timeline">시기</TabsTrigger> : null}
+            {hasStudioField ? <TabsTrigger value="studio">제작사</TabsTrigger> : null}
           </TabsList>
+          <TabsContent value="all">
+            <CategoryAllGrid nodes={results} />
+          </TabsContent>
           {hasStudioField ? (
             <TabsContent value="studio">
               <CategoryStudioRows groups={buildStudioGroups(results)} />
@@ -348,9 +348,6 @@ export function CategoryRootGrid({
               <CategoryTimelineRows groups={buildTimelineGroups(results)} />
             </TabsContent>
           ) : null}
-          <TabsContent value="all">
-            <CategoryAllGrid nodes={results} />
-          </TabsContent>
         </Tabs>
       ) : (
         <CategoryAllGrid nodes={results} />

@@ -45,12 +45,12 @@ jobs:
             cp -R public dist-artifacts/next-build/public
           fi
           cp package.json pnpm-lock.yaml next.config.ts dist-artifacts/next-build/
+          tar -C dist-artifacts/next-build -czf dist-artifacts/next-build.tar.gz .
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-build
-          path: dist-artifacts/next-build
-          include-hidden-files: true
+          path: dist-artifacts/next-build.tar.gz
           if-no-files-found: error
           retention-days: 7

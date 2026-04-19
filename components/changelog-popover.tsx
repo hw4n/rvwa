@@ -11,6 +11,12 @@ import { Separator } from "@/components/ui/separator";
 
 const CHANGELOG_ENTRIES = [
   {
+    date: "2026.04.19",
+    title: "좀 더 커뮤니티fy 하기",
+    summary:
+      "추천과 댓글 시스템을 추가합니다. 로고는 심심해서 바꿉니다",
+  },
+  {
     date: "2026.04.17",
     title: "제작사, [방영/출시/등장...] 시기 탭",
     summary:

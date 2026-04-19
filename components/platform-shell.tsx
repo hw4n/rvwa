@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useConvexAuth, usePaginatedQuery, useQuery } from "convex/react";
 import Link from "next/link";
@@ -29,6 +30,7 @@ import type { Category, ContentNode, Review, UserSummary } from "@/lib/domain";
 import { getReviewDisplayTitle } from "@/lib/review-display";
 import { getReviewExplicitTitle } from "@/lib/review-display";
 import { formatCompactRating } from "@/lib/review-rating";
+import appIcon from "@/app/icon1.png";
 
 export function PlatformShell({
   children,
@@ -455,11 +457,16 @@ export function PlatformShell({
   const railNavigation = (
     <>
       <Link
-        className="flex h-16 w-full items-center justify-center"
+        className="flex h-16 w-full items-center justify-center border-b border-border bg-surface-lowest transition-colors hover:bg-surface-low"
         href="/dashboard"
         onClick={keepMobileNavOpenOnNextRouteChange}
       >
-        <AppIcon className="size-6 text-primary" name="hub" strokeWidth={2.4} />
+        <Image
+          alt="R."
+          className="size-9 object-contain"
+          priority
+          src={appIcon}
+        />
       </Link>
       <nav className="flex w-full flex-1 flex-col gap-0">
         {categories.map((category) => (

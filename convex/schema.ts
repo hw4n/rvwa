@@ -92,6 +92,9 @@ export default defineSchema({
     ),
     createdAt: v.string(),
     updatedAt: v.string(),
+    recommendCount: v.optional(v.number()),
+    notRecommendCount: v.optional(v.number()),
+    commentCount: v.optional(v.number()),
     submittedAt: v.optional(v.string()),
     approvedAt: v.optional(v.string()),
     approvedBy: v.optional(v.id("users")),
@@ -103,6 +106,25 @@ export default defineSchema({
     .index("by_author_id_and_updated_at", ["authorId", "updatedAt"])
     .index("by_status", ["status"])
     .index("by_status_and_updated_at", ["status", "updatedAt"]),
+
+  reviewVotes: defineTable({
+    reviewId: v.id("reviews"),
+    userId: v.id("users"),
+    value: v.union(v.literal("recommend"), v.literal("not_recommend")),
+    createdAt: v.string(),
+  })
+    .index("by_review_id", ["reviewId"])
+    .index("by_review_id_and_user_id", ["reviewId", "userId"]),
+
+  reviewComments: defineTable({
+    reviewId: v.id("reviews"),
+    parentCommentId: v.optional(v.id("reviewComments")),
+    authorId: v.id("users"),
+    body: v.string(),
+    replyCount: v.number(),
+    createdAt: v.string(),
+    updatedAt: v.string(),
+  }).index("by_review_id_and_created_at", ["reviewId", "createdAt"]),
 
   collections: defineTable({
     slug: v.string(),

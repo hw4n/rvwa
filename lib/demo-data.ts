@@ -284,8 +284,11 @@ The pacing looks relaxed until you realize each quiet stretch is doing narrative
 - Reviewing the full series would blur the seasonal arc.
 - Reviewing each episode only would miss how the season accumulates grief.
 
-A season-level node is exactly the right container.`,
+    A season-level node is exactly the right container.`,
     rating: 9.3,
+    recommendCount: 0,
+    notRecommendCount: 0,
+    commentCount: 0,
     spoiler: false,
     status: "approved",
     author: demoUser,
@@ -300,6 +303,9 @@ A season-level node is exactly the right container.`,
 
 The food logic is still present, but now it is carrying dread instead of comfort. That tonal inversion is why episode-level reviews matter at all.`,
     rating: 8.9,
+    recommendCount: 0,
+    notRecommendCount: 0,
+    commentCount: 0,
     spoiler: true,
     status: "approved",
     author: demoUser,
@@ -314,6 +320,9 @@ The food logic is still present, but now it is carrying dread instead of comfort
 
 Even when the film goes huge, the blocking and rhythm keep scene intent obvious. A lot of expensive science fiction fails exactly there.`,
     rating: 8.7,
+    recommendCount: 0,
+    notRecommendCount: 0,
+    commentCount: 0,
     spoiler: false,
     status: "approved",
     author: demoUser,
@@ -328,6 +337,9 @@ Even when the film goes huge, the blocking and rhythm keep scene intent obvious.
 
 That makes this a good example of why dish-level reviews should exist separately from restaurant-level ones. The restaurant's identity is experimentation; this bowl's identity is restraint.`,
     rating: 9.1,
+    recommendCount: 0,
+    notRecommendCount: 0,
+    commentCount: 0,
     spoiler: false,
     status: "approved",
     author: demoUser,
@@ -342,6 +354,9 @@ That makes this a good example of why dish-level reviews should exist separately
 
 Here I care about line management, consistency, menu spread, and whether the concept hangs together. The specific bowls can split into their own reviews underneath.`,
     rating: 8.8,
+    recommendCount: 0,
+    notRecommendCount: 0,
+    commentCount: 0,
     spoiler: false,
     status: "approved",
     author: demoUser,

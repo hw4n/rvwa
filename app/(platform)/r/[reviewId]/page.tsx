@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ReviewDeleteButton } from "@/components/review-delete-button";
 import { ReviewRejectButton } from "@/components/review-reject-button";
+import { ReviewDiscussion } from "@/components/review-discussion";
 import { Button } from "@/components/ui/button";
 import { ReviewDetail } from "@/components/review-detail";
 import { getViewer } from "@/lib/auth";
@@ -79,13 +80,13 @@ export async function generateMetadata({
 
   const title = review.spoiler
     ? buildBrandedTitle([
-        getReviewEmbedContentTitle(review),
-        SPOILER_SHARE_LABEL,
-      ])
+      getReviewEmbedContentTitle(review),
+      SPOILER_SHARE_LABEL,
+    ])
     : buildBrandedTitle([
-        getReviewEmbedContentTitle(review),
-        getReviewEmbedHeading(review),
-      ]);
+      getReviewEmbedContentTitle(review),
+      getReviewEmbedHeading(review),
+    ]);
   const description = getReviewEmbedDescription(review);
   const imageUrl = getPosterImageUrl(review.coverImage, "card") ?? getDefaultShareImageUrl();
   const isApproved = review.status === "approved";
@@ -96,9 +97,9 @@ export async function generateMetadata({
     robots: isApproved
       ? undefined
       : {
-          index: false,
-          follow: false,
-        },
+        index: false,
+        follow: false,
+      },
     openGraph: {
       type: "article",
       title,
@@ -163,8 +164,11 @@ export default async function ReviewPage({
 
   return (
     <div className="space-y-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto space-y-12 pb-24">
         <ReviewDetail review={review} actions={actions} />
+        {review.status === "approved" ? (
+          <ReviewDiscussion reviewId={review.id} />
+        ) : null}
       </div>
     </div>
   );

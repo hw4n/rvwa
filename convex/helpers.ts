@@ -22,6 +22,7 @@ export const INPUT_LIMITS = {
   tagLength: 40,
   reviewTitle: 160,
   reviewBody: 20000,
+  commentBody: 5000,
   suggestedCategoryName: 80,
   metadataTextValue: 500,
   metadataListCount: 20,
@@ -368,6 +369,9 @@ export async function toReview(
     title?: string | null;
     body: string;
     rating?: number | null;
+    recommendCount?: number | null;
+    notRecommendCount?: number | null;
+    commentCount?: number | null;
     spoiler: boolean;
     status: "draft" | "pending" | "approved" | "rejected";
     createdAt: string;
@@ -390,6 +394,9 @@ export async function toReview(
     title: review.title ?? undefined,
     body: review.body,
     rating: normalizeStoredRating(review.rating),
+    recommendCount: Math.max(0, review.recommendCount ?? 0),
+    notRecommendCount: Math.max(0, review.notRecommendCount ?? 0),
+    commentCount: Math.max(0, review.commentCount ?? 0),
     spoiler: review.spoiler,
     status: review.status,
     author: author ? toUserSummary(author as any) : null,

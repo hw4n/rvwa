@@ -47,7 +47,14 @@ export const getView = query({
     const reviews = await Promise.all(
       rawReviews
         .filter((review) => canReadReview(viewer as any, review as any))
-        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+        .sort((a, b) => {
+          const recommendDiff = (b.recommendCount ?? 0) - (a.recommendCount ?? 0);
+          if (recommendDiff !== 0) {
+            return recommendDiff;
+          }
+
+          return b.updatedAt.localeCompare(a.updatedAt);
+        })
         .map((review) => toReview(ctx, review as any))
     );
 

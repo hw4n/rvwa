@@ -14,6 +14,7 @@ import {
   sanitizeOptionalText,
   sanitizeRequiredText,
   sanitizeAttributes,
+  toUserSummary,
   toReview,
 } from "./helpers";
 import { formatRatingInputValue, normalizeStoredRating, normalizeSubmittedRating } from "../lib/review-rating";
@@ -90,6 +91,69 @@ async function getExistingCategory(ctx: any, slug?: string | null) {
     .query("categories")
     .withIndex("by_slug", (q: any) => q.eq("slug", slug))
     .unique();
+}
+
+const REVIEW_DISCUSSION_LIMIT = 200;
+
+function clampDiscussionLimit(limit?: number) {
+  return Math.max(1, Math.min(Math.floor(limit ?? REVIEW_DISCUSSION_LIMIT), REVIEW_DISCUSSION_LIMIT));
+}
+
+function getReviewRecommendCount(review: { recommendCount?: number | null }) {
+  return Math.max(0, review.recommendCount ?? 0);
+}
+
+function getReviewNotRecommendCount(review: { notRecommendCount?: number | null }) {
+  return Math.max(0, review.notRecommendCount ?? 0);
+}
+
+function getReviewCommentCount(review: { commentCount?: number | null }) {
+  return Math.max(0, review.commentCount ?? 0);
+}
+
+async function getReadableReviewWithViewer(ctx: any, reviewId: string) {
+  const review = await ctx.db.get(reviewId);
+  if (!review) {
+    return { review: null, viewer: null };
+  }
+
+  const viewer = await getViewerDoc(ctx);
+  if (!canReadReview(viewer as any, review as any)) {
+    return { review: null, viewer };
+  }
+
+  return { review, viewer };
+}
+
+async function ensureApprovedReview(ctx: any, reviewId: string) {
+  const review = await ctx.db.get(reviewId);
+  if (!review) {
+    throw new Error("리뷰를 찾을 수 없습니다.");
+  }
+
+  if (review.status !== "approved") {
+    throw new Error("승인된 리뷰에서만 사용할 수 있습니다.");
+  }
+
+  return review;
+}
+
+async function getExistingVote(ctx: any, reviewId: string, userId: string) {
+  return await ctx.db
+    .query("reviewVotes")
+    .withIndex("by_review_id_and_user_id", (q: any) => q.eq("reviewId", reviewId).eq("userId", userId))
+    .unique();
+}
+
+async function getCommentAuthors(ctx: any, comments: any[]) {
+  const authorIds = Array.from(new Set(comments.map((comment) => comment.authorId)));
+  const authorDocs = await Promise.all(authorIds.map((authorId) => ctx.db.get(authorId)));
+
+  return new Map(
+    authorIds
+      .map((authorId, index) => [authorId, authorDocs[index]] as const)
+      .filter((entry) => Boolean(entry[1]))
+  );
 }
 
 export const listRecent = query({
@@ -208,6 +272,308 @@ export const getByIdForShare = query({
   },
 });
 
+export const getEngagement = query({
+  args: { reviewId: v.id("reviews") },
+  handler: async (ctx, args) => {
+    const { review, viewer } = await getReadableReviewWithViewer(ctx, args.reviewId);
+    if (!review) {
+      return null;
+    }
+
+    const viewerVote = viewer && review.status === "approved"
+      ? await getExistingVote(ctx, args.reviewId, viewer._id)
+      : null;
+
+    return {
+      recommendCount: getReviewRecommendCount(review),
+      notRecommendCount: getReviewNotRecommendCount(review),
+      commentCount: getReviewCommentCount(review),
+      viewerVote: viewerVote?.value ?? null,
+      canVote: Boolean(viewer && review.status === "approved"),
+    };
+  },
+});
+
+export const getDiscussion = query({
+  args: {
+    reviewId: v.id("reviews"),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { review, viewer } = await getReadableReviewWithViewer(ctx, args.reviewId);
+    if (!review) {
+      return null;
+    }
+
+    const limit = clampDiscussionLimit(args.limit);
+    const comments = review.status === "approved"
+      ? await ctx.db
+        .query("reviewComments")
+        .withIndex("by_review_id_and_created_at", (q) => q.eq("reviewId", args.reviewId))
+        .order("asc")
+        .take(limit)
+      : [];
+    const authorById = await getCommentAuthors(ctx, comments as any[]);
+    const viewerVote = viewer
+      ? await getExistingVote(ctx, args.reviewId, viewer._id)
+      : null;
+
+    const repliesByParentId = new Map<string, any[]>();
+    const topLevelComments: any[] = [];
+    for (const comment of comments) {
+      if (comment.parentCommentId) {
+        const siblings = repliesByParentId.get(comment.parentCommentId) ?? [];
+        siblings.push(comment);
+        repliesByParentId.set(comment.parentCommentId, siblings);
+        continue;
+      }
+
+      topLevelComments.push(comment);
+    }
+
+    const serializedComments = topLevelComments.map((comment) => {
+      const author = authorById.get(comment.authorId);
+      const replies = (repliesByParentId.get(comment._id) ?? []).map((reply) => {
+        const replyAuthor = authorById.get(reply.authorId);
+        return {
+          id: reply._id,
+          parentCommentId: reply.parentCommentId ?? undefined,
+          body: reply.body,
+          author: replyAuthor ? toUserSummary(replyAuthor as any) : null,
+          createdAt: reply.createdAt,
+          updatedAt: reply.updatedAt,
+          replyCount: reply.replyCount,
+          isMine: Boolean(viewer && reply.authorId === viewer._id),
+          isReviewAuthor: reply.authorId === review.authorId,
+          canReply: false,
+          canEdit: Boolean(viewer && reply.authorId === viewer._id && reply.replyCount === 0),
+          canDelete: Boolean(viewer && reply.authorId === viewer._id && reply.replyCount === 0),
+          replies: [],
+        };
+      });
+
+      return {
+        id: comment._id,
+        parentCommentId: comment.parentCommentId ?? undefined,
+        body: comment.body,
+        author: author ? toUserSummary(author as any) : null,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+        replyCount: comment.replyCount,
+        isMine: Boolean(viewer && comment.authorId === viewer._id),
+        isReviewAuthor: comment.authorId === review.authorId,
+        canReply: Boolean(viewer && review.status === "approved"),
+        canEdit: Boolean(viewer && comment.authorId === viewer._id && comment.replyCount === 0),
+        canDelete: Boolean(viewer && comment.authorId === viewer._id && comment.replyCount === 0),
+        replies,
+      };
+    });
+
+    return {
+      recommendCount: getReviewRecommendCount(review),
+      notRecommendCount: getReviewNotRecommendCount(review),
+      commentCount: getReviewCommentCount(review),
+      viewerVote: viewerVote?.value ?? null,
+      canVote: Boolean(viewer && review.status === "approved"),
+      canComment: Boolean(viewer && review.status === "approved"),
+      comments: serializedComments,
+      hasMore: getReviewCommentCount(review) > comments.length,
+    };
+  },
+});
+
+export const castVote = mutation({
+  args: {
+    reviewId: v.id("reviews"),
+    value: v.union(v.literal("recommend"), v.literal("not_recommend")),
+  },
+  handler: async (ctx, args) => {
+    const viewer = await requireViewer(ctx);
+    const review = await ensureApprovedReview(ctx, args.reviewId);
+    const existingVote = await getExistingVote(ctx, args.reviewId, viewer._id);
+
+    if (existingVote) {
+      if (existingVote.value === args.value) {
+        await ctx.db.delete(existingVote._id);
+
+        await ctx.db.patch(args.reviewId, {
+          recommendCount: args.value === "recommend"
+            ? Math.max(0, getReviewRecommendCount(review) - 1)
+            : getReviewRecommendCount(review),
+          notRecommendCount: args.value === "not_recommend"
+            ? Math.max(0, getReviewNotRecommendCount(review) - 1)
+            : getReviewNotRecommendCount(review),
+        });
+
+        return {
+          reviewId: args.reviewId,
+          value: null,
+          action: "removed",
+        };
+      }
+
+      await ctx.db.patch(existingVote._id, {
+        value: args.value,
+      });
+
+      await ctx.db.patch(args.reviewId, {
+        recommendCount: args.value === "recommend"
+          ? getReviewRecommendCount(review) + 1
+          : Math.max(0, getReviewRecommendCount(review) - 1),
+        notRecommendCount: args.value === "not_recommend"
+          ? getReviewNotRecommendCount(review) + 1
+          : Math.max(0, getReviewNotRecommendCount(review) - 1),
+      });
+
+      return {
+        reviewId: args.reviewId,
+        value: args.value,
+        action: "switched",
+      };
+    }
+
+    await ctx.db.insert("reviewVotes", {
+      reviewId: args.reviewId,
+      userId: viewer._id as any,
+      value: args.value,
+      createdAt: nowIso(),
+    });
+
+    await ctx.db.patch(args.reviewId, {
+      recommendCount: args.value === "recommend"
+        ? getReviewRecommendCount(review) + 1
+        : getReviewRecommendCount(review),
+      notRecommendCount: args.value === "not_recommend"
+        ? getReviewNotRecommendCount(review) + 1
+        : getReviewNotRecommendCount(review),
+    });
+
+    return {
+      reviewId: args.reviewId,
+      value: args.value,
+      action: "created",
+    };
+  },
+});
+
+export const addComment = mutation({
+  args: {
+    reviewId: v.id("reviews"),
+    body: v.string(),
+    parentCommentId: v.optional(v.id("reviewComments")),
+  },
+  handler: async (ctx, args) => {
+    const viewer = await requireViewer(ctx);
+    const review = await ensureApprovedReview(ctx, args.reviewId);
+    const body = sanitizeRequiredText(args.body, "Comment", INPUT_LIMITS.commentBody);
+    let parentComment = null;
+
+    if (args.parentCommentId) {
+      parentComment = await ctx.db.get(args.parentCommentId);
+      if (!parentComment || parentComment.reviewId !== args.reviewId) {
+        throw new Error("답글을 달 댓글을 찾을 수 없습니다.");
+      }
+      if (parentComment.parentCommentId) {
+        throw new Error("대댓글은 한 단계까지만 작성할 수 있습니다.");
+      }
+    }
+
+    const timestamp = nowIso();
+    const commentId = await ctx.db.insert("reviewComments", {
+      reviewId: args.reviewId,
+      parentCommentId: args.parentCommentId,
+      authorId: viewer._id as any,
+      body,
+      replyCount: 0,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    });
+
+    if (parentComment) {
+      await ctx.db.patch(parentComment._id, {
+        replyCount: Math.max(0, (parentComment.replyCount ?? 0) + 1),
+      });
+    }
+
+    await ctx.db.patch(args.reviewId, {
+      commentCount: getReviewCommentCount(review) + 1,
+    });
+
+    return { commentId };
+  },
+});
+
+export const updateComment = mutation({
+  args: {
+    commentId: v.id("reviewComments"),
+    body: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const viewer = await requireViewer(ctx);
+    const comment = await ctx.db.get(args.commentId);
+
+    if (!comment) {
+      throw new Error("댓글을 찾을 수 없습니다.");
+    }
+
+    if (comment.authorId !== viewer._id) {
+      throw new Error("본인 댓글만 수정할 수 있습니다.");
+    }
+
+    if ((comment.replyCount ?? 0) > 0) {
+      throw new Error("답글이 있는 댓글은 수정할 수 없습니다.");
+    }
+
+    await ensureApprovedReview(ctx, comment.reviewId);
+    await ctx.db.patch(args.commentId, {
+      body: sanitizeRequiredText(args.body, "Comment", INPUT_LIMITS.commentBody),
+      updatedAt: nowIso(),
+    });
+
+    return { commentId: args.commentId };
+  },
+});
+
+export const deleteComment = mutation({
+  args: {
+    commentId: v.id("reviewComments"),
+  },
+  handler: async (ctx, args) => {
+    const viewer = await requireViewer(ctx);
+    const comment = await ctx.db.get(args.commentId);
+
+    if (!comment) {
+      throw new Error("댓글을 찾을 수 없습니다.");
+    }
+
+    if (comment.authorId !== viewer._id) {
+      throw new Error("본인 댓글만 삭제할 수 있습니다.");
+    }
+
+    if ((comment.replyCount ?? 0) > 0) {
+      throw new Error("답글이 있는 댓글은 삭제할 수 없습니다.");
+    }
+
+    const review = await ensureApprovedReview(ctx, comment.reviewId);
+    await ctx.db.delete(args.commentId);
+
+    if (comment.parentCommentId) {
+      const parentComment = await ctx.db.get(comment.parentCommentId);
+      if (parentComment) {
+        await ctx.db.patch(parentComment._id, {
+          replyCount: Math.max(0, (parentComment.replyCount ?? 0) - 1),
+        });
+      }
+    }
+
+    await ctx.db.patch(comment.reviewId, {
+      commentCount: Math.max(0, getReviewCommentCount(review) - 1),
+    });
+
+    return { commentId: args.commentId };
+  },
+});
+
 export const upsertDraft = mutation({
   args: {
     nodeId: v.id("nodes"),
@@ -243,6 +609,9 @@ export const upsertDraft = mutation({
       rating: normalizeSubmittedRating(args.rating),
       spoiler: args.spoiler,
       status: "draft",
+      recommendCount: 0,
+      notRecommendCount: 0,
+      commentCount: 0,
       createdAt: timestamp,
       updatedAt: timestamp,
     });
@@ -292,6 +661,9 @@ export const publish = mutation({
       rating: normalizeSubmittedRating(args.rating),
       spoiler: args.spoiler,
       status: "pending",
+      recommendCount: 0,
+      notRecommendCount: 0,
+      commentCount: 0,
       createdAt: timestamp,
       updatedAt: timestamp,
       submittedAt: timestamp,
@@ -355,6 +727,9 @@ export const submit = mutation({
       rating: normalizeSubmittedRating(args.rating),
       spoiler: args.spoiler,
       status: "pending",
+      recommendCount: 0,
+      notRecommendCount: 0,
+      commentCount: 0,
       createdAt: timestamp,
       updatedAt: timestamp,
       submittedAt: timestamp,

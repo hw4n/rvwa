@@ -52,6 +52,7 @@ export type UserSummary = {
 };
 
 export type ReviewStatus = "draft" | "pending" | "approved" | "rejected";
+export type ReviewVoteValue = "recommend" | "not_recommend";
 
 export type Review = {
   id: string;
@@ -66,11 +67,49 @@ export type Review = {
   title?: string;
   body: string;
   rating?: number;
+  recommendCount: number;
+  notRecommendCount: number;
+  commentCount: number;
   spoiler: boolean;
   status: ReviewStatus;
   author: UserSummary | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type ReviewEngagement = {
+  recommendCount: number;
+  notRecommendCount: number;
+  commentCount: number;
+  viewerVote: ReviewVoteValue | null;
+  canVote: boolean;
+};
+
+export type ReviewComment = {
+  id: string;
+  parentCommentId?: string;
+  body: string;
+  author: UserSummary | null;
+  createdAt: string;
+  updatedAt: string;
+  replyCount: number;
+  isMine: boolean;
+  isReviewAuthor: boolean;
+  canReply: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  replies: ReviewComment[];
+};
+
+export type ReviewDiscussion = {
+  recommendCount: number;
+  notRecommendCount: number;
+  commentCount: number;
+  viewerVote: ReviewVoteValue | null;
+  canVote: boolean;
+  canComment: boolean;
+  comments: ReviewComment[];
+  hasMore: boolean;
 };
 
 export type Collection = {

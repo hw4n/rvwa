@@ -28,7 +28,11 @@ export default async function CategoryPage({
 }) {
   const { categorySlug } = await params;
   const normalizedCategorySlug = decodeRouteSegment(categorySlug);
-  const [category, viewer] = await Promise.all([getCategoryBySlug(normalizedCategorySlug), getViewer()]);
+  const [category, viewer, categoryView] = await Promise.all([
+    getCategoryBySlug(normalizedCategorySlug),
+    getViewer(),
+    getCategoryView(normalizedCategorySlug),
+  ]);
 
   if (!category) {
     notFound();
@@ -36,8 +40,6 @@ export default async function CategoryPage({
 
   const hasStudioField = category.fieldDefinitions.some((field) => field.key === "studio");
   const hasTimelineField = category.fieldDefinitions.some((field) => field.key === "airing-quarter");
-  const groupedCategoryView =
-    hasStudioField || hasTimelineField ? await getCategoryView(normalizedCategorySlug) : null;
 
   return (
     <div className="space-y-10 md:space-y-16">
@@ -67,7 +69,7 @@ export default async function CategoryPage({
 
       <CategoryRootGrid
         categorySlug={category.slug}
-        groupedNodes={groupedCategoryView?.roots}
+        groupedNodes={categoryView?.roots}
         hasStudioField={hasStudioField}
         hasTimelineField={hasTimelineField}
       />

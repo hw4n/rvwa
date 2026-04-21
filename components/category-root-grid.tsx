@@ -19,6 +19,7 @@ type CategoryGridNode = {
   title: string;
   coverImage?: string | null;
   rating?: number | null;
+  updatedAt?: string;
   attributes: Record<string, unknown>;
 };
 
@@ -287,6 +288,15 @@ function CategoryHorizontalRows({
   );
 }
 
+function compareByNewestUpdatedAt(
+  left: CategoryGridNode & { updatedAt?: string },
+  right: CategoryGridNode & { updatedAt?: string }
+) {
+  const leftTime = left.updatedAt ?? left.id;
+  const rightTime = right.updatedAt ?? right.id;
+  return rightTime.localeCompare(leftTime);
+}
+
 export function CategoryRootGrid({
   categorySlug,
   hasStudioField = false,
@@ -302,21 +312,60 @@ export function CategoryRootGrid({
   const defaultTab = "all";
   const hasGroupedView = hasStudioField || hasTimelineField;
   const [activeTab, setActiveTab] = React.useState(defaultTab);
+  const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
+  const hasPrefetchedRoots = Boolean(groupedNodes);
   const { results, status, isLoading, loadMore } = usePaginatedQuery(
     api.categories.listRootsPage,
-    { slug: categorySlug },
+    hasPrefetchedRoots ? "skip" : { slug: categorySlug },
     { initialNumItems: PAGE_SIZE }
+  ) as {
+    results: CategoryGridNode[];
+    status: "CanLoadMore" | "Exhausted" | "LoadingFirstPage" | "LoadingMore";
+    isLoading: boolean;
+    loadMore: (numItems: number) => void;
+  };
+  const groupedSourceNodes = React.useMemo(
+    () => (groupedNodes ?? results).slice().sort(compareByNewestUpdatedAt),
+    [groupedNodes, results]
   );
-  const groupedSourceNodes = groupedNodes ?? results;
+  const allNodes = hasPrefetchedRoots ? groupedSourceNodes.slice(0, visibleCount) : results;
   const isAllTab = !hasGroupedView || activeTab === defaultTab;
-  const hasVisibleNodes = isAllTab ? results.length > 0 : groupedSourceNodes.length > 0;
+  const hasVisibleNodes = isAllTab ? allNodes.length > 0 : groupedSourceNodes.length > 0;
 
   React.useEffect(() => {
-    if (!loadMoreRef.current || status !== "CanLoadMore") {
+    setVisibleCount(PAGE_SIZE);
+  }, [categorySlug, groupedNodes]);
+
+  React.useEffect(() => {
+    if (!loadMoreRef.current) {
       return;
     }
 
     if (hasGroupedView && activeTab !== defaultTab) {
+      return;
+    }
+
+    if (hasPrefetchedRoots) {
+      if (visibleCount >= groupedSourceNodes.length) {
+        return;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting) {
+            setVisibleCount((current) => Math.min(current + PAGE_SIZE, groupedSourceNodes.length));
+          }
+        },
+        {
+          rootMargin: "240px 0px",
+        }
+      );
+
+      observer.observe(loadMoreRef.current);
+      return () => observer.disconnect();
+    }
+
+    if (status !== "CanLoadMore") {
       return;
     }
 
@@ -333,7 +382,7 @@ export function CategoryRootGrid({
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [activeTab, hasGroupedView, loadMore, status]);
+  }, [activeTab, groupedSourceNodes.length, hasGroupedView, hasPrefetchedRoots, loadMore, status, visibleCount]);
 
   return (
     <section className="space-y-6">
@@ -345,7 +394,7 @@ export function CategoryRootGrid({
             {hasStudioField ? <TabsTrigger value="studio">제작사</TabsTrigger> : null}
           </TabsList>
           <TabsContent value="all">
-            <CategoryAllGrid nodes={results} />
+            <CategoryAllGrid nodes={allNodes} />
           </TabsContent>
           {hasStudioField ? (
             <TabsContent value="studio">
@@ -359,7 +408,7 @@ export function CategoryRootGrid({
           ) : null}
         </Tabs>
       ) : (
-        <CategoryAllGrid nodes={results} />
+        <CategoryAllGrid nodes={allNodes} />
       )}
 
       {!hasVisibleNodes && !isLoading ? (
@@ -370,8 +419,10 @@ export function CategoryRootGrid({
         </div>
       ) : null}
 
-      {isAllTab && status !== "Exhausted" ? <div className="h-8" ref={loadMoreRef} /> : null}
-      {isAllTab && status === "LoadingMore" ? (
+      {isAllTab && (hasPrefetchedRoots ? visibleCount < groupedSourceNodes.length : status !== "Exhausted") ? (
+        <div className="h-8" ref={loadMoreRef} />
+      ) : null}
+      {isAllTab && !hasPrefetchedRoots && status === "LoadingMore" ? (
         <div className="flex justify-center">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/25">
             더 불러오는 중

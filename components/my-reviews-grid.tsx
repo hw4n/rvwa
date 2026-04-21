@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   useConvexAuth,
   usePaginatedQuery,
+  useQuery,
   type PaginatedQueryReference,
 } from "convex/react";
 import Image from "next/image";
@@ -11,16 +12,33 @@ import Link from "next/link";
 import { PosterRatingBadge } from "@/components/poster-rating-badge";
 import { ReviewPosterGridSkeleton } from "@/components/platform-loading-skeletons";
 import { ReviewItemTitle } from "@/components/review-item-title";
-import type { Review } from "@/lib/domain";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Category, Review } from "@/lib/domain";
 import { getPosterImageUrl } from "@/lib/poster";
 import { getReviewDisplayTitle } from "@/lib/review-display";
 
 const PAGE_SIZE = 12;
 const listMinePage = "reviews:listMinePage" as unknown as PaginatedQueryReference;
+const listMineCategories = "reviews:listMineCategories" as const;
+const listCategories = "categories:list" as const;
 
 export function MyReviewsGrid() {
   const { isLoading: isAuthLoading } = useConvexAuth();
   const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
+  const categories = (useQuery(listCategories as any, {}) as Category[] | undefined) ?? [];
+  const reviewedCategorySlugs = (useQuery(
+    listMineCategories as any,
+    isAuthLoading ? "skip" : {}
+  ) as string[] | undefined) ?? [];
+  const [activeTab, setActiveTab] = React.useState("all");
+  const reviewedCategorySlugSet = React.useMemo(
+    () => new Set(reviewedCategorySlugs),
+    [reviewedCategorySlugs]
+  );
+  const availableCategories = React.useMemo(
+    () => categories.filter((category) => reviewedCategorySlugSet.has(category.slug)),
+    [categories, reviewedCategorySlugSet]
+  );
   const {
     results,
     status,
@@ -38,7 +56,22 @@ export function MyReviewsGrid() {
   };
 
   React.useEffect(() => {
+    if (activeTab !== "all" && !availableCategories.some((category) => category.slug === activeTab)) {
+      setActiveTab("all");
+    }
+  }, [activeTab, availableCategories]);
+
+  const filteredResults = React.useMemo(
+    () => (activeTab === "all" ? results : results.filter((review) => review.categorySlug === activeTab)),
+    [activeTab, results]
+  );
+
+  React.useEffect(() => {
     if (!loadMoreRef.current || status !== "CanLoadMore") {
+      return;
+    }
+
+    if (activeTab !== "all" && filteredResults.length === 0) {
       return;
     }
 
@@ -55,26 +88,36 @@ export function MyReviewsGrid() {
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [loadMore, status]);
+  }, [activeTab, filteredResults.length, loadMore, status]);
+
+  React.useEffect(() => {
+    if (activeTab === "all" || filteredResults.length > 0 || status !== "CanLoadMore") {
+      return;
+    }
+
+    loadMore(PAGE_SIZE);
+  }, [activeTab, filteredResults.length, loadMore, status]);
+
+  const emptyMessage = activeTab === "all" ? "작성한 리뷰가 없습니다." : "이 카테고리의 리뷰가 없습니다.";
 
   if (isAuthLoading || (isLoading && results.length === 0)) {
     return <ReviewPosterGridSkeleton count={10} />;
   }
 
-  if (!isLoading && results.length === 0) {
+  if (!isLoading && status === "Exhausted" && filteredResults.length === 0) {
     return (
       <div className="border border-border bg-surface-low p-10 text-center md:p-20">
         <p className="text-xs font-black uppercase tracking-[0.4em] text-foreground/20">
-          작성한 리뷰가 없습니다.
+          {emptyMessage}
         </p>
       </div>
     );
   }
 
-  return (
+  const grid = (
     <section className="space-y-6">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:gap-8">
-        {results.map((review) => (
+        {filteredResults.map((review) => (
           <Link
             className="group space-y-4"
             href={`/r/${review.id}`}
@@ -132,6 +175,22 @@ export function MyReviewsGrid() {
           </p>
         </div>
       ) : null}
+    </section>
+  );
+
+  return (
+    <section className="space-y-6">
+      <Tabs onValueChange={setActiveTab} value={activeTab}>
+        <TabsList aria-label="내 리뷰 카테고리 탭">
+          <TabsTrigger value="all">전체</TabsTrigger>
+          {availableCategories.map((category) => (
+            <TabsTrigger key={category.id} value={category.slug}>
+              {category.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent value={activeTab}>{grid}</TabsContent>
+      </Tabs>
     </section>
   );
 }

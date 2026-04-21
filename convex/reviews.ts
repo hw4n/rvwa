@@ -138,6 +138,25 @@ async function ensureApprovedReview(ctx: any, reviewId: string) {
   return review;
 }
 
+async function getReviewCategorySlug(
+  ctx: any,
+  review: { nodeId?: string | null; selectedCategorySlug?: string | null },
+  nodeCategoryCache: Map<string, string | null>
+) {
+  if (review.nodeId) {
+    if (nodeCategoryCache.has(review.nodeId)) {
+      return nodeCategoryCache.get(review.nodeId) ?? null;
+    }
+
+    const node = await ctx.db.get(review.nodeId as any);
+    const categorySlug = node?.categorySlug ?? null;
+    nodeCategoryCache.set(review.nodeId, categorySlug);
+    return categorySlug;
+  }
+
+  return review.selectedCategorySlug ?? null;
+}
+
 async function getExistingVote(ctx: any, reviewId: string, userId: string) {
   return await ctx.db
     .query("reviewVotes")
@@ -190,6 +209,33 @@ export const listMine = query({
     return await Promise.all(
       reviews.map((review) => toReview(ctx, review as any))
     );
+  },
+});
+
+export const listMineCategories = query({
+  args: {},
+  handler: async (ctx) => {
+    const viewer = await getViewerDoc(ctx);
+    if (!viewer) {
+      return [];
+    }
+
+    const nodeCategoryCache = new Map<string, string | null>();
+    const categorySlugs = new Set<string>();
+
+    const reviews = ctx.db
+      .query("reviews")
+      .withIndex("by_author_id_and_updated_at", (q) => q.eq("authorId", viewer._id))
+      .order("desc");
+
+    for await (const review of reviews) {
+      const categorySlug = await getReviewCategorySlug(ctx, review as any, nodeCategoryCache);
+      if (categorySlug) {
+        categorySlugs.add(categorySlug);
+      }
+    }
+
+    return [...categorySlugs];
   },
 });
 
@@ -788,7 +834,10 @@ export const listModeration = query({
 });
 
 export const listMinePage = query({
-  args: { paginationOpts: paginationOptsValidator },
+  args: {
+    categorySlug: v.optional(v.string()),
+    paginationOpts: paginationOptsValidator,
+  },
   handler: async (ctx, args) => {
     const viewer = await getViewerDoc(ctx);
     if (!viewer) {
@@ -799,17 +848,50 @@ export const listMinePage = query({
       };
     }
 
-    const page = await ctx.db
+    const reviews = ctx.db
       .query("reviews")
       .withIndex("by_author_id_and_updated_at", (q) => q.eq("authorId", viewer._id))
-      .order("desc")
-      .paginate(args.paginationOpts);
+      .order("desc");
+
+    if (!args.categorySlug) {
+      const page = await reviews.paginate(args.paginationOpts);
+
+      return {
+        ...page,
+        page: await Promise.all(
+          page.page.map((review) => toReview(ctx, review as any))
+        ),
+      };
+    }
+
+    const matchedReviews = [];
+    const nodeCategoryCache = new Map<string, string | null>();
+    let cursor = args.paginationOpts.cursor ?? null;
+    let isDone = false;
+
+    while (matchedReviews.length < args.paginationOpts.numItems && !isDone) {
+      const nextPage = await reviews.paginate({
+        cursor,
+        numItems: args.paginationOpts.numItems - matchedReviews.length,
+      });
+
+      cursor = nextPage.continueCursor;
+      isDone = nextPage.isDone;
+
+      for (const review of nextPage.page) {
+        const categorySlug = await getReviewCategorySlug(ctx, review as any, nodeCategoryCache);
+        if (categorySlug === args.categorySlug) {
+          matchedReviews.push(review);
+        }
+      }
+    }
 
     return {
-      ...page,
       page: await Promise.all(
-        page.page.map((review) => toReview(ctx, review as any))
+        matchedReviews.map((review) => toReview(ctx, review as any))
       ),
+      isDone,
+      continueCursor: cursor ?? "",
     };
   },
 });

@@ -11,6 +11,12 @@ import { Separator } from "@/components/ui/separator";
 
 const CHANGELOG_ENTRIES = [
   {
+    date: "2026.04.21",
+    title: "내 리뷰 탭",
+    summary:
+      "내 리뷰에서 카테고리를 선택하여 필터링할 수 있는 기능을 추가합니다.",
+  },
+  {
     date: "2026.04.19",
     title: "좀 더 커뮤니티fy 하기",
     summary:

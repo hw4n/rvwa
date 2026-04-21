@@ -5,7 +5,6 @@ import {
   useConvexAuth,
   usePaginatedQuery,
   useQuery,
-  type PaginatedQueryReference,
 } from "convex/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,23 +12,20 @@ import { PosterRatingBadge } from "@/components/poster-rating-badge";
 import { ReviewPosterGridSkeleton } from "@/components/platform-loading-skeletons";
 import { ReviewItemTitle } from "@/components/review-item-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { api } from "@/convex/_generated/api";
 import type { Category, Review } from "@/lib/domain";
 import { getPosterImageUrl } from "@/lib/poster";
 import { getReviewDisplayTitle } from "@/lib/review-display";
 
 const PAGE_SIZE = 12;
-const listMinePage = "reviews:listMinePage" as unknown as PaginatedQueryReference;
-const listMineCategories = "reviews:listMineCategories" as const;
-const listCategories = "categories:list" as const;
+const EMPTY_CATEGORIES: Category[] = [];
+const EMPTY_CATEGORY_SLUGS: string[] = [];
 
 export function MyReviewsGrid() {
   const { isLoading: isAuthLoading } = useConvexAuth();
   const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
-  const categories = (useQuery(listCategories as any, {}) as Category[] | undefined) ?? [];
-  const reviewedCategorySlugs = (useQuery(
-    listMineCategories as any,
-    isAuthLoading ? "skip" : {}
-  ) as string[] | undefined) ?? [];
+  const categories = useQuery(api.categories.list, {}) ?? EMPTY_CATEGORIES;
+  const reviewedCategorySlugs = useQuery(api.reviews.listMineCategories, isAuthLoading ? "skip" : {}) ?? EMPTY_CATEGORY_SLUGS;
   const [activeTab, setActiveTab] = React.useState("all");
   const reviewedCategorySlugSet = React.useMemo(
     () => new Set(reviewedCategorySlugs),
@@ -45,7 +41,7 @@ export function MyReviewsGrid() {
     isLoading,
     loadMore,
   } = usePaginatedQuery(
-    listMinePage,
+    api.reviews.listMinePage,
     isAuthLoading ? "skip" : {},
     { initialNumItems: PAGE_SIZE }
   ) as {

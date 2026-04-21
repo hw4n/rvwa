@@ -1,0 +1,2 @@
+export const AUTH_DISPLAY_NAME_MAX_LENGTH = 40;
+export const AUTH_PASSWORD_MIN_LENGTH = 8;

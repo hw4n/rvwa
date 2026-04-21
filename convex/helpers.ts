@@ -2,6 +2,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { GenericMutationCtx, GenericQueryCtx } from "convex/server";
 import type { MetadataFieldType } from "../lib/domain";
+import { AUTH_DISPLAY_NAME_MAX_LENGTH } from "../lib/auth-constraints";
 import { normalizeStoredRating } from "../lib/review-rating";
 
 type AppCtx = GenericMutationCtx<any> | GenericQueryCtx<any>;
@@ -9,7 +10,7 @@ type UserRole = "admin" | "member";
 const NORMALIZED_SLUG_PATTERN = /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u;
 const metadataFieldTypes = new Set<MetadataFieldType>(["text", "number", "boolean", "list"]);
 export const INPUT_LIMITS = {
-  handle: 40,
+  handle: AUTH_DISPLAY_NAME_MAX_LENGTH,
   categoryName: 80,
   categoryDescription: 500,
   icon: 64,

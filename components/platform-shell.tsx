@@ -61,13 +61,14 @@ export function PlatformShell({
     (useQuery("reviews:getById" as any, editingReviewId ? { reviewId: editingReviewId } : "skip") as Review | null | undefined) ??
     null;
   const sidebarMode = getSidebarMode(pathname, currentReview);
+  const showRecentSidebar = sidebarMode === "dashboard" || sidebarMode === "leaderboard";
   const {
     results: recentSidebarResults,
     status: recentSidebarStatus,
     loadMore: loadMoreRecentSidebar,
   } = usePaginatedQuery(
     api.reviews.listRecentPage,
-    sidebarMode === "dashboard" ? {} : "skip",
+    showRecentSidebar ? {} : "skip",
     { initialNumItems: SIDEBAR_PAGE_SIZE }
   );
   const {
@@ -123,7 +124,7 @@ export function PlatformShell({
       ? itemView.reviews.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       : [];
   const sidebarItemVisibleReviews = sidebarItemReviews.slice(0, itemReviewLimit);
-  const sidebarRecentReviews = sidebarMode === "dashboard" ? recentSidebarResults as Review[] : [];
+  const sidebarRecentReviews = showRecentSidebar ? recentSidebarResults as Review[] : [];
   const sidebarMyReviews = sidebarMode === "mine" ? mySidebarResults as Review[] : [];
   const sidebarPendingReviews = sidebarMode === "pending" ? pendingReviews : [];
   const sidebarSettingsReviews: Review[] = sidebarMode === "settings" ? [] : [];
@@ -210,7 +211,7 @@ export function PlatformShell({
             if (mySidebarStatus === "CanLoadMore") {
               loadMoreMySidebar(SIDEBAR_PAGE_SIZE);
             }
-          } else if (sidebarMode === "dashboard") {
+          } else if (showRecentSidebar) {
             if (recentSidebarStatus === "CanLoadMore") {
               loadMoreRecentSidebar(SIDEBAR_PAGE_SIZE);
             }
@@ -233,6 +234,7 @@ export function PlatformShell({
     mySidebarStatus,
     recentSidebarStatus,
     sidebarMode,
+    showRecentSidebar,
     sidebarReviews.length,
   ]);
 
@@ -243,6 +245,7 @@ export function PlatformShell({
   const drawerNavigation = (
     <>
       <DrawerLink active={pathname === "/dashboard"} href="/dashboard" icon="history" label="모든 리뷰" />
+      <DrawerLink active={pathname.startsWith("/leaderboard")} href="/leaderboard" icon="sparkles" label="리더보드" />
       {!authIsPending && viewer ? (
         <div
           className={`group flex min-h-11 items-center gap-2 pr-3 transition-colors duration-300 ${pathname.startsWith("/my-reviews") || pathname.startsWith("/write") ? "bg-surface-high" : ""
@@ -350,6 +353,13 @@ export function PlatformShell({
         href="/dashboard"
         icon="history"
         label="모든 리뷰"
+        onClick={keepMobileNavOpenOnNextRouteChange}
+      />
+      <DrawerLink
+        active={pathname.startsWith("/leaderboard")}
+        href="/leaderboard"
+        icon="sparkles"
+        label="리더보드"
         onClick={keepMobileNavOpenOnNextRouteChange}
       />
 
@@ -789,6 +799,10 @@ function getSidebarMode(pathname: string, currentReview: Review | null) {
     return "mine";
   }
 
+  if (pathname.startsWith("/leaderboard")) {
+    return "leaderboard";
+  }
+
   if (pathname.startsWith("/settings")) {
     return "settings";
   }
@@ -845,6 +859,10 @@ function resolveTopCrumbs(
 
   if (pathname === "/dashboard") {
     return [{ label: "모든 리뷰" }];
+  }
+
+  if (pathname.startsWith("/leaderboard")) {
+    return [{ label: "리더보드" }];
   }
 
   if (pathname.startsWith("/my-reviews")) {

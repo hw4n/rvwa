@@ -51,6 +51,13 @@ export type UserSummary = {
   role: "admin" | "member";
 };
 
+export type ReviewLeaderboardEntry = {
+  userId: string;
+  rank: number;
+  displayName: string;
+  reviewCount: number;
+};
+
 export type ReviewStatus = "draft" | "pending" | "approved" | "rejected";
 export type ReviewVoteValue = "recommend" | "not_recommend";
 

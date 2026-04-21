@@ -291,20 +291,32 @@ export function CategoryRootGrid({
   categorySlug,
   hasStudioField = false,
   hasTimelineField = false,
+  groupedNodes,
 }: {
   categorySlug: string;
   hasStudioField?: boolean;
   hasTimelineField?: boolean;
+  groupedNodes?: CategoryGridNode[];
 }) {
   const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
+  const defaultTab = "all";
+  const hasGroupedView = hasStudioField || hasTimelineField;
+  const [activeTab, setActiveTab] = React.useState(defaultTab);
   const { results, status, isLoading, loadMore } = usePaginatedQuery(
     api.categories.listRootsPage,
     { slug: categorySlug },
     { initialNumItems: PAGE_SIZE }
   );
+  const groupedSourceNodes = groupedNodes ?? results;
+  const isAllTab = !hasGroupedView || activeTab === defaultTab;
+  const hasVisibleNodes = isAllTab ? results.length > 0 : groupedSourceNodes.length > 0;
 
   React.useEffect(() => {
     if (!loadMoreRef.current || status !== "CanLoadMore") {
+      return;
+    }
+
+    if (hasGroupedView && activeTab !== defaultTab) {
       return;
     }
 
@@ -321,15 +333,12 @@ export function CategoryRootGrid({
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [loadMore, status]);
-
-  const defaultTab = "all";
-  const hasGroupedView = hasStudioField || hasTimelineField;
+  }, [activeTab, hasGroupedView, loadMore, status]);
 
   return (
     <section className="space-y-6">
       {hasGroupedView ? (
-        <Tabs defaultValue={defaultTab}>
+        <Tabs onValueChange={setActiveTab} value={activeTab}>
           <TabsList aria-label="카테고리 보기 방식">
             <TabsTrigger value="all">전체</TabsTrigger>
             {hasTimelineField ? <TabsTrigger value="timeline">시기</TabsTrigger> : null}
@@ -340,12 +349,12 @@ export function CategoryRootGrid({
           </TabsContent>
           {hasStudioField ? (
             <TabsContent value="studio">
-              <CategoryStudioRows groups={buildStudioGroups(results)} />
+              <CategoryStudioRows groups={buildStudioGroups(groupedSourceNodes)} />
             </TabsContent>
           ) : null}
           {hasTimelineField ? (
             <TabsContent value="timeline">
-              <CategoryTimelineRows groups={buildTimelineGroups(results)} />
+              <CategoryTimelineRows groups={buildTimelineGroups(groupedSourceNodes)} />
             </TabsContent>
           ) : null}
         </Tabs>
@@ -353,7 +362,7 @@ export function CategoryRootGrid({
         <CategoryAllGrid nodes={results} />
       )}
 
-      {!results.length && !isLoading ? (
+      {!hasVisibleNodes && !isLoading ? (
         <div className="border border-border bg-surface-low p-10 text-center">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/20">
             표시할 상위 항목이 없습니다.
@@ -361,8 +370,8 @@ export function CategoryRootGrid({
         </div>
       ) : null}
 
-      {status !== "Exhausted" ? <div className="h-8" ref={loadMoreRef} /> : null}
-      {status === "LoadingMore" ? (
+      {isAllTab && status !== "Exhausted" ? <div className="h-8" ref={loadMoreRef} /> : null}
+      {isAllTab && status === "LoadingMore" ? (
         <div className="flex justify-center">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/25">
             더 불러오는 중

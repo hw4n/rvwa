@@ -6,7 +6,7 @@ import { CategoryDeleteButton } from "@/components/category-delete-button";
 import { PlatformHeader } from "@/components/platform-header";
 import { Button } from "@/components/ui/button";
 import { getViewer } from "@/lib/auth";
-import { getCategoryBySlug } from "@/lib/repository";
+import { getCategoryBySlug, getCategoryView } from "@/lib/repository";
 import { buildBrandedTitle, getDefaultShareImageUrl } from "@/lib/share-metadata";
 
 function decodeRouteSegment(value: string | undefined) {
@@ -33,6 +33,11 @@ export default async function CategoryPage({
   if (!category) {
     notFound();
   }
+
+  const hasStudioField = category.fieldDefinitions.some((field) => field.key === "studio");
+  const hasTimelineField = category.fieldDefinitions.some((field) => field.key === "airing-quarter");
+  const groupedCategoryView =
+    hasStudioField || hasTimelineField ? await getCategoryView(normalizedCategorySlug) : null;
 
   return (
     <div className="space-y-10 md:space-y-16">
@@ -62,8 +67,9 @@ export default async function CategoryPage({
 
       <CategoryRootGrid
         categorySlug={category.slug}
-        hasStudioField={category.fieldDefinitions.some((field) => field.key === "studio")}
-        hasTimelineField={category.fieldDefinitions.some((field) => field.key === "airing-quarter")}
+        groupedNodes={groupedCategoryView?.roots}
+        hasStudioField={hasStudioField}
+        hasTimelineField={hasTimelineField}
       />
     </div>
   );

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { PosterUploadField } from "@/components/poster-upload-field";
 import { Switch } from "@/components/ui/switch";
 import { validatePosterFile } from "@/lib/poster";
+import { uploadPosterFile } from "@/lib/poster-upload-client";
 import {
   formatMetadataValueForInput,
   inferMetadataFieldType,
@@ -105,42 +106,6 @@ async function deletePosterQueue(urls: string[]) {
   );
 }
 
-async function requestPosterUpload(file: File) {
-  const presignResponse = await fetch("/api/posters/upload", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      fileName: file.name,
-      contentType: file.type,
-      size: file.size,
-    }),
-  });
-
-  const presignPayload = (await presignResponse.json().catch(() => null)) as
-    | { uploadUrl?: string; publicUrl?: string; message?: string }
-    | null;
-
-  if (!presignResponse.ok || !presignPayload?.uploadUrl || !presignPayload.publicUrl) {
-    throw new Error(presignPayload?.message ?? "포스터 업로드 준비에 실패했습니다.");
-  }
-
-  const uploadResponse = await fetch(presignPayload.uploadUrl, {
-    method: "PUT",
-    headers: {
-      "Content-Type": file.type,
-    },
-    body: file,
-  });
-
-  if (!uploadResponse.ok) {
-    throw new Error("포스터 업로드에 실패했습니다.");
-  }
-
-  return presignPayload.publicUrl;
-}
-
 async function uploadPosterFromDataUrl(dataUrl: string) {
   const response = await fetch(dataUrl);
   const blob = await response.blob();
@@ -149,7 +114,7 @@ async function uploadPosterFromDataUrl(dataUrl: string) {
   const file = new File([blob], `clipboard-poster.${extension}`, { type: contentType });
 
   validatePosterFile(file);
-  return requestPosterUpload(file);
+  return uploadPosterFile(file);
 }
 
 export function NodeCreateForm({

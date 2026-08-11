@@ -29,6 +29,47 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Production environment
+
+The runtime `.env` used by `next start` must define:
+
+```dotenv
+NEXT_PUBLIC_CONVEX_URL=https://example.convex.cloud
+R2_ACCOUNT_ID=...
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+R2_BUCKET=...
+R2_PUBLIC_BASE_URL=https://cdn.example.com
+```
+
+For release-directory deployments, set `SHARED_ENV_FILE` to the absolute path of
+this file so every release receives a `.env` symlink before PM2 starts Next.js.
+The R2 bucket must also allow browser `PUT` requests from the production site
+origin and the `Content-Type` request header.
+
+Example R2 CORS policy:
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://app.example.com"],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["Content-Type"]
+  }
+]
+```
+
+The GitHub Actions production environment should define
+`NEXT_PUBLIC_CONVEX_URL`, `NEXT_PUBLIC_R2_IMAGE_BASE_URL`, and
+`R2_PUBLIC_BASE_URL` as repository/environment variables because Next.js image
+configuration is generated during the build.
+
+When upload preparation fails in production, inspect the server-side cause with:
+
+```bash
+pm2 logs rvwa --lines 100
+```
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

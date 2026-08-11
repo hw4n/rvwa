@@ -4,42 +4,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { getPosterImageUrl, validatePosterFile } from "@/lib/poster";
-
-async function requestPosterUpload(file: File) {
-  const presignResponse = await fetch("/api/posters/upload", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      fileName: file.name,
-      contentType: file.type,
-      size: file.size,
-    }),
-  });
-
-  const presignPayload = (await presignResponse.json().catch(() => null)) as
-    | { uploadUrl?: string; publicUrl?: string; message?: string }
-    | null;
-
-  if (!presignResponse.ok || !presignPayload?.uploadUrl || !presignPayload.publicUrl) {
-    throw new Error(presignPayload?.message ?? "업로드 준비에 실패했습니다.");
-  }
-
-  const uploadResponse = await fetch(presignPayload.uploadUrl, {
-    method: "PUT",
-    headers: {
-      "Content-Type": file.type,
-    },
-    body: file,
-  });
-
-  if (!uploadResponse.ok) {
-    throw new Error("이미지 업로드에 실패했습니다.");
-  }
-
-  return presignPayload.publicUrl;
-}
+import { uploadPosterFile } from "@/lib/poster-upload-client";
 
 async function deletePosterNow(coverImageUrl: string) {
   const response = await fetch("/api/posters/delete", {
@@ -87,7 +52,7 @@ export function PosterUploadField({
     try {
       validatePosterFile(file);
       setIsUploading(true);
-      const nextUrl = await requestPosterUpload(file);
+      const nextUrl = await uploadPosterFile(file);
       const previousUrl = value;
 
       if (previousUrl && previousUrl !== nextUrl) {

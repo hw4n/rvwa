@@ -13,6 +13,8 @@ jobs:
     environment: production
     env:
       NEXT_PUBLIC_CONVEX_URL: ${{ vars.NEXT_PUBLIC_CONVEX_URL }}
+      NEXT_PUBLIC_R2_IMAGE_BASE_URL: ${{ vars.NEXT_PUBLIC_R2_IMAGE_BASE_URL }}
+      R2_PUBLIC_BASE_URL: ${{ vars.R2_PUBLIC_BASE_URL }}
     timeout-minutes: 20
 
     steps:

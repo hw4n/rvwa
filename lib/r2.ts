@@ -8,6 +8,13 @@ import { isAllowedPosterContentType, posterUploadMaxBytes } from "@/lib/poster";
 
 const POSTER_OBJECT_PREFIX = "nodes/";
 
+export class PosterUploadValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "PosterUploadValidationError";
+  }
+}
+
 function requireEnv(name: string) {
   const value = process.env[name]?.trim();
   if (!value) {
@@ -100,11 +107,11 @@ export async function createPosterUpload(args: {
   size: number;
 }) {
   if (!isAllowedPosterContentType(args.contentType)) {
-    throw new Error("Unsupported content type");
+    throw new PosterUploadValidationError("Unsupported content type");
   }
 
   if (!Number.isFinite(args.size) || args.size <= 0 || args.size > posterUploadMaxBytes) {
-    throw new Error("Invalid upload size");
+    throw new PosterUploadValidationError("Invalid upload size");
   }
 
   const objectKey = buildPosterObjectKey(args.fileName, args.contentType);

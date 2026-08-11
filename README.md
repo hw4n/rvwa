@@ -47,6 +47,23 @@ this file so every release receives a `.env` symlink before PM2 starts Next.js.
 The R2 bucket must also allow browser `PUT` requests from the production site
 origin and the `Content-Type` request header.
 
+The `next-build` workflow artifact contains `next-build.tar.gz`. Extract it into
+the new release directory instead of moving the archive as a regular file:
+
+```bash
+ARTIFACT_ARCHIVE="${TMP_DIR}/next-build.tar.gz"
+[[ -f "${ARTIFACT_ARCHIVE}" ]] || {
+  echo "Missing build archive: ${ARTIFACT_ARCHIVE}" >&2
+  exit 1
+}
+tar -xzf "${ARTIFACT_ARCHIVE}" -C "${NEW_RELEASE}"
+```
+
+The tar layer is required because the Next.js build contains traced module
+symlinks under `.next/node_modules`. GitHub artifact directory uploads do not
+reliably preserve those links, which causes hashed external modules such as the
+AWS SDK to be missing at runtime.
+
 Example R2 CORS policy:
 
 ```json

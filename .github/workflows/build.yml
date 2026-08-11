@@ -40,22 +40,24 @@ jobs:
 
       - name: Collect build artifact
         run: |
-          mkdir -p dist-artifacts/next-build
-          cp -R .next dist-artifacts/next-build/.next
-          rm -rf dist-artifacts/next-build/.next/cache
+          mkdir -p dist-artifacts
+          artifact_paths=(.next package.json pnpm-lock.yaml next.config.ts)
           if [ -d public ]; then
-            cp -R public dist-artifacts/next-build/public
+            artifact_paths+=(public)
           fi
-          cp package.json pnpm-lock.yaml next.config.ts dist-artifacts/next-build/
           if [ -d patches ]; then
-            cp -R patches dist-artifacts/next-build/patches
+            artifact_paths+=(patches)
           fi
+          tar \
+            --exclude='.next/cache' \
+            --exclude='.next/dev' \
+            -czf dist-artifacts/next-build.tar.gz \
+            "${artifact_paths[@]}"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-build
-          path: dist-artifacts/next-build/
-          include-hidden-files: true
+          path: dist-artifacts/next-build.tar.gz
           if-no-files-found: error
           retention-days: 7

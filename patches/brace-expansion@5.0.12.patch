@@ -1,0 +1,9 @@
+--- a/dist/commonjs/index.js
++++ b/dist/commonjs/index.js
+@@ -330,4 +330,6 @@
+     }
+     return acc;
+ }
++Object.assign(expand, exports, { __esModule: true });
++module.exports = expand;
+ //# sourceMappingURL=index.js.map

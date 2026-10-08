@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { getErrorMessage } from "@/lib/error-message";
 import Link from "next/link";
 import * as React from "react";
 import { startTransition, useDeferredValue } from "react";
@@ -101,7 +102,7 @@ export function ReviewComposer({
         router.push(`/r/${result.reviewId}`);
       });
     } catch (caught) {
-      toast.error(caught instanceof Error ? caught.message : "저장에 실패했습니다.");
+      toast.error(getErrorMessage(caught, "저장에 실패했습니다."));
       setPending(false);
     }
   }
@@ -114,7 +115,7 @@ export function ReviewComposer({
       toast.success("초안을 비웠습니다.");
       setDiscardOpen(false);
     } catch (caught) {
-      toast.error(caught instanceof Error ? caught.message : "초안 파기에 실패했습니다.");
+      toast.error(getErrorMessage(caught, "초안 파기에 실패했습니다."));
     } finally {
       setPending(false);
     }

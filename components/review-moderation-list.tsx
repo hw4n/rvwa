@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { getErrorMessage } from "@/lib/error-message";
 import * as React from "react";
 import { useMutation, useQuery } from "convex/react";
 import type { Category, ContentNode, MetadataFieldType, Review } from "@/lib/domain";
@@ -231,7 +232,7 @@ export function ReviewModerationList() {
     } catch (caught) {
       setMessages((current) => ({
         ...current,
-        [activeReview.id]: caught instanceof Error ? caught.message : "처리에 실패했습니다.",
+        [activeReview.id]: getErrorMessage(caught, "처리에 실패했습니다."),
       }));
     } finally {
       setPendingId(null);
@@ -261,7 +262,7 @@ export function ReviewModerationList() {
     } catch (caught) {
       setMessages((current) => ({
         ...current,
-        [activeReview.id]: caught instanceof Error ? caught.message : "검토 대기 이동에 실패했습니다.",
+        [activeReview.id]: getErrorMessage(caught, "검토 대기 이동에 실패했습니다."),
       }));
     } finally {
       setPendingId(null);

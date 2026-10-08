@@ -14,6 +14,7 @@ import { ReviewRatingInput } from "@/components/review-rating-input";
 import { MarkdownPreview } from "@/components/markdown-preview";
 import { formatRatingInputValue } from "@/lib/review-rating";
 import { getReviewExplicitTitle } from "@/lib/review-display";
+import { getErrorMessage } from "@/lib/error-message";
 
 export function ReviewSubmissionForm({
   items,
@@ -70,7 +71,7 @@ export function ReviewSubmissionForm({
         router.push(`/r/${result.reviewId}`);
       });
     } catch (caught) {
-      toast.error(caught instanceof Error ? caught.message : "저장에 실패했습니다.");
+      toast.error(getErrorMessage(caught, "저장에 실패했습니다."));
       setPending(false);
     }
   }

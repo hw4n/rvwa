@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mutationGeneric as mutation, queryGeneric as query } from "convex/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import {
   INPUT_LIMITS,
   assertNormalizedSlug,
@@ -91,7 +91,7 @@ export const create = mutation({
     const slug = assertNormalizedSlug(args.slug || args.title, "Item slug");
 
     if (!slug) {
-      throw new Error("Slug is required");
+      throw new ConvexError("항목 slug를 입력해주세요.");
     }
 
     const category = await ctx.db
@@ -100,7 +100,7 @@ export const create = mutation({
       .unique();
 
     if (!category) {
-      throw new Error("Category not found");
+      throw new ConvexError("카테고리를 찾을 수 없습니다. 페이지를 새로고침해주세요.");
     }
 
     const fieldDefinitions = category.fieldDefinitions ?? [];
@@ -111,13 +111,13 @@ export const create = mutation({
       .unique();
 
     if (existing) {
-      throw new Error("Node slug already exists");
+      throw new ConvexError("같은 slug의 항목이 이미 있습니다. 다른 slug를 입력해주세요.");
     }
 
     if (args.parentId) {
       const parent = await ctx.db.get(args.parentId);
       if (!parent || parent.categorySlug !== args.categorySlug) {
-        throw new Error("Invalid parent");
+        throw new ConvexError("선택한 상위 항목이 올바르지 않습니다.");
       }
     }
 
@@ -127,7 +127,7 @@ export const create = mutation({
       title: sanitizeRequiredText(args.title, "Item title", INPUT_LIMITS.nodeTitle),
       categorySlug: args.categorySlug,
       parentId: args.parentId,
-      summary: sanitizeRequiredText(args.summary, "Item summary", INPUT_LIMITS.nodeSummary),
+      summary: sanitizeOptionalText(args.summary, "Item summary", INPUT_LIMITS.nodeSummary) ?? "",
       status: undefined,
       coverImage: sanitizeOptionalText(args.coverImage, "Cover image URL", 500),
       attributes: sanitizeAttributes(args.attributes, fieldDefinitions),
@@ -160,7 +160,7 @@ export const update = mutation({
     const nextSlug = assertNormalizedSlug(args.slug || args.title, "Item slug");
 
     if (!currentSlug || !nextSlug) {
-      throw new Error("Slug is required");
+      throw new ConvexError("항목 slug를 입력해주세요.");
     }
 
     const node = await ctx.db
@@ -169,7 +169,7 @@ export const update = mutation({
       .unique();
 
     if (!node) {
-      throw new Error("Item not found");
+      throw new ConvexError("항목을 찾을 수 없습니다.");
     }
 
     const category = await ctx.db
@@ -178,7 +178,7 @@ export const update = mutation({
       .unique();
 
     if (!category) {
-      throw new Error("Category not found");
+      throw new ConvexError("카테고리를 찾을 수 없습니다. 페이지를 새로고침해주세요.");
     }
 
     const fieldDefinitions = category.fieldDefinitions ?? [];
@@ -190,18 +190,18 @@ export const update = mutation({
         .unique();
 
       if (existing) {
-        throw new Error("Node slug already exists");
+        throw new ConvexError("같은 slug의 항목이 이미 있습니다. 다른 slug를 입력해주세요.");
       }
     }
 
     if (args.parentId) {
       if (args.parentId === node._id) {
-        throw new Error("Invalid parent");
+        throw new ConvexError("선택한 상위 항목이 올바르지 않습니다.");
       }
 
       const parent = await ctx.db.get(args.parentId);
       if (!parent || parent.categorySlug !== args.categorySlug) {
-        throw new Error("Invalid parent");
+        throw new ConvexError("선택한 상위 항목이 올바르지 않습니다.");
       }
     }
 
@@ -211,7 +211,7 @@ export const update = mutation({
       title: sanitizeRequiredText(args.title, "Item title", INPUT_LIMITS.nodeTitle),
       categorySlug: args.categorySlug,
       parentId: args.parentId,
-      summary: sanitizeRequiredText(args.summary, "Item summary", INPUT_LIMITS.nodeSummary),
+      summary: sanitizeOptionalText(args.summary, "Item summary", INPUT_LIMITS.nodeSummary) ?? "",
       coverImage: sanitizeOptionalText(args.coverImage, "Cover image URL", 500),
       attributes: sanitizeAttributes(args.attributes, fieldDefinitions),
       tagSlugs: sanitizeTagList(args.tags),
@@ -229,7 +229,7 @@ export const remove = mutation({
     const slug = normalizeSlug(args.slug);
 
     if (!slug) {
-      throw new Error("Slug is required");
+      throw new ConvexError("항목 slug를 입력해주세요.");
     }
 
     const node = await ctx.db
@@ -238,7 +238,7 @@ export const remove = mutation({
       .unique();
 
     if (!node) {
-      throw new Error("Item not found");
+      throw new ConvexError("항목을 찾을 수 없습니다.");
     }
 
     const timestamp = nowIso();

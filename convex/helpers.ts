@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ConvexError } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { GenericMutationCtx, GenericQueryCtx } from "convex/server";
 import type { MetadataFieldType } from "../lib/domain";
@@ -36,7 +37,7 @@ export function nowIso() {
 
 function ensureMaxLength(value: string, label: string, maxLength: number) {
   if (value.length > maxLength) {
-    throw new Error(`${label} must be ${maxLength} characters or fewer`);
+    throw new ConvexError(`${label} must be ${maxLength} characters or fewer`);
   }
   return value;
 }
@@ -44,7 +45,7 @@ function ensureMaxLength(value: string, label: string, maxLength: number) {
 export function sanitizeRequiredText(value: string, label: string, maxLength: number) {
   const normalized = value.trim();
   if (!normalized) {
-    throw new Error(`${label} is required`);
+    throw new ConvexError(`${label} is required`);
   }
   return ensureMaxLength(normalized, label, maxLength);
 }
@@ -75,7 +76,7 @@ export function normalizeSlug(value: string) {
 export function assertExplicitSlug(value: string, label = "Slug") {
   const normalized = normalizeSlug(value);
   if (!normalized || !NORMALIZED_SLUG_PATTERN.test(normalized)) {
-    throw new Error(`${label} is invalid`);
+    throw new ConvexError(`${label} is invalid`);
   }
   return normalized;
 }
@@ -83,7 +84,7 @@ export function assertExplicitSlug(value: string, label = "Slug") {
 export function assertNormalizedSlug(value: string, label = "Slug") {
   const normalized = normalizeSlug(value);
   if (!normalized || !NORMALIZED_SLUG_PATTERN.test(normalized)) {
-    throw new Error(`${label} is invalid`);
+    throw new ConvexError(`${label} is invalid`);
   }
   return normalized;
 }
@@ -113,7 +114,7 @@ export function sanitizeFieldDefinitions(
   fieldDefinitions: Array<{ key: string; label: string; type: string }>
 ) {
   if (fieldDefinitions.length > INPUT_LIMITS.metadataFieldCount) {
-    throw new Error(`Metadata fields must be ${INPUT_LIMITS.metadataFieldCount} or fewer`);
+    throw new ConvexError(`Metadata fields must be ${INPUT_LIMITS.metadataFieldCount} or fewer`);
   }
 
   const seenKeys = new Set<string>();
@@ -127,17 +128,17 @@ export function sanitizeFieldDefinitions(
     );
 
     if (!key) {
-      throw new Error(`Metadata field ${index + 1} key is required`);
+      throw new ConvexError(`Metadata field ${index + 1} key is required`);
     }
 
     ensureMaxLength(key, `Metadata field ${index + 1} key`, INPUT_LIMITS.metadataFieldKey);
 
     if (!metadataFieldTypes.has(field.type as MetadataFieldType)) {
-      throw new Error(`Metadata field ${index + 1} type is invalid`);
+      throw new ConvexError(`Metadata field ${index + 1} type is invalid`);
     }
 
     if (seenKeys.has(key)) {
-      throw new Error(`Metadata field key "${key}" is duplicated`);
+      throw new ConvexError(`Metadata field key "${key}" is duplicated`);
     }
 
     seenKeys.add(key);
@@ -156,25 +157,25 @@ function sanitizeAttributeValue(
 ) {
   if (type === "boolean") {
     if (typeof value !== "boolean") {
-      throw new Error(`Metadata "${key}" must be boolean`);
+      throw new ConvexError(`Metadata "${key}" must be boolean`);
     }
     return value;
   }
 
   if (type === "number") {
     if (typeof value !== "number" || !Number.isFinite(value)) {
-      throw new Error(`Metadata "${key}" must be number`);
+      throw new ConvexError(`Metadata "${key}" must be number`);
     }
     return value;
   }
 
   if (type === "list") {
     if (!Array.isArray(value)) {
-      throw new Error(`Metadata "${key}" must be list`);
+      throw new ConvexError(`Metadata "${key}" must be list`);
     }
 
     if (value.length > INPUT_LIMITS.metadataListCount) {
-      throw new Error(`Metadata "${key}" must contain ${INPUT_LIMITS.metadataListCount} items or fewer`);
+      throw new ConvexError(`Metadata "${key}" must contain ${INPUT_LIMITS.metadataListCount} items or fewer`);
     }
 
     const normalized = value
@@ -186,7 +187,7 @@ function sanitizeAttributeValue(
   }
 
   if (typeof value !== "string") {
-    throw new Error(`Metadata "${key}" must be text`);
+    throw new ConvexError(`Metadata "${key}" must be text`);
   }
 
   const normalized = value.trim();
@@ -215,7 +216,7 @@ export function sanitizeAttributes(
   fieldDefinitions: Array<{ key: string; type: MetadataFieldType }>
 ) {
   if (Object.keys(attributes).length > INPUT_LIMITS.metadataFieldCount) {
-    throw new Error(`Metadata fields must be ${INPUT_LIMITS.metadataFieldCount} or fewer`);
+    throw new ConvexError(`Metadata fields must be ${INPUT_LIMITS.metadataFieldCount} or fewer`);
   }
 
   const expectedTypes = new Map(fieldDefinitions.map((field) => [field.key, field.type]));
@@ -224,7 +225,7 @@ export function sanitizeAttributes(
   for (const [rawKey, rawValue] of Object.entries(attributes)) {
     const key = normalizeMetadataKey(rawKey);
     if (!key) {
-      throw new Error("Metadata key is invalid");
+      throw new ConvexError("Metadata key is invalid");
     }
 
     ensureMaxLength(key, "Metadata key", INPUT_LIMITS.metadataFieldKey);
@@ -241,7 +242,7 @@ export function sanitizeAttributes(
 
 export function sanitizeTagList(tags: string[]) {
   if (tags.length > INPUT_LIMITS.tagCount) {
-    throw new Error(`Tags must be ${INPUT_LIMITS.tagCount} or fewer`);
+    throw new ConvexError(`Tags must be ${INPUT_LIMITS.tagCount} or fewer`);
   }
 
   return Array.from(
@@ -266,7 +267,7 @@ export async function getViewerDoc(ctx: AppCtx) {
 export async function requireViewer(ctx: AppCtx) {
   const viewer = await getViewerDoc(ctx);
   if (!viewer) {
-    throw new Error("Authentication required");
+    throw new ConvexError("로그인이 만료되었습니다. 다시 로그인해주세요.");
   }
   return viewer;
 }
@@ -274,7 +275,7 @@ export async function requireViewer(ctx: AppCtx) {
 export async function requireAdmin(ctx: AppCtx) {
   const viewer = await requireViewer(ctx);
   if (viewer.role !== "admin") {
-    throw new Error("Admin only");
+    throw new ConvexError("관리자만 항목을 등록하거나 수정할 수 있습니다.");
   }
   return viewer;
 }

@@ -11,6 +11,7 @@ import { PosterUploadField } from "@/components/poster-upload-field";
 import { Switch } from "@/components/ui/switch";
 import { validatePosterFile } from "@/lib/poster";
 import { uploadPosterFile } from "@/lib/poster-upload-client";
+import { getErrorMessage } from "@/lib/error-message";
 import {
   formatMetadataValueForInput,
   inferMetadataFieldType,
@@ -391,12 +392,12 @@ export function NodeCreateForm({
           }
           router.push(`/n/${result.slug}`);
         } catch (caught) {
-          setError(caught instanceof Error ? caught.message : isEdit ? "수정에 실패했습니다." : "생성에 실패했습니다.");
+          setError(getErrorMessage(caught, isEdit ? "수정에 실패했습니다." : "생성에 실패했습니다."));
           setIsSubmitting(false);
         }
       }}
     >
-      <Input className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground" onChange={(event) => setTitle(event.currentTarget.value)} placeholder="항목 제목" value={title} />
+      <Input className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground" maxLength={120} required onChange={(event) => setTitle(event.currentTarget.value)} placeholder="항목 제목" value={title} />
       <Input className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground" onChange={(event) => setSlug(event.currentTarget.value)} placeholder="slug" value={slug} />
       <Input className="h-12 rounded-none border-border bg-surface-lowest px-4 text-foreground" onChange={(event) => setTags(event.currentTarget.value)} placeholder="tags, comma, separated" value={tags} />
       <PosterUploadField
@@ -416,7 +417,7 @@ export function NodeCreateForm({
           </option>
         ))}
       </select>
-      <textarea className="min-h-[220px] w-full border border-border bg-surface-lowest p-4 text-sm text-foreground focus:border-primary/30" onChange={(event) => setSummary(event.currentTarget.value)} placeholder="요약" value={summary} />
+      <textarea className="min-h-[220px] w-full border border-border bg-surface-lowest p-4 text-sm text-foreground focus:border-primary/30" maxLength={2000} onChange={(event) => setSummary(event.currentTarget.value)} placeholder="요약 (선택)" value={summary} />
       {category.fieldDefinitions.length ? (
         <div className="space-y-3">
           <span className="text-sm font-bold text-foreground">메타데이터</span>
